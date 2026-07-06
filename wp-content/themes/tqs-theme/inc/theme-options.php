@@ -81,6 +81,17 @@ function tqs_sanitize_checkbox( $checked ) {
 	return ( isset( $checked ) && true === $checked ) ? true : false;
 }
 
+/**
+ * Gallery grid column count (Customizer).
+ *
+ * @param mixed $value Raw value.
+ * @return int 3 or 4.
+ */
+function tqs_sanitize_gallery_columns( $value ) {
+	$value = absint( $value );
+	return in_array( $value, array( 3, 4 ), true ) ? $value : 4;
+}
+
 function tqs_sanitize_url_or_path( $url ) {
 	$url = trim( (string) $url );
 	if ( '' === $url ) {

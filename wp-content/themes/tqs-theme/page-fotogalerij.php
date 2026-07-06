@@ -6,10 +6,77 @@
  */
 get_header();
 
-$ids = get_post_meta( get_the_ID(), '_tqs_gallery_ids', true );
-$ids = $ids ? array_filter( explode( ',', $ids ) ) : array();
+$gallery_columns          = tqs_sanitize_gallery_columns( get_theme_mod( 'tqs_gallery_columns', 4 ) );
+$gallery_show_filters     = (bool) get_theme_mod( 'tqs_gallery_show_filters', true );
+$gallery_lightbox_enabled = (bool) get_theme_mod( 'tqs_gallery_lightbox_enabled', true );
 
-// Fallback category labels/icons if no images uploaded yet (illustrated placeholders).
+$gallery_items = get_posts( array(
+	'post_type'      => 'tqs_gallery_item',
+	'post_status'    => 'publish',
+	'posts_per_page' => -1,
+	'orderby'        => 'menu_order date',
+	'order'          => 'ASC',
+) );
+
+$gallery_tiles = array();
+$filter_terms  = array();
+
+foreach ( $gallery_items as $item ) {
+	if ( ! has_post_thumbnail( $item->ID ) ) {
+		continue;
+	}
+
+	$grid_url = get_the_post_thumbnail_url( $item->ID, 'tqs-gallery' );
+	$full_url = get_the_post_thumbnail_url( $item->ID, 'full' );
+	if ( ! $grid_url ) {
+		continue;
+	}
+
+	$term_slugs = array();
+	$terms      = get_the_terms( $item->ID, 'tqs_gallery_category' );
+	if ( $terms && ! is_wp_error( $terms ) ) {
+		foreach ( $terms as $term ) {
+			$term_slugs[]              = $term->slug;
+			$filter_terms[ $term->slug ] = $term;
+		}
+	}
+
+	$style = tqs_sanitize_gallery_display_style( get_post_meta( $item->ID, '_tqs_gallery_display_style', true ) );
+	$after_grid = '';
+	$after_full = '';
+
+	if ( 'before_after' === $style ) {
+		$after_id = absint( get_post_meta( $item->ID, '_tqs_gallery_after_image_id', true ) );
+		if ( $after_id ) {
+			$after_grid = wp_get_attachment_image_url( $after_id, 'tqs-gallery' );
+			$after_full = wp_get_attachment_image_url( $after_id, 'full' );
+		}
+		if ( ! $after_grid ) {
+			$style = 'grid';
+		}
+	}
+
+	$gallery_tiles[] = array(
+		'title'      => get_the_title( $item ),
+		'grid'       => $grid_url,
+		'full'       => $full_url ? $full_url : $grid_url,
+		'cats'       => implode( ' ', $term_slugs ),
+		'style'      => $style,
+		'after_grid' => $after_grid,
+		'after_full' => $after_full ? $after_full : $after_grid,
+	);
+}
+
+if ( ! empty( $filter_terms ) ) {
+	uasort(
+		$filter_terms,
+		function ( $a, $b ) {
+			return strcasecmp( $a->name, $b->name );
+		}
+	);
+}
+
+// Fallback category labels/icons if no gallery items published yet (illustrated placeholders).
 $placeholder_tiles = array(
 	array( 'label' => 'Retailbeveiliging', 'icon' => 'fa-store' ),
 	array( 'label' => 'Horecabeveiliging', 'icon' => 'fa-martini-glass' ),
@@ -35,18 +102,41 @@ $placeholder_tiles = array(
 </section>
 
 <section class="tqs-gallery-section">
-	<div class="tqs-gallery-grid" id="tqsGalleryGrid">
-		<?php if ( ! empty( $ids ) ) : ?>
-			<?php foreach ( $ids as $i => $id ) :
-				$url  = wp_get_attachment_image_url( $id, 'tqs-gallery' );
-				$full = wp_get_attachment_image_url( $id, 'large' );
-				$alt  = get_post_meta( $id, '_wp_attachment_image_alt', true ) ?: get_the_title();
-				if ( ! $url ) continue;
+	<?php if ( $gallery_show_filters && ! empty( $gallery_tiles ) && ! empty( $filter_terms ) ) : ?>
+	<div class="tqs-gallery-filters" id="tqsGalleryFilters" role="toolbar" aria-label="<?php esc_attr_e( 'Filter galerij op categorie', 'tqs-theme' ); ?>">
+		<button type="button" class="tqs-gallery-filter is-active" data-filter="all"><?php esc_html_e( 'Alle', 'tqs-theme' ); ?></button>
+		<?php foreach ( $filter_terms as $term ) : ?>
+			<button type="button" class="tqs-gallery-filter" data-filter="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( $term->name ); ?></button>
+		<?php endforeach; ?>
+	</div>
+	<?php endif; ?>
+
+	<div class="tqs-gallery-grid cols-<?php echo esc_attr( $gallery_columns ); ?>" id="tqsGalleryGrid" data-lightbox="<?php echo $gallery_lightbox_enabled ? '1' : '0'; ?>">
+		<?php if ( ! empty( $gallery_tiles ) ) : ?>
+			<?php foreach ( $gallery_tiles as $i => $tile ) :
+				$tile_classes = array( 'tqs-gallery-tile' );
+				if ( 'featured' === $tile['style'] ) {
+					$tile_classes[] = 'tqs-gallery-tile--featured';
+				} elseif ( 'before_after' === $tile['style'] ) {
+					$tile_classes[] = 'tqs-gallery-tile--before-after';
+				}
 			?>
-			<div class="tqs-gallery-tile" data-index="<?php echo esc_attr( $i ); ?>" data-full="<?php echo esc_url( $full ?: $url ); ?>">
-				<img src="<?php echo esc_url( $url ); ?>" alt="<?php echo esc_attr( $alt ); ?>" loading="lazy">
-				<span class="tqs-gallery-tile-zoom"><i class="fa-solid fa-magnifying-glass"></i></span>
-				<div class="tqs-gallery-tile-caption"><?php echo esc_html( $alt ); ?></div>
+			<div class="<?php echo esc_attr( implode( ' ', $tile_classes ) ); ?>" data-style="<?php echo esc_attr( $tile['style'] ); ?>" data-index="<?php echo esc_attr( $i ); ?>" data-full="<?php echo esc_url( $tile['full'] ); ?>"<?php echo $tile['cats'] ? ' data-category="' . esc_attr( $tile['cats'] ) . '"' : ''; ?>>
+				<?php if ( 'before_after' === $tile['style'] ) : ?>
+					<div class="tqs-ba-slider" style="--ba-pos: 50%;">
+						<img class="tqs-ba-img tqs-ba-img--before" src="<?php echo esc_url( $tile['grid'] ); ?>" alt="<?php echo esc_attr( $tile['title'] ); ?>" loading="lazy">
+						<div class="tqs-ba-after-wrap">
+							<img class="tqs-ba-img tqs-ba-img--after" src="<?php echo esc_url( $tile['after_grid'] ); ?>" alt="<?php echo esc_attr( $tile['title'] ); ?>" loading="lazy">
+						</div>
+						<button type="button" class="tqs-ba-handle" style="left: 50%;" aria-label="<?php esc_attr_e( 'Versleep om voor en na te vergelijken', 'tqs-theme' ); ?>">
+							<span class="tqs-ba-handle-grip" aria-hidden="true"></span>
+						</button>
+					</div>
+				<?php else : ?>
+					<img class="tqs-gallery-tile-img" src="<?php echo esc_url( $tile['grid'] ); ?>" alt="<?php echo esc_attr( $tile['title'] ); ?>" loading="lazy">
+					<span class="tqs-gallery-tile-zoom"><i class="fa-solid fa-magnifying-glass"></i></span>
+				<?php endif; ?>
+				<div class="tqs-gallery-tile-caption"><?php echo esc_html( $tile['title'] ); ?></div>
 			</div>
 			<?php endforeach; ?>
 		<?php else : ?>
@@ -69,8 +159,8 @@ $placeholder_tiles = array(
 				<div class="tqs-gallery-tile-caption"><?php echo esc_html( $tile['label'] ); ?></div>
 			</div>
 			<?php endforeach; ?>
-			<p style="grid-column:1/-1; text-align:center; color:#9080A8; font-size:14px; margin-top:10px;">
-				<em>Nog geen foto's geüpload. Ga naar de pagina-editor van Fotogalerij → "🖼️ Galerij Afbeeldingen" om echte foto's toe te voegen.</em>
+			<p class="tqs-gallery-empty-msg">
+				<em><?php esc_html_e( 'Nog geen foto\'s beschikbaar. Voeg galerij items toe via Gallery in wp-admin (titel, uitgelichte afbeelding en categorie).', 'tqs-theme' ); ?></em>
 			</p>
 		<?php endif; ?>
 	</div>

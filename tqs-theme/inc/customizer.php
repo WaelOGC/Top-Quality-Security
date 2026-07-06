@@ -232,6 +232,47 @@ function tqs_customize_register( $wp_customize ) {
 	tqs_add_checkbox( $wp_customize, 'tqs_show_contact_map', true, 'tqs_contact_settings', __( 'Toon kaart op contactpagina', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_maps_embed_url', '', 'tqs_contact_settings', __( 'Google Maps embed URL (optioneel)', 'tqs-theme' ), 'url', 'esc_url_raw' );
 
+	/* --- Gallery (Fotogalerij) --- */
+	$wp_customize->add_section( 'tqs_gallery_settings', array(
+		'title'       => __( 'Galerij Instellingen', 'tqs-theme' ),
+		'panel'       => 'tqs_theme_settings',
+		'description' => __( 'Standaardweergave van de fotogalerij-pagina. Per item kunt u in Gallery nog een eigen weergavestijl instellen.', 'tqs-theme' ),
+	) );
+	$wp_customize->add_setting( 'tqs_gallery_columns', array(
+		'default'           => 4,
+		'sanitize_callback' => 'tqs_sanitize_gallery_columns',
+		'transport'         => 'postMessage',
+	) );
+	$wp_customize->add_control( 'tqs_gallery_columns', array(
+		'label'   => __( 'Aantal kolommen', 'tqs-theme' ),
+		'section' => 'tqs_gallery_settings',
+		'type'    => 'select',
+		'choices' => array(
+			4 => __( '4 kolommen', 'tqs-theme' ),
+			3 => __( '3 kolommen', 'tqs-theme' ),
+		),
+	) );
+	$wp_customize->add_setting( 'tqs_gallery_lightbox_enabled', array(
+		'default'           => true,
+		'sanitize_callback' => 'tqs_sanitize_checkbox',
+		'transport'         => 'postMessage',
+	) );
+	$wp_customize->add_control( 'tqs_gallery_lightbox_enabled', array(
+		'label'   => __( 'Lightbox inschakelen', 'tqs-theme' ),
+		'section' => 'tqs_gallery_settings',
+		'type'    => 'checkbox',
+	) );
+	$wp_customize->add_setting( 'tqs_gallery_show_filters', array(
+		'default'           => true,
+		'sanitize_callback' => 'tqs_sanitize_checkbox',
+		'transport'         => 'postMessage',
+	) );
+	$wp_customize->add_control( 'tqs_gallery_show_filters', array(
+		'label'   => __( 'Toon categorie-filters', 'tqs-theme' ),
+		'section' => 'tqs_gallery_settings',
+		'type'    => 'checkbox',
+	) );
+
 	/* --- Footer --- */
 	$wp_customize->add_section( 'tqs_footer_settings', array(
 		'title' => __( 'Footer Settings', 'tqs-theme' ),

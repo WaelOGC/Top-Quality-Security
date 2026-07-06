@@ -1,0 +1,139 @@
+/**
+ * TQS Theme — Admin styles for custom post type screens only.
+ *
+ * Brand: Deep Purple #2D0A4E | Vivid Purple #8B2FC9 | Gold #C9973A
+ *        Dark #1A0533 | Light #F9F6FF
+ *
+ * Scoped via body.post-type-* / body.taxonomy-tqs_gallery_category (see functions.php enqueue).
+ */
+
+/* --------------------------------------------------------------------------
+   Meta box headers — subtle purple accent
+   -------------------------------------------------------------------------- */
+.post-type-tqs_service .postbox .postbox-header,
+.post-type-tqs_service .postbox > .hndle,
+.post-type-tqs_review .postbox .postbox-header,
+.post-type-tqs_review .postbox > .hndle,
+.post-type-tqs_gallery_item .postbox .postbox-header,
+.post-type-tqs_gallery_item .postbox > .hndle {
+	border-left: 3px solid #8B2FC9;
+	background-color: #F9F6FF;
+}
+
+.post-type-tqs_service .postbox .postbox-header .hndle,
+.post-type-tqs_review .postbox .postbox-header .hndle,
+.post-type-tqs_gallery_item .postbox .postbox-header .hndle {
+	color: #2D0A4E;
+}
+
+/* Highlight TQS-owned meta boxes slightly stronger */
+#tqs_review_details_box > .postbox-header,
+#tqs_review_details_box > .hndle,
+#tqs_gallery_display_box > .postbox-header,
+#tqs_gallery_display_box > .hndle,
+#tqs_service_icon_box > .postbox-header,
+#tqs_service_icon_box > .hndle {
+	border-left-color: #2D0A4E;
+}
+
+/* --------------------------------------------------------------------------
+   Buttons inside meta boxes — gold hover accent
+   -------------------------------------------------------------------------- */
+.post-type-tqs_service .postbox .button:hover,
+.post-type-tqs_service .postbox .button:focus,
+.post-type-tqs_review .postbox .button:hover,
+.post-type-tqs_review .postbox .button:focus,
+.post-type-tqs_gallery_item .postbox .button:hover,
+.post-type-tqs_gallery_item .postbox .button:focus {
+	border-color: #C9973A;
+	color: #1A0533;
+	box-shadow: 0 0 0 1px #C9973A;
+}
+
+.post-type-tqs_service .postbox .button-primary:hover,
+.post-type-tqs_service .postbox .button-primary:focus,
+.post-type-tqs_review .postbox .button-primary:hover,
+.post-type-tqs_review .postbox .button-primary:focus,
+.post-type-tqs_gallery_item .postbox .button-primary:hover,
+.post-type-tqs_gallery_item .postbox .button-primary:focus {
+	background: #E8C06A;
+	border-color: #C9973A;
+	color: #1A0533;
+	box-shadow: 0 0 0 1px #C9973A;
+}
+
+/* --------------------------------------------------------------------------
+   List tables — Stijl column & star ratings
+   -------------------------------------------------------------------------- */
+.post-type-tqs_gallery_item .wp-list-table .column-tqs_gallery_style {
+	color: #C9973A;
+	font-weight: 600;
+}
+
+.post-type-tqs_review .wp-list-table .column-tqs_review_rating {
+	color: #C9973A;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+}
+
+/* --------------------------------------------------------------------------
+   Gallery — Weergave stijl select & category checklist
+   -------------------------------------------------------------------------- */
+.post-type-tqs_gallery_item #tqs_gallery_display_style:hover,
+.post-type-tqs_gallery_item #tqs_gallery_display_style:focus {
+	background-color: #F9F6FF;
+	border-color: #8B2FC9;
+	box-shadow: 0 0 0 1px #8B2FC9;
+	color: #2D0A4E;
+}
+
+.post-type-tqs_gallery_item #tqs_gallery_categorydiv .categorychecklist label:hover,
+.post-type-tqs_gallery_item #tqs_gallery_categorydiv .categorychecklist label:focus-within,
+.post-type-tqs_gallery_item #tqs_gallery_categorydiv .categorychecklist li:hover > label {
+	background-color: #F9F6FF;
+	border-radius: 3px;
+}
+
+.post-type-tqs_gallery_item #tqs_gallery_categorydiv .categorychecklist input[type="checkbox"]:focus {
+	box-shadow: 0 0 0 1px #8B2FC9;
+	border-color: #8B2FC9;
+}
+
+/* --------------------------------------------------------------------------
+   Reviews — star rating radios in meta box
+   -------------------------------------------------------------------------- */
+.post-type-tqs_review #tqs_review_details_box label:has(input[type="radio"]:checked) {
+	color: #C9973A;
+	font-weight: 600;
+}
+
+.post-type-tqs_review #tqs_review_details_box label:hover {
+	background-color: #F9F6FF;
+	border-radius: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Gallery category taxonomy screen (edit-tags)
+   -------------------------------------------------------------------------- */
+.taxonomy-tqs_gallery_category .button:hover,
+.taxonomy-tqs_gallery_category .button:focus {
+	border-color: #C9973A;
+	color: #1A0533;
+	box-shadow: 0 0 0 1px #C9973A;
+}
+
+.taxonomy-tqs_gallery_category .button-primary:hover,
+.taxonomy-tqs_gallery_category .button-primary:focus {
+	background: #E8C06A;
+	border-color: #C9973A;
+	color: #1A0533;
+	box-shadow: 0 0 0 1px #C9973A;
+}
+
+.taxonomy-tqs_gallery_category #col-left .form-field input[type="text"]:focus,
+.taxonomy-tqs_gallery_category #col-left .form-field textarea:focus,
+.taxonomy-tqs_gallery_category #col-left .form-field select:focus {
+	background-color: #F9F6FF;
+	border-color: #8B2FC9;
+	box-shadow: 0 0 0 1px #8B2FC9;
+}

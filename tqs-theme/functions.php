@@ -87,6 +87,20 @@ function tqs_theme_enqueue_assets() {
 }
 add_action( 'wp_enqueue_scripts', 'tqs_theme_enqueue_assets' );
 
+/**
+ * Customizer preview script for postMessage gallery settings.
+ */
+function tqs_customize_preview_enqueue() {
+	wp_enqueue_script(
+		'tqs-customize-preview',
+		get_template_directory_uri() . '/assets/js/customize-preview.js',
+		array( 'customize-preview', 'jquery' ),
+		tqs_theme_version(),
+		true
+	);
+}
+add_action( 'customize_preview_init', 'tqs_customize_preview_enqueue' );
+
 // Performance: remove emoji scripts + generator tag.
 remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 remove_action( 'wp_print_styles', 'print_emoji_styles' );
@@ -365,6 +379,396 @@ function tqs_review_admin_column_content( $column, $post_id ) {
 add_action( 'manage_tqs_review_posts_custom_column', 'tqs_review_admin_column_content', 10, 2 );
 
 /* ==========================================================================
+   3c. CUSTOM POST TYPE: tqs_gallery_item + tqs_gallery_category
+   ========================================================================== */
+function tqs_register_gallery_cpt() {
+	$labels = array(
+		'name'               => __( 'Galerij Items', 'tqs-theme' ),
+		'singular_name'      => __( 'Galerij Item', 'tqs-theme' ),
+		'add_new'            => __( 'Galerij item toevoegen', 'tqs-theme' ),
+		'add_new_item'       => __( 'Galerij item toevoegen', 'tqs-theme' ),
+		'edit_item'          => __( 'Galerij item bewerken', 'tqs-theme' ),
+		'new_item'           => __( 'Nieuw galerij item', 'tqs-theme' ),
+		'view_item'          => __( 'Galerij item bekijken', 'tqs-theme' ),
+		'search_items'       => __( 'Galerij items zoeken', 'tqs-theme' ),
+		'not_found'          => __( 'Geen galerij items gevonden', 'tqs-theme' ),
+		'not_found_in_trash' => __( 'Geen galerij items in prullenbak', 'tqs-theme' ),
+		'all_items'          => __( 'Alle galerij items', 'tqs-theme' ),
+		'menu_name'          => 'Gallery',
+	);
+
+	register_post_type( 'tqs_gallery_item', array(
+		'labels'              => $labels,
+		'public'              => true,
+		'publicly_queryable'  => true,
+		'show_ui'             => true,
+		'show_in_menu'        => true,
+		'show_in_nav_menus'   => false,
+		'has_archive'         => false,
+		'rewrite'             => false,
+		'query_var'           => true,
+		'capability_type'     => 'post',
+		'supports'            => array( 'title', 'thumbnail' ),
+		'show_in_rest'        => true,
+		'menu_icon'           => 'dashicons-format-gallery',
+		'menu_position'       => 7,
+	) );
+}
+add_action( 'init', 'tqs_register_gallery_cpt' );
+
+function tqs_register_gallery_taxonomy() {
+	$labels = array(
+		'name'              => __( 'Galerij Categorieën', 'tqs-theme' ),
+		'singular_name'     => __( 'Galerij Categorie', 'tqs-theme' ),
+		'search_items'      => __( 'Categorieën zoeken', 'tqs-theme' ),
+		'all_items'         => __( 'Alle categorieën', 'tqs-theme' ),
+		'parent_item'       => __( 'Hoofdcategorie', 'tqs-theme' ),
+		'parent_item_colon' => __( 'Hoofdcategorie:', 'tqs-theme' ),
+		'edit_item'         => __( 'Categorie bewerken', 'tqs-theme' ),
+		'update_item'       => __( 'Categorie bijwerken', 'tqs-theme' ),
+		'add_new_item'      => __( 'Categorie toevoegen', 'tqs-theme' ),
+		'new_item_name'     => __( 'Nieuwe categorienaam', 'tqs-theme' ),
+		'menu_name'         => __( 'Galerij Categorieën', 'tqs-theme' ),
+	);
+
+	register_taxonomy( 'tqs_gallery_category', 'tqs_gallery_item', array(
+		'labels'            => $labels,
+		'hierarchical'      => true,
+		'public'            => true,
+		'show_ui'           => true,
+		'show_admin_column' => false,
+		'show_in_nav_menus' => false,
+		'show_in_rest'      => true,
+		'rewrite'           => false,
+		'query_var'         => true,
+	) );
+}
+add_action( 'init', 'tqs_register_gallery_taxonomy' );
+
+function tqs_get_gallery_category_seed_terms() {
+	return array(
+		'Retailbeveiliging',
+		'Horecabeveiliging',
+		'Evenementenbeveiliging',
+		'Hotelbeveiliging',
+		'Objectbeveiliging',
+		'Supermarktbeveiliging',
+		"Casino's Beveiliging",
+		'Algemeen',
+	);
+}
+
+function tqs_seed_gallery_categories() {
+	if ( get_option( 'tqs_gallery_categories_seeded_v1' ) ) {
+		return;
+	}
+
+	foreach ( tqs_get_gallery_category_seed_terms() as $term_name ) {
+		if ( ! term_exists( $term_name, 'tqs_gallery_category' ) ) {
+			wp_insert_term( $term_name, 'tqs_gallery_category' );
+		}
+	}
+
+	update_option( 'tqs_gallery_categories_seeded_v1', 1 );
+}
+add_action( 'init', 'tqs_seed_gallery_categories', 20 );
+
+function tqs_gallery_admin_columns( $columns ) {
+	$new = array();
+	if ( isset( $columns['cb'] ) ) {
+		$new['cb'] = $columns['cb'];
+	}
+	$new['tqs_gallery_thumb']     = __( 'Afbeelding', 'tqs-theme' );
+	$new['title']                 = __( 'Titel', 'tqs-theme' );
+	$new['tqs_gallery_style']     = __( 'Stijl', 'tqs-theme' );
+	$new['tqs_gallery_category']  = __( 'Categorie', 'tqs-theme' );
+	$new['menu_order']            = __( 'Volgorde', 'tqs-theme' );
+	$new['date']                  = __( 'Datum', 'tqs-theme' );
+	return $new;
+}
+add_filter( 'manage_tqs_gallery_item_posts_columns', 'tqs_gallery_admin_columns' );
+
+function tqs_gallery_admin_column_content( $column, $post_id ) {
+	switch ( $column ) {
+		case 'tqs_gallery_thumb':
+			if ( has_post_thumbnail( $post_id ) ) {
+				echo get_the_post_thumbnail( $post_id, array( 60, 60 ), array(
+					'style' => 'width:60px;height:60px;object-fit:cover;border-radius:6px;',
+					'alt'   => esc_attr( get_the_title( $post_id ) ),
+				) );
+			} else {
+				echo '—';
+			}
+			break;
+
+		case 'tqs_gallery_style':
+			echo esc_html( tqs_get_gallery_display_style_label( get_post_meta( $post_id, '_tqs_gallery_display_style', true ) ) );
+			break;
+
+		case 'tqs_gallery_category':
+			$terms = get_the_terms( $post_id, 'tqs_gallery_category' );
+			if ( empty( $terms ) || is_wp_error( $terms ) ) {
+				echo '—';
+				break;
+			}
+			$links = array();
+			foreach ( $terms as $term ) {
+				$url = add_query_arg(
+					array(
+						'post_type'            => 'tqs_gallery_item',
+						'tqs_gallery_category' => $term->slug,
+					),
+					admin_url( 'edit.php' )
+				);
+				$links[] = '<a href="' . esc_url( $url ) . '">' . esc_html( $term->name ) . '</a>';
+			}
+			echo implode( ', ', $links );
+			break;
+
+		case 'menu_order':
+			$post = get_post( $post_id );
+			echo esc_html( $post ? (string) $post->menu_order : '0' );
+			break;
+	}
+}
+add_action( 'manage_tqs_gallery_item_posts_custom_column', 'tqs_gallery_admin_column_content', 10, 2 );
+
+function tqs_gallery_admin_sortable_columns( $columns ) {
+	$columns['menu_order'] = 'menu_order';
+	return $columns;
+}
+add_filter( 'manage_edit-tqs_gallery_item_sortable_columns', 'tqs_gallery_admin_sortable_columns' );
+
+function tqs_gallery_category_filter_dropdown() {
+	global $typenow;
+
+	if ( 'tqs_gallery_item' !== $typenow ) {
+		return;
+	}
+
+	$taxonomy = 'tqs_gallery_category';
+	$selected = isset( $_GET[ $taxonomy ] ) ? sanitize_text_field( wp_unslash( $_GET[ $taxonomy ] ) ) : '';
+
+	wp_dropdown_categories( array(
+		'show_option_all' => __( 'Alle categorieën', 'tqs-theme' ),
+		'taxonomy'        => $taxonomy,
+		'name'            => $taxonomy,
+		'orderby'         => 'name',
+		'selected'        => $selected,
+		'hierarchical'    => true,
+		'value_field'     => 'slug',
+		'hide_empty'      => false,
+	) );
+}
+add_action( 'restrict_manage_posts', 'tqs_gallery_category_filter_dropdown' );
+
+function tqs_gallery_category_filter_query( $query ) {
+	global $pagenow;
+
+	if ( ! is_admin() || 'edit.php' !== $pagenow || ! $query->is_main_query() ) {
+		return;
+	}
+
+	if ( 'tqs_gallery_item' !== $query->get( 'post_type' ) ) {
+		return;
+	}
+
+	$taxonomy = 'tqs_gallery_category';
+	if ( empty( $_GET[ $taxonomy ] ) ) {
+		return;
+	}
+
+	$term_slug = sanitize_text_field( wp_unslash( $_GET[ $taxonomy ] ) );
+	if ( ! $term_slug ) {
+		return;
+	}
+
+	$query->set( 'tax_query', array(
+		array(
+			'taxonomy' => $taxonomy,
+			'field'    => 'slug',
+			'terms'    => $term_slug,
+		),
+	) );
+}
+add_action( 'pre_get_posts', 'tqs_gallery_category_filter_query' );
+
+function tqs_get_gallery_display_styles() {
+	return array(
+		'grid'         => __( 'Standaard Grid', 'tqs-theme' ),
+		'featured'     => __( 'Uitgelicht (groter blok)', 'tqs-theme' ),
+		'before_after' => __( 'Voor en Na Vergelijking', 'tqs-theme' ),
+	);
+}
+
+function tqs_sanitize_gallery_display_style( $style ) {
+	$allowed = array_keys( tqs_get_gallery_display_styles() );
+	$style   = sanitize_text_field( (string) $style );
+	return in_array( $style, $allowed, true ) ? $style : 'grid';
+}
+
+function tqs_get_gallery_display_style_label( $style ) {
+	$styles = tqs_get_gallery_display_styles();
+	$style  = tqs_sanitize_gallery_display_style( $style );
+	return $styles[ $style ];
+}
+
+function tqs_add_gallery_display_meta_box() {
+	add_meta_box(
+		'tqs_gallery_display_box',
+		__( 'Weergave-instellingen', 'tqs-theme' ),
+		'tqs_render_gallery_display_meta_box',
+		'tqs_gallery_item',
+		'side',
+		'low'
+	);
+}
+add_action( 'add_meta_boxes', 'tqs_add_gallery_display_meta_box', 20 );
+
+function tqs_enqueue_gallery_display_admin_assets( $hook ) {
+	global $post_type;
+
+	if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+		return;
+	}
+	if ( 'tqs_gallery_item' !== $post_type ) {
+		return;
+	}
+
+	wp_enqueue_media();
+	wp_enqueue_script(
+		'tqs-gallery-display-admin',
+		get_template_directory_uri() . '/assets/js/gallery-display-admin.js',
+		array( 'jquery' ),
+		tqs_theme_version(),
+		true
+	);
+}
+add_action( 'admin_enqueue_scripts', 'tqs_enqueue_gallery_display_admin_assets' );
+
+/**
+ * Brand-accent admin CSS for TQS custom post type screens only.
+ *
+ * @param string $hook Current admin page hook suffix.
+ */
+function tqs_enqueue_cpt_admin_styles( $hook ) {
+	$screen = get_current_screen();
+	if ( ! $screen ) {
+		return;
+	}
+
+	$tqs_post_types = array( 'tqs_service', 'tqs_review', 'tqs_gallery_item' );
+	$allowed_hooks  = array( 'post.php', 'post-new.php', 'edit.php' );
+
+	$load = false;
+
+	if ( in_array( $hook, $allowed_hooks, true )
+		&& ! empty( $screen->post_type )
+		&& in_array( $screen->post_type, $tqs_post_types, true ) ) {
+		$load = true;
+	}
+
+	if ( 'edit-tags.php' === $hook && 'tqs_gallery_category' === $screen->taxonomy ) {
+		$load = true;
+	}
+
+	if ( ! $load ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'tqs-admin-cpt',
+		get_template_directory_uri() . '/assets/css/admin.css',
+		array(),
+		tqs_theme_version()
+	);
+}
+add_action( 'admin_enqueue_scripts', 'tqs_enqueue_cpt_admin_styles' );
+
+function tqs_render_gallery_display_meta_box( $post ) {
+	wp_nonce_field( 'tqs_save_gallery_display_meta', 'tqs_gallery_display_meta_nonce' );
+
+	$style        = tqs_sanitize_gallery_display_style( get_post_meta( $post->ID, '_tqs_gallery_display_style', true ) );
+	$after_id     = absint( get_post_meta( $post->ID, '_tqs_gallery_after_image_id', true ) );
+	$after_url    = $after_id ? wp_get_attachment_image_url( $after_id, 'medium' ) : '';
+	$style_labels = tqs_get_gallery_display_styles();
+	?>
+	<p>
+		<label for="tqs_gallery_display_style"><strong><?php esc_html_e( 'Weergave stijl', 'tqs-theme' ); ?></strong></label><br>
+		<select id="tqs_gallery_display_style" name="tqs_gallery_display_style" class="widefat">
+			<?php foreach ( $style_labels as $value => $label ) : ?>
+				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $style, $value ); ?>><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+	</p>
+
+	<div id="tqs_gallery_after_image_wrap" style="<?php echo 'before_after' === $style ? '' : 'display:none;'; ?>">
+		<p><strong><?php esc_html_e( 'Na-afbeelding (voor Voor/Na vergelijking)', 'tqs-theme' ); ?></strong></p>
+		<input type="hidden" name="tqs_gallery_after_image_id" id="tqs_gallery_after_image_id" value="<?php echo esc_attr( $after_id ); ?>">
+		<div id="tqs_gallery_after_image_preview" style="margin-bottom:10px;">
+			<?php if ( $after_url ) : ?>
+				<img src="<?php echo esc_url( $after_url ); ?>" alt="" style="max-width:100%;height:auto;border-radius:6px;">
+			<?php endif; ?>
+		</div>
+		<button type="button" class="button" id="tqs_gallery_after_upload_btn"><?php esc_html_e( 'Kies Afbeelding', 'tqs-theme' ); ?></button>
+		<button type="button" class="button" id="tqs_gallery_after_remove_btn" <?php echo $after_id ? '' : 'style="display:none;"'; ?>><?php esc_html_e( 'Verwijderen', 'tqs-theme' ); ?></button>
+		<p class="description"><?php esc_html_e( 'De uitgelichte afbeelding wordt gebruikt als de "voor"-foto.', 'tqs-theme' ); ?></p>
+	</div>
+	<script>
+	jQuery(function($){
+		var frame;
+		$('#tqs_gallery_after_upload_btn').on('click', function(e){
+			e.preventDefault();
+			if ( frame ) { frame.open(); return; }
+			frame = wp.media({ title: '<?php echo esc_js( __( 'Kies Na-afbeelding', 'tqs-theme' ) ); ?>', multiple: false, library: { type: 'image' } });
+			frame.on('select', function(){
+				var att = frame.state().get('selection').first().toJSON();
+				$('#tqs_gallery_after_image_id').val(att.id);
+				$('#tqs_gallery_after_image_preview').html('<img src="'+att.url+'" alt="" style="max-width:100%;height:auto;border-radius:6px;">');
+				$('#tqs_gallery_after_remove_btn').show();
+			});
+			frame.open();
+		});
+		$('#tqs_gallery_after_remove_btn').on('click', function(e){
+			e.preventDefault();
+			$('#tqs_gallery_after_image_id').val('');
+			$('#tqs_gallery_after_image_preview').html('');
+			$(this).hide();
+		});
+	});
+	</script>
+	<?php
+}
+
+function tqs_save_gallery_display_meta( $post_id ) {
+	if ( ! isset( $_POST['tqs_gallery_display_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tqs_gallery_display_meta_nonce'] ) ), 'tqs_save_gallery_display_meta' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	$style = isset( $_POST['tqs_gallery_display_style'] ) ? sanitize_text_field( wp_unslash( $_POST['tqs_gallery_display_style'] ) ) : 'grid';
+	$style = tqs_sanitize_gallery_display_style( $style );
+	update_post_meta( $post_id, '_tqs_gallery_display_style', $style );
+
+	$after_id = isset( $_POST['tqs_gallery_after_image_id'] ) ? absint( $_POST['tqs_gallery_after_image_id'] ) : 0;
+	if ( 'before_after' === $style ) {
+		if ( $after_id ) {
+			update_post_meta( $post_id, '_tqs_gallery_after_image_id', $after_id );
+		} else {
+			delete_post_meta( $post_id, '_tqs_gallery_after_image_id' );
+		}
+	} else {
+		delete_post_meta( $post_id, '_tqs_gallery_after_image_id' );
+	}
+}
+add_action( 'save_post_tqs_gallery_item', 'tqs_save_gallery_display_meta' );
+
+/* ==========================================================================
    4. CONTENT SEEDING (Services + Pages)
    ========================================================================== */
 function tqs_get_seed_services() {
@@ -523,6 +927,7 @@ function tqs_seed_pages() {
 function tqs_run_seeding() {
 	tqs_seed_services();
 	tqs_seed_pages();
+	tqs_seed_gallery_categories();
 	flush_rewrite_rules();
 }
 add_action( 'after_switch_theme', 'tqs_run_seeding' );

@@ -206,43 +206,151 @@
 		}
 
 		/* ==================================================================
-		   6. GALLERY LIGHTBOX (Fotogalerij)
+		   5b. GALLERY CATEGORY FILTER (Fotogalerij)
 		   ================================================================== */
-		var $galleryTiles = $('#tqsGalleryGrid .tqs-gallery-tile:not([data-placeholder="1"])');
+		var $galleryFilters = $('#tqsGalleryFilters');
+		if ($galleryFilters.length) {
+			$galleryFilters.on('click', '.tqs-gallery-filter', function () {
+				var filter = $(this).data('filter');
+				$galleryFilters.find('.tqs-gallery-filter').removeClass('is-active');
+				$(this).addClass('is-active');
+
+				var $tiles = $('#tqsGalleryGrid .tqs-gallery-tile').not('[data-placeholder="1"]');
+				if (filter === 'all') {
+					$tiles.removeClass('is-hidden');
+					return;
+				}
+
+				$tiles.each(function () {
+					var cats = String($(this).attr('data-category') || '').split(/\s+/).filter(Boolean);
+					$(this).toggleClass('is-hidden', cats.indexOf(filter) === -1);
+				});
+			});
+		}
+
+		/* ==================================================================
+		   5c. GALLERY BEFORE/AFTER SLIDER (Fotogalerij)
+		   ================================================================== */
+		var $beforeAfterSliders = $('.tqs-gallery-tile--before-after .tqs-ba-slider');
+		if ($beforeAfterSliders.length) {
+			$beforeAfterSliders.each(function () {
+				var $slider = $(this);
+				var $handle = $slider.find('.tqs-ba-handle');
+				var dragging = false;
+
+				function setPosition(clientX) {
+					var rect = $slider[0].getBoundingClientRect();
+					if (!rect.width) {
+						return;
+					}
+					var x = clientX - rect.left;
+					var pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
+					$slider[0].style.setProperty('--ba-pos', pct + '%');
+					$handle.css('left', pct + '%');
+				}
+
+				function pointerX(e) {
+					if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length) {
+						return e.originalEvent.touches[0].clientX;
+					}
+					if (e.touches && e.touches.length) {
+						return e.touches[0].clientX;
+					}
+					return e.clientX;
+				}
+
+				function onStart(e) {
+					dragging = true;
+					e.preventDefault();
+					e.stopPropagation();
+					setPosition(pointerX(e));
+				}
+
+				function onMove(e) {
+					if (!dragging) {
+						return;
+					}
+					e.preventDefault();
+					setPosition(pointerX(e));
+				}
+
+				function onEnd() {
+					dragging = false;
+				}
+
+				$handle.on('mousedown touchstart', onStart);
+				$slider.on('mousedown touchstart', function (e) {
+					if ($(e.target).closest('.tqs-ba-handle').length) {
+						return;
+					}
+					onStart(e);
+				});
+
+				$(document).on('mousemove touchmove', onMove);
+				$(document).on('mouseup touchend touchcancel', onEnd);
+			});
+		}
+
+		/* ==================================================================
+		   6. GALLERY LIGHTBOX (Fotogalerij) — grid/featured tiles only when enabled
+		   ================================================================== */
+		var $galleryGrid = $('#tqsGalleryGrid');
 		var $lightbox = $('#tqsLightbox');
-		var $lightboxImg = $('#tqsLightboxImg');
-		var lightboxIndex = 0;
+		if ($galleryGrid.length && $lightbox.length) {
+			var $galleryTiles = $galleryGrid.find('.tqs-gallery-tile:not([data-placeholder="1"]):not([data-style="before_after"])');
+			var $lightboxImg = $('#tqsLightboxImg');
+			var lightboxIndex = 0;
 
-		function openLightbox(index) {
-			if (!$galleryTiles.length) return;
-			lightboxIndex = index;
-			var full = $galleryTiles.eq(lightboxIndex).data('full');
-			$lightboxImg.attr('src', full);
-			$lightbox.addClass('is-open');
-		}
-		function closeLightbox() {
-			$lightbox.removeClass('is-open');
-		}
+			function galleryLightboxEnabled() {
+				return String($galleryGrid.attr('data-lightbox')) !== '0';
+			}
 
-		$galleryTiles.on('click', function () {
-			openLightbox($(this).data('index'));
-		});
-		$('#tqsLightboxClose').on('click', closeLightbox);
-		$lightbox.on('click', function (e) {
-			if (e.target === this) closeLightbox();
-		});
-		$('#tqsLightboxPrev').on('click', function () {
-			openLightbox((lightboxIndex - 1 + $galleryTiles.length) % $galleryTiles.length);
-		});
-		$('#tqsLightboxNext').on('click', function () {
-			openLightbox((lightboxIndex + 1) % $galleryTiles.length);
-		});
-		$(document).on('keydown', function (e) {
-			if (!$lightbox.hasClass('is-open')) return;
-			if (e.key === 'Escape') closeLightbox();
-			if (e.key === 'ArrowLeft') $('#tqsLightboxPrev').click();
-			if (e.key === 'ArrowRight') $('#tqsLightboxNext').click();
-		});
+			function openLightbox(index) {
+				if (!galleryLightboxEnabled() || !$galleryTiles.length) {
+					return;
+				}
+				lightboxIndex = index;
+				var full = $galleryTiles.eq(lightboxIndex).data('full');
+				$lightboxImg.attr('src', full);
+				$lightbox.addClass('is-open');
+			}
+			function closeLightbox() {
+				$lightbox.removeClass('is-open');
+			}
+
+			$galleryTiles.on('click', function () {
+				if (!galleryLightboxEnabled()) {
+					return;
+				}
+				openLightbox($(this).data('index'));
+			});
+			$('#tqsLightboxClose').on('click', closeLightbox);
+			$lightbox.on('click', function (e) {
+				if (e.target === this) {
+					closeLightbox();
+				}
+			});
+			$('#tqsLightboxPrev').on('click', function () {
+				openLightbox((lightboxIndex - 1 + $galleryTiles.length) % $galleryTiles.length);
+			});
+			$('#tqsLightboxNext').on('click', function () {
+				openLightbox((lightboxIndex + 1) % $galleryTiles.length);
+			});
+			$(document).on('keydown', function (e) {
+				if (!$lightbox.hasClass('is-open')) {
+					return;
+				}
+				if (e.key === 'Escape') {
+					closeLightbox();
+				}
+				if (e.key === 'ArrowLeft') {
+					$('#tqsLightboxPrev').click();
+				}
+				if (e.key === 'ArrowRight') {
+					$('#tqsLightboxNext').click();
+				}
+			});
+		}
 
 		/* ==================================================================
 		   7. CONTACT FORM — AJAX SUBMIT
