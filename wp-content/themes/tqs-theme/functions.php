@@ -9,7 +9,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'TQS_THEME_VERSION', '2.0.1' );
+/**
+ * Asset cache-bust version — reads Theme Version from style.css header.
+ *
+ * @return string
+ */
+function tqs_theme_version() {
+	static $version = null;
+	if ( null === $version ) {
+		$theme   = wp_get_theme();
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.0.1';
+	}
+	return $version;
+}
 
 require get_template_directory() . '/inc/theme-options.php';
 require get_template_directory() . '/inc/customizer.php';
@@ -56,9 +68,9 @@ add_action( 'after_setup_theme', 'tqs_theme_setup' );
 function tqs_theme_enqueue_assets() {
 	wp_enqueue_style( 'tqs-google-fonts', 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap', array(), null );
 	wp_enqueue_style( 'tqs-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', array(), '6.5.1' );
-	wp_enqueue_style( 'tqs-theme-style', get_stylesheet_uri(), array(), TQS_THEME_VERSION );
+	wp_enqueue_style( 'tqs-theme-style', get_stylesheet_uri(), array(), tqs_theme_version() );
 
-	wp_enqueue_script( 'tqs-main', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), TQS_THEME_VERSION, true );
+	wp_enqueue_script( 'tqs-main', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), tqs_theme_version(), true );
 
 	wp_localize_script( 'tqs-main', 'tqsData', array(
 		'ajaxUrl'            => admin_url( 'admin-ajax.php' ),

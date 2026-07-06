@@ -107,7 +107,7 @@ $wa       = preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', 
 		</div>
 	</div>
 
-	<aside>
+	<aside class="tqs-contact-sidebar">
 		<div class="tqs-sidebar-card">
 			<h4>OPENINGSTIJDEN</h4>
 			<?php foreach ( $hours_lines as $line ) :

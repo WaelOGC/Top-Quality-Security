@@ -1,6 +1,6 @@
 === TQS Theme ===
 Theme Name: TQS Theme
-Version: 2.0.0
+Version: 2.0.1
 Requires PHP: 8.0
 Requires at least: WordPress 6.0
 
