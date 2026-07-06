@@ -99,6 +99,12 @@ $wa       = preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', 
 			<button type="submit" class="tqs-btn tqs-btn-gold tqs-form-submit" id="tqsFormSubmit">Bericht Versturen</button>
 		</form>
 		<?php endif; ?>
+
+		<div class="tqs-review-form-section" style="margin-top:48px;">
+			<h2 class="tqs-contact-form-title"><?php esc_html_e( 'Deel Je Ervaring', 'tqs-theme' ); ?></h2>
+			<p class="tqs-contact-form-sub"><?php esc_html_e( 'Heeft u met ons samengewerkt? Deel uw ervaring — uw beoordeling wordt eerst door ons gecontroleerd.', 'tqs-theme' ); ?></p>
+			<?php echo do_shortcode( '[tqs_review_form]' ); ?>
+		</div>
 	</div>
 
 	<aside>

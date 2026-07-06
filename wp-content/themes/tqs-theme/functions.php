@@ -63,11 +63,14 @@ function tqs_theme_enqueue_assets() {
 	wp_localize_script( 'tqs-main', 'tqsData', array(
 		'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
 		'nonce'              => wp_create_nonce( 'tqs_contact_nonce' ),
+		'reviewNonce'        => wp_create_nonce( 'tqs_review_nonce' ),
 		'whatsapp'           => preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', '31636286183' ) ),
 		'cookieExpiry'       => absint( get_theme_mod( 'tqs_cookie_expiry_days', 180 ) ),
 		'heroAutoplay'       => (bool) get_theme_mod( 'tqs_hero_autoplay', true ),
 		'heroAutoplayMs'     => absint( get_theme_mod( 'tqs_hero_autoplay_interval', 5500 ) ),
 		'formErrorMsg'       => get_theme_mod( 'tqs_form_error_msg', __( 'Er ging iets mis. Probeer het later opnieuw of bel ons direct.', 'tqs-theme' ) ),
+		'reviewSuccessMsg'   => __( 'Bedankt voor je beoordeling! Deze wordt binnenkort gecontroleerd en gepubliceerd.', 'tqs-theme' ),
+		'reviewErrorMsg'     => __( 'Er ging iets mis. Probeer het later opnieuw.', 'tqs-theme' ),
 	) );
 }
 add_action( 'wp_enqueue_scripts', 'tqs_theme_enqueue_assets' );
@@ -101,6 +104,253 @@ function tqs_register_service_cpt() {
 	) );
 }
 add_action( 'init', 'tqs_register_service_cpt' );
+
+/* ==========================================================================
+   3b. CUSTOM POST TYPE: tqs_review
+   ========================================================================== */
+function tqs_register_review_cpt() {
+	$labels = array(
+		'name'                  => __( 'Beoordelingen', 'tqs-theme' ),
+		'singular_name'         => __( 'Beoordeling', 'tqs-theme' ),
+		'add_new'               => __( 'Beoordeling toevoegen', 'tqs-theme' ),
+		'add_new_item'          => __( 'Beoordeling toevoegen', 'tqs-theme' ),
+		'edit_item'             => __( 'Beoordeling bewerken', 'tqs-theme' ),
+		'new_item'              => __( 'Nieuwe beoordeling', 'tqs-theme' ),
+		'view_item'             => __( 'Beoordeling bekijken', 'tqs-theme' ),
+		'search_items'          => __( 'Beoordelingen zoeken', 'tqs-theme' ),
+		'not_found'             => __( 'Geen beoordelingen gevonden', 'tqs-theme' ),
+		'not_found_in_trash'    => __( 'Geen beoordelingen in prullenbak', 'tqs-theme' ),
+		'all_items'             => __( 'Alle beoordelingen', 'tqs-theme' ),
+		'menu_name'             => __( 'Beoordelingen', 'tqs-theme' ),
+	);
+
+	register_post_type( 'tqs_review', array(
+		'labels'              => $labels,
+		'public'              => true,
+		'publicly_queryable'  => true,
+		'show_ui'             => true,
+		'show_in_menu'        => true,
+		'show_in_nav_menus'   => false,
+		'has_archive'         => false,
+		'rewrite'             => false,
+		'query_var'           => true,
+		'capability_type'     => 'post',
+		'supports'            => array( 'title' ),
+		'menu_icon'           => 'dashicons-star-filled',
+		'menu_position'       => 6,
+	) );
+}
+add_action( 'init', 'tqs_register_review_cpt' );
+
+/**
+ * Insert a review from a front-end submission (Phase 2).
+ * Always creates posts with status "pending" for admin approval.
+ *
+ * @param array $postarr Post data for wp_insert_post (post_title = reviewer name).
+ * @param array $meta    Review meta: rating, service_id, email, consent, text.
+ * @return int|WP_Error Post ID on success.
+ */
+function tqs_insert_review_from_submission( $postarr = array(), $meta = array() ) {
+	$postarr = wp_parse_args( $postarr, array(
+		'post_type'   => 'tqs_review',
+		'post_status' => 'pending',
+	) );
+
+	if ( 'tqs_review' !== $postarr['post_type'] ) {
+		$postarr['post_type'] = 'tqs_review';
+	}
+
+	$postarr['post_status'] = 'pending';
+
+	$post_id = wp_insert_post( wp_slash( $postarr ), true );
+	if ( is_wp_error( $post_id ) ) {
+		return $post_id;
+	}
+
+	if ( $meta ) {
+		tqs_save_review_meta_fields( $post_id, $meta );
+	}
+
+	return $post_id;
+}
+
+function tqs_get_review_status_label( $status ) {
+	$labels = array(
+		'publish' => __( 'Gepubliceerd', 'tqs-theme' ),
+		'pending' => __( 'In afwachting', 'tqs-theme' ),
+		'draft'   => __( 'Concept', 'tqs-theme' ),
+		'private' => __( 'Privé', 'tqs-theme' ),
+		'trash'   => __( 'Prullenbak', 'tqs-theme' ),
+	);
+
+	return isset( $labels[ $status ] ) ? $labels[ $status ] : $status;
+}
+
+function tqs_render_review_stars( $rating ) {
+	$rating = absint( $rating );
+	if ( $rating < 1 || $rating > 5 ) {
+		return '—';
+	}
+
+	return str_repeat( '★', $rating );
+}
+
+function tqs_add_review_meta_box() {
+	add_meta_box(
+		'tqs_review_details_box',
+		__( 'Beoordeling Details', 'tqs-theme' ),
+		'tqs_render_review_meta_box',
+		'tqs_review',
+		'normal',
+		'high'
+	);
+}
+add_action( 'add_meta_boxes', 'tqs_add_review_meta_box' );
+
+function tqs_render_review_meta_box( $post ) {
+	wp_nonce_field( 'tqs_save_review_meta', 'tqs_review_meta_nonce' );
+
+	$rating     = absint( get_post_meta( $post->ID, '_tqs_review_rating', true ) );
+	$service_id = absint( get_post_meta( $post->ID, '_tqs_review_service_id', true ) );
+	$email      = get_post_meta( $post->ID, '_tqs_review_email', true );
+	$consent    = (bool) get_post_meta( $post->ID, '_tqs_review_consent', true );
+	$text       = get_post_meta( $post->ID, '_tqs_review_text', true );
+	$services   = tqs_get_services();
+
+	echo '<table class="form-table" role="presentation">';
+
+	echo '<tr><th scope="row"><label for="tqs_review_text">' . esc_html__( 'Beoordelingstekst', 'tqs-theme' ) . '</label></th>';
+	echo '<td><textarea id="tqs_review_text" name="tqs_review_text" class="large-text" rows="5">' . esc_textarea( $text ) . '</textarea>';
+	echo '<p class="description">' . esc_html__( 'De tekst van de klantbeoordeling (niet via de hoofd-editor).', 'tqs-theme' ) . '</p></td></tr>';
+
+	echo '<tr><th scope="row">' . esc_html__( 'Sterrenbeoordeling', 'tqs-theme' ) . '</th><td>';
+	for ( $i = 5; $i >= 1; $i-- ) {
+		echo '<label style="margin-right:12px;">';
+		echo '<input type="radio" name="tqs_review_rating" value="' . esc_attr( $i ) . '" ' . checked( $rating, $i, false ) . '> ';
+		echo esc_html( str_repeat( '★', $i ) );
+		echo '</label><br>';
+	}
+	echo '</td></tr>';
+
+	echo '<tr><th scope="row"><label for="tqs_review_service_id">' . esc_html__( 'Gekoppelde dienst', 'tqs-theme' ) . '</label></th><td>';
+	echo '<select id="tqs_review_service_id" name="tqs_review_service_id">';
+	echo '<option value="0"' . selected( $service_id, 0, false ) . '>' . esc_html__( 'Algemeen', 'tqs-theme' ) . '</option>';
+	foreach ( $services as $service ) {
+		echo '<option value="' . esc_attr( $service->ID ) . '"' . selected( $service_id, $service->ID, false ) . '>' . esc_html( $service->post_title ) . '</option>';
+	}
+	echo '</select></td></tr>';
+
+	echo '<tr><th scope="row"><label for="tqs_review_email">' . esc_html__( 'E-mail reviewer', 'tqs-theme' ) . '</label></th>';
+	echo '<td><input type="email" id="tqs_review_email" name="tqs_review_email" class="regular-text" value="' . esc_attr( $email ) . '">';
+	echo '<p class="description">' . esc_html__( 'Alleen zichtbaar in wp-admin; wordt nooit op de website getoond.', 'tqs-theme' ) . '</p></td></tr>';
+
+	echo '<tr><th scope="row">' . esc_html__( 'AVG-toestemming', 'tqs-theme' ) . '</th><td>';
+	if ( $consent ) {
+		echo '<label><input type="checkbox" checked disabled> ' . esc_html__( 'Toestemming gegeven bij inzending', 'tqs-theme' ) . '</label>';
+		echo '<input type="hidden" name="tqs_review_consent" value="1">';
+	} else {
+		echo '<label><input type="checkbox" name="tqs_review_consent" value="1"' . checked( $consent, true, false ) . '> ';
+		echo esc_html__( 'Toestemming gegeven (handmatig instellen voor tests)', 'tqs-theme' ) . '</label>';
+	}
+	echo '</td></tr>';
+
+	echo '</table>';
+}
+
+/**
+ * Sanitize and persist review meta fields.
+ *
+ * @param int   $post_id Post ID.
+ * @param array $data    Raw field values.
+ */
+function tqs_save_review_meta_fields( $post_id, $data ) {
+	if ( isset( $data['text'] ) ) {
+		update_post_meta( $post_id, '_tqs_review_text', sanitize_textarea_field( $data['text'] ) );
+	}
+
+	if ( isset( $data['rating'] ) ) {
+		$rating = absint( $data['rating'] );
+		if ( $rating >= 1 && $rating <= 5 ) {
+			update_post_meta( $post_id, '_tqs_review_rating', $rating );
+		}
+	}
+
+	if ( isset( $data['service_id'] ) ) {
+		$service_id = absint( $data['service_id'] );
+		if ( $service_id > 0 && 'tqs_service' !== get_post_type( $service_id ) ) {
+			$service_id = 0;
+		}
+		update_post_meta( $post_id, '_tqs_review_service_id', $service_id );
+	}
+
+	if ( isset( $data['email'] ) ) {
+		update_post_meta( $post_id, '_tqs_review_email', sanitize_email( $data['email'] ) );
+	}
+
+	$consent = ! empty( $data['consent'] );
+	update_post_meta( $post_id, '_tqs_review_consent', $consent ? '1' : '' );
+}
+
+function tqs_save_review_meta( $post_id ) {
+	if ( ! isset( $_POST['tqs_review_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tqs_review_meta_nonce'] ) ), 'tqs_save_review_meta' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	$rating = isset( $_POST['tqs_review_rating'] ) ? absint( $_POST['tqs_review_rating'] ) : 0;
+
+	tqs_save_review_meta_fields( $post_id, array(
+		'text'       => isset( $_POST['tqs_review_text'] ) ? wp_unslash( $_POST['tqs_review_text'] ) : '',
+		'rating'     => $rating,
+		'service_id' => isset( $_POST['tqs_review_service_id'] ) ? absint( $_POST['tqs_review_service_id'] ) : 0,
+		'email'      => isset( $_POST['tqs_review_email'] ) ? wp_unslash( $_POST['tqs_review_email'] ) : '',
+		'consent'    => isset( $_POST['tqs_review_consent'] ),
+	) );
+}
+add_action( 'save_post_tqs_review', 'tqs_save_review_meta' );
+
+function tqs_review_admin_columns( $columns ) {
+	$new = array();
+	if ( isset( $columns['cb'] ) ) {
+		$new['cb'] = $columns['cb'];
+	}
+	$new['title']              = __( 'Naam', 'tqs-theme' );
+	$new['tqs_review_rating']  = __( 'Rating', 'tqs-theme' );
+	$new['tqs_review_service'] = __( 'Gekoppelde Dienst', 'tqs-theme' );
+	$new['tqs_review_status']  = __( 'Status', 'tqs-theme' );
+	$new['date']               = __( 'Datum', 'tqs-theme' );
+	return $new;
+}
+add_filter( 'manage_tqs_review_posts_columns', 'tqs_review_admin_columns' );
+
+function tqs_review_admin_column_content( $column, $post_id ) {
+	switch ( $column ) {
+		case 'tqs_review_rating':
+			echo esc_html( tqs_render_review_stars( get_post_meta( $post_id, '_tqs_review_rating', true ) ) );
+			break;
+
+		case 'tqs_review_service':
+			$service_id = absint( get_post_meta( $post_id, '_tqs_review_service_id', true ) );
+			if ( 0 === $service_id ) {
+				echo esc_html__( 'Algemeen', 'tqs-theme' );
+			} elseif ( get_post_type( $service_id ) === 'tqs_service' ) {
+				echo esc_html( get_the_title( $service_id ) );
+			} else {
+				echo '—';
+			}
+			break;
+
+		case 'tqs_review_status':
+			echo esc_html( tqs_get_review_status_label( get_post_status( $post_id ) ) );
+			break;
+	}
+}
+add_action( 'manage_tqs_review_posts_custom_column', 'tqs_review_admin_column_content', 10, 2 );
 
 /* ==========================================================================
    4. CONTENT SEEDING (Services + Pages)
@@ -647,6 +897,150 @@ add_action( 'wp_ajax_tqs_contact_submit', 'tqs_handle_contact_submit' );
 add_action( 'wp_ajax_nopriv_tqs_contact_submit', 'tqs_handle_contact_submit' );
 
 /* ==========================================================================
+   9b. REVIEW FORM SHORTCODE + AJAX HANDLER
+   ========================================================================== */
+function tqs_render_review_form_shortcode() {
+	$services = tqs_get_services();
+
+	ob_start();
+	?>
+	<div class="tqs-review-form-wrap">
+		<div class="tqs-form-message" id="tqsReviewFormMessage" hidden></div>
+		<form id="tqsReviewForm" class="tqs-review-form" novalidate>
+			<div class="tqs-hp-field" aria-hidden="true">
+				<label for="tqs_review_hp"><?php esc_html_e( 'Laat dit veld leeg', 'tqs-theme' ); ?></label>
+				<input type="text" id="tqs_review_hp" name="tqs_review_hp" tabindex="-1" autocomplete="off">
+			</div>
+
+			<div class="tqs-form-group" style="margin-bottom:20px;">
+				<label for="tqs_review_name"><?php esc_html_e( 'Naam', 'tqs-theme' ); ?>*</label>
+				<input type="text" id="tqs_review_name" name="name" class="tqs-input" required>
+			</div>
+
+			<div class="tqs-form-group" style="margin-bottom:20px;">
+				<label for="tqs_review_email"><?php esc_html_e( 'E-mailadres', 'tqs-theme' ); ?>*</label>
+				<input type="email" id="tqs_review_email" name="email" class="tqs-input" required>
+			</div>
+
+			<div class="tqs-form-group" style="margin-bottom:20px;">
+				<label for="tqs_review_service"><?php esc_html_e( 'Gekoppelde dienst', 'tqs-theme' ); ?></label>
+				<select id="tqs_review_service" name="service_id" class="tqs-select">
+					<option value="0"><?php esc_html_e( 'Algemeen', 'tqs-theme' ); ?></option>
+					<?php foreach ( $services as $service ) : ?>
+						<option value="<?php echo esc_attr( $service->ID ); ?>"><?php echo esc_html( $service->post_title ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+
+			<fieldset class="tqs-star-rating" style="margin-bottom:20px;">
+				<legend class="tqs-star-rating__legend"><?php esc_html_e( 'Beoordeling', 'tqs-theme' ); ?>*</legend>
+				<div class="tqs-star-rating__group" role="radiogroup" aria-label="<?php esc_attr_e( 'Beoordeling', 'tqs-theme' ); ?>">
+					<?php for ( $i = 5; $i >= 1; $i-- ) : ?>
+						<input type="radio" id="tqs_review_rating_<?php echo esc_attr( $i ); ?>" name="rating" value="<?php echo esc_attr( $i ); ?>" required>
+						<label for="tqs_review_rating_<?php echo esc_attr( $i ); ?>" title="<?php echo esc_attr( sprintf( __( '%d sterren', 'tqs-theme' ), $i ) ); ?>">
+							<span class="screen-reader-text"><?php echo esc_html( sprintf( __( '%d sterren', 'tqs-theme' ), $i ) ); ?></span>
+							<i class="fa-solid fa-star" aria-hidden="true"></i>
+						</label>
+					<?php endfor; ?>
+				</div>
+			</fieldset>
+
+			<div class="tqs-form-group" style="margin-bottom:8px;">
+				<label for="tqs_review_text"><?php esc_html_e( 'Uw ervaring', 'tqs-theme' ); ?>*</label>
+				<textarea id="tqs_review_text" name="text" rows="5" class="tqs-textarea" maxlength="1000" required></textarea>
+			</div>
+			<p class="tqs-char-counter" aria-live="polite">
+				<span id="tqsReviewCharCount">0</span> / 1000
+			</p>
+
+			<div class="tqs-form-group tqs-form-group--consent" style="margin-bottom:20px;">
+				<label class="tqs-consent-label">
+					<input type="checkbox" id="tqs_review_consent" name="consent" value="1" required>
+					<?php
+					echo wp_kses(
+						sprintf(
+							/* translators: %s: privacy policy link */
+							__( 'Ik ga akkoord met het %s voor het verwerken van mijn gegevens.', 'tqs-theme' ),
+							'<a href="' . esc_url( home_url( '/privacybeleid' ) ) . '">' . esc_html__( 'Privacybeleid', 'tqs-theme' ) . '</a>'
+						),
+						array( 'a' => array( 'href' => array() ) )
+					);
+					?>
+				</label>
+			</div>
+
+			<button type="submit" class="tqs-btn tqs-btn-gold tqs-form-submit" id="tqsReviewFormSubmit">
+				<?php esc_html_e( 'Beoordeling Versturen', 'tqs-theme' ); ?>
+			</button>
+		</form>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'tqs_review_form', 'tqs_render_review_form_shortcode' );
+
+function tqs_handle_review_submit() {
+	check_ajax_referer( 'tqs_review_nonce', 'nonce' );
+
+	$honeypot = isset( $_POST['tqs_review_hp'] ) ? sanitize_text_field( wp_unslash( $_POST['tqs_review_hp'] ) ) : '';
+	if ( '' !== $honeypot ) {
+		wp_send_json_success( array(
+			'message' => __( 'Bedankt voor je beoordeling! Deze wordt binnenkort gecontroleerd en gepubliceerd.', 'tqs-theme' ),
+		) );
+	}
+
+	$name       = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+	$email      = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+	$service_id = isset( $_POST['service_id'] ) ? absint( $_POST['service_id'] ) : 0;
+	$rating     = isset( $_POST['rating'] ) ? absint( $_POST['rating'] ) : 0;
+	$text       = isset( $_POST['text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['text'] ) ) : '';
+	$consent    = ! empty( $_POST['consent'] );
+
+	if ( ! $name ) {
+		wp_send_json_error( array( 'message' => __( 'Vul uw naam in.', 'tqs-theme' ) ) );
+	}
+	if ( ! is_email( $email ) ) {
+		wp_send_json_error( array( 'message' => __( 'Vul een geldig e-mailadres in.', 'tqs-theme' ) ) );
+	}
+	if ( $service_id > 0 && 'tqs_service' !== get_post_type( $service_id ) ) {
+		$service_id = 0;
+	}
+	if ( $rating < 1 || $rating > 5 ) {
+		wp_send_json_error( array( 'message' => __( 'Selecteer een beoordeling van 1 tot 5 sterren.', 'tqs-theme' ) ) );
+	}
+	if ( ! $text ) {
+		wp_send_json_error( array( 'message' => __( 'Vul uw ervaring in.', 'tqs-theme' ) ) );
+	}
+	if ( mb_strlen( $text ) > 1000 ) {
+		wp_send_json_error( array( 'message' => __( 'Uw ervaring mag maximaal 1000 tekens bevatten.', 'tqs-theme' ) ) );
+	}
+	if ( ! $consent ) {
+		wp_send_json_error( array( 'message' => __( 'U moet akkoord gaan met het Privacybeleid.', 'tqs-theme' ) ) );
+	}
+
+	$post_id = tqs_insert_review_from_submission(
+		array( 'post_title' => $name ),
+		array(
+			'text'       => $text,
+			'rating'     => $rating,
+			'service_id' => $service_id,
+			'email'      => $email,
+			'consent'    => true,
+		)
+	);
+
+	if ( is_wp_error( $post_id ) ) {
+		wp_send_json_error( array( 'message' => __( 'Er ging iets mis bij het opslaan van uw beoordeling. Probeer het later opnieuw.', 'tqs-theme' ) ) );
+	}
+
+	wp_send_json_success( array(
+		'message' => __( 'Bedankt voor je beoordeling! Deze wordt binnenkort gecontroleerd en gepubliceerd.', 'tqs-theme' ),
+	) );
+}
+add_action( 'wp_ajax_tqs_submit_review', 'tqs_handle_review_submit' );
+add_action( 'wp_ajax_nopriv_tqs_submit_review', 'tqs_handle_review_submit' );
+
+/* ==========================================================================
    10. FALLBACK MENUS (if no menu assigned in Appearance → Menus)
    ========================================================================== */
 function tqs_fallback_primary_menu() {
@@ -654,7 +1048,7 @@ function tqs_fallback_primary_menu() {
 	echo '<a href="' . esc_url( home_url( '/' ) ) . '" class="tqs-navlink' . ( is_front_page() ? ' is-current' : '' ) . '">Home</a>';
 	echo '<a href="' . esc_url( home_url( '/wie-zijn-wij' ) ) . '" class="tqs-navlink">Wie Zijn Wij</a>';
 	echo '<div class="tqs-nav-dropdown-wrap">';
-	echo '<a href="' . esc_url( home_url( '/onze-diensten' ) ) . '" class="tqs-navlink' . ( is_post_type_archive( 'tqs_service' ) || is_singular( 'tqs_service' ) ? ' is-current' : '' ) . '">Onze Diensten <span style="font-size:10px;color:#C9973A;">▼</span></a>';
+	echo '<a href="' . esc_url( home_url( '/onze-diensten' ) ) . '" class="tqs-navlink' . ( is_post_type_archive( 'tqs_service' ) || is_singular( 'tqs_service' ) ? ' is-current' : '' ) . '" aria-expanded="false">Onze Diensten <span style="font-size:10px;color:#C9973A;">▼</span></a>';
 	echo '<div class="tqs-nav-dropdown">';
 	foreach ( $services as $s ) {
 		echo '<a href="' . esc_url( get_permalink( $s ) ) . '" class="tqs-drop-item">' . esc_html( $s->post_title ) . '</a>';

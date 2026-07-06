@@ -26,11 +26,55 @@
 			$('#tqsMobileServicesChevron').text(isOpen ? '▼' : '▲');
 		});
 
-		/* Desktop dropdown (hover) */
-		$('.tqs-nav-dropdown-wrap').on('mouseenter', function () {
-			$(this).find('.tqs-nav-dropdown').show();
-		}).on('mouseleave', function () {
-			$(this).find('.tqs-nav-dropdown').hide();
+		/* Desktop nav dropdowns (click toggle) */
+		var $navDropdownWraps = $('.tqs-nav-dropdown-wrap');
+
+		function closeNavDropdowns() {
+			$navDropdownWraps.removeClass('is-open');
+			$navDropdownWraps.each(function () {
+				var $toggle = $(this).children('a, button').first();
+				if ($toggle.length) {
+					$toggle.attr('aria-expanded', 'false');
+				}
+			});
+		}
+
+		$navDropdownWraps.each(function () {
+			var $wrap = $(this);
+			var $toggle = $wrap.children('a, button').first();
+			if (!$toggle.length) {
+				return;
+			}
+			if (!$toggle.attr('aria-expanded')) {
+				$toggle.attr('aria-expanded', 'false');
+			}
+
+			$toggle.on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				var isOpen = $wrap.hasClass('is-open');
+				closeNavDropdowns();
+				if (!isOpen) {
+					$wrap.addClass('is-open');
+					$toggle.attr('aria-expanded', 'true');
+				}
+			});
+		});
+
+		$navDropdownWraps.on('click', '.tqs-nav-dropdown a', function () {
+			closeNavDropdowns();
+		});
+
+		$(document).on('click', function (e) {
+			if (!$(e.target).closest('.tqs-nav-dropdown-wrap').length) {
+				closeNavDropdowns();
+			}
+		});
+
+		$(document).on('keydown', function (e) {
+			if (e.key === 'Escape') {
+				closeNavDropdowns();
+			}
 		});
 
 		/* ==================================================================
@@ -238,6 +282,66 @@
 					$message.addClass('is-error').text((window.tqsData && tqsData.formErrorMsg) || 'Er ging iets mis. Probeer het later opnieuw of bel ons direct.').show();
 				}).always(function () {
 					$submit.prop('disabled', false).text(originalText);
+				});
+			});
+		}
+
+		/* ==================================================================
+		   8. REVIEW FORM — AJAX SUBMIT
+		   ================================================================== */
+		var $reviewForm = $('#tqsReviewForm');
+		if ($reviewForm.length && window.tqsData) {
+			var $reviewText = $('#tqs_review_text');
+			var $charCount = $('#tqsReviewCharCount');
+
+			$reviewText.on('input', function () {
+				var val = $(this).val();
+				if (val.length > 1000) {
+					val = val.substring(0, 1000);
+					$(this).val(val);
+				}
+				$charCount.text(val.length);
+			});
+
+			$reviewForm.on('submit', function (e) {
+				e.preventDefault();
+				var $submit = $('#tqsReviewFormSubmit');
+				var $message = $('#tqsReviewFormMessage');
+				var originalText = $submit.text();
+
+				$submit.prop('disabled', true).text('Verzenden...');
+				$message.removeClass('is-success is-error').hide().attr('hidden', 'hidden');
+
+				$.ajax({
+					url: tqsData.ajaxUrl,
+					method: 'POST',
+					data: {
+						action: 'tqs_submit_review',
+						nonce: tqsData.reviewNonce,
+						name: $('#tqs_review_name').val(),
+						email: $('#tqs_review_email').val(),
+						service_id: $('#tqs_review_service').val(),
+						rating: $reviewForm.find('input[name="rating"]:checked').val(),
+						text: $reviewText.val(),
+						consent: $('#tqs_review_consent').is(':checked') ? 1 : 0,
+						tqs_review_hp: $('#tqs_review_hp').val()
+					}
+				}).done(function (response) {
+					if (response.success) {
+						var successText = (response.data && response.data.message) ? response.data.message : tqsData.reviewSuccessMsg;
+						$reviewForm.replaceWith(
+							'<div class="tqs-form-message is-success" role="status">' + $('<div>').text(successText).html() + '</div>'
+						);
+					} else {
+						var errorText = (response.data && response.data.message) ? response.data.message : tqsData.reviewErrorMsg;
+						$message.addClass('is-error').text(errorText).show().removeAttr('hidden');
+					}
+				}).fail(function () {
+					$message.addClass('is-error').text(tqsData.reviewErrorMsg || tqsData.formErrorMsg).show().removeAttr('hidden');
+				}).always(function () {
+					if ($submit.length) {
+						$submit.prop('disabled', false).text(originalText);
+					}
 				});
 			});
 		}
