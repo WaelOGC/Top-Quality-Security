@@ -4,7 +4,7 @@ Theme URI: https://topqualitysecurity.com/
 Author: Top Quality Security Dev Team
 Author URI: https://topqualitysecurity.com/
 Description: Custom standalone WordPress theme for Top Quality Security — a professional security services company in Den Haag, Netherlands. Elementor-compatible, SEO-optimised, GDPR-compliant.
-Version: 2.0.0
+Version: 2.0.1
 Requires at least: 6.0
 Requires PHP: 8.0
 Text Domain: tqs-theme
@@ -248,6 +248,26 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 900px) { .tqs-whyus-outer { grid-template-columns: 1fr !important; gap: 36px !important; } }
 @media (max-width: 640px) { .tqs-whyus { padding: 44px 20px 36px !important; } .tqs-whyus-h2 { font-size: 28px !important; } }
 @media (max-width: 480px) { .tqs-whyus-cards { grid-template-columns: 1fr !important; } }
+
+/* --- Reviews (service page + homepage) --- */
+.tqs-review-stars { display: inline-flex; gap: 3px; margin-bottom: 14px; }
+.tqs-review-star { font-size: 18px; line-height: 1; }
+.tqs-review-star.is-filled { color: var(--tqs-gold); }
+.tqs-review-star.is-empty { color: var(--tqs-muted-light); }
+.tqs-review-card { padding: 28px 24px; border-radius: 12px; background: var(--tqs-light); border: 1px solid var(--tqs-border); transition: border-color var(--transition-base); }
+.tqs-review-card:hover { border-color: var(--tqs-gold); }
+.tqs-review-text { font-size: 15px; line-height: 1.7; color: var(--tqs-text); margin: 0 0 16px; font-style: normal; }
+.tqs-review-author { display: block; font-size: 14px; font-weight: 700; color: var(--tqs-primary); font-style: normal; }
+
+.tqs-service-reviews { margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--tqs-border); }
+.tqs-service-reviews-heading { font-weight: 800; font-size: 28px; color: var(--tqs-primary); margin: 0 0 24px; }
+.tqs-service-reviews-grid { display: grid; gap: 20px; }
+
+.tqs-reviews-section { background: var(--tqs-light); padding: 56px 40px 48px; }
+.tqs-reviews-outer { max-width: var(--container-max); margin: 0 auto; }
+.tqs-reviews-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+@media (max-width: 1080px) { .tqs-reviews-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+@media (max-width: 640px) { .tqs-reviews-section { padding: 44px 20px 36px !important; } .tqs-reviews-grid { grid-template-columns: 1fr !important; } .tqs-service-reviews-heading { font-size: 24px !important; } }
 
 /* ==========================================================================
    10. FINAL CTA BANNER

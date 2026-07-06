@@ -528,6 +528,75 @@ function tqs_maybe_reseed() {
 add_action( 'init', 'tqs_maybe_reseed' );
 
 /* ==========================================================================
+   TEMPORARY — Remove after review display is verified in production.
+   Seeds 3 sample published tqs_review posts (admin visit, once only).
+   ========================================================================== */
+function tqs_seed_sample_reviews() {
+	if ( get_option( 'tqs_reviews_display_seeded_v1' ) ) {
+		return;
+	}
+
+	$services = tqs_get_services();
+	if ( count( $services ) < 2 ) {
+		return;
+	}
+
+	$samples = array(
+		array(
+			'title'      => 'Jan de Vries',
+			'text'       => 'Zeer professionele beveiligers die discreet en alert aanwezig waren. Onze winkel voelt zich een stuk veiliger sinds de samenwerking met TQS.',
+			'rating'     => 5,
+			'service_id' => $services[0]->ID,
+			'email'      => 'jan.devries@example.test',
+		),
+		array(
+			'title'      => 'Maria Jansen',
+			'text'       => 'Tijdens ons evenement was het team rustig, vriendelijk en doortastend. Alles verliep vlekkeloos — absoluut een aanrader.',
+			'rating'     => 4,
+			'service_id' => $services[1]->ID,
+			'email'      => 'maria.jansen@example.test',
+		),
+		array(
+			'title'      => 'Pieter Bakker',
+			'text'       => 'Snelle reactie, duidelijke communicatie en representatief personeel. Wij zijn zeer tevreden over de algehele service van TQS.',
+			'rating'     => 5,
+			'service_id' => 0,
+			'email'      => 'pieter.bakker@example.test',
+		),
+	);
+
+	foreach ( $samples as $sample ) {
+		$post_id = wp_insert_post( array(
+			'post_type'   => 'tqs_review',
+			'post_title'  => $sample['title'],
+			'post_status' => 'publish',
+		), true );
+
+		if ( is_wp_error( $post_id ) || ! $post_id ) {
+			continue;
+		}
+
+		tqs_save_review_meta_fields( $post_id, array(
+			'text'       => $sample['text'],
+			'rating'     => $sample['rating'],
+			'service_id' => $sample['service_id'],
+			'email'      => $sample['email'],
+			'consent'    => true,
+		) );
+	}
+
+	update_option( 'tqs_reviews_display_seeded_v1', 1 );
+}
+
+function tqs_maybe_seed_sample_reviews() {
+	if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	tqs_seed_sample_reviews();
+}
+add_action( 'admin_init', 'tqs_maybe_seed_sample_reviews' );
+
+/* ==========================================================================
    5. META BOXES — Page Hero Image + Page Options
    ========================================================================== */
 function tqs_add_meta_boxes() {
@@ -745,6 +814,88 @@ function tqs_get_services( $limit = -1 ) {
 		'orderby'        => 'menu_order date',
 		'order'          => 'ASC',
 	) );
+}
+
+/**
+ * Query published reviews for front-end display.
+ *
+ * @param array $args Optional get_posts overrides.
+ * @return WP_Post[]
+ */
+function tqs_get_published_reviews( $args = array() ) {
+	$defaults = array(
+		'post_type'      => 'tqs_review',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+	);
+
+	return get_posts( wp_parse_args( $args, $defaults ) );
+}
+
+/**
+ * Published reviews linked to a specific service.
+ *
+ * @param int $service_id tqs_service post ID.
+ * @return WP_Post[]
+ */
+function tqs_get_service_reviews( $service_id ) {
+	$service_id = absint( $service_id );
+	if ( ! $service_id ) {
+		return array();
+	}
+
+	return tqs_get_published_reviews( array(
+		'posts_per_page' => -1,
+		'meta_query'     => array(
+			array(
+				'key'     => '_tqs_review_service_id',
+				'value'   => $service_id,
+				'compare' => '=',
+				'type'    => 'NUMERIC',
+			),
+		),
+	) );
+}
+
+/**
+ * Front-end star markup (filled / empty).
+ *
+ * @param int $rating Rating 1–5.
+ * @return string
+ */
+function tqs_render_review_stars_markup( $rating ) {
+	$rating = absint( $rating );
+	$rating = max( 0, min( 5, $rating ) );
+
+	$html = '<span class="tqs-review-stars" aria-label="' . esc_attr( sprintf( __( '%d van 5 sterren', 'tqs-theme' ), $rating ) ) . '">';
+	for ( $i = 1; $i <= 5; $i++ ) {
+		$class = $i <= $rating ? 'tqs-review-star is-filled' : 'tqs-review-star is-empty';
+		$html .= '<span class="' . esc_attr( $class ) . '" aria-hidden="true">★</span>';
+	}
+	$html .= '</span>';
+
+	return $html;
+}
+
+/**
+ * Render a single review card (no email).
+ *
+ * @param WP_Post $review Review post object.
+ */
+function tqs_render_review_card( $review ) {
+	$rating = absint( get_post_meta( $review->ID, '_tqs_review_rating', true ) );
+	$text   = get_post_meta( $review->ID, '_tqs_review_text', true );
+	?>
+	<article class="tqs-review-card">
+		<?php echo tqs_render_review_stars_markup( $rating ); ?>
+		<?php if ( $text ) : ?>
+			<blockquote class="tqs-review-text"><?php echo esc_html( $text ); ?></blockquote>
+		<?php endif; ?>
+		<cite class="tqs-review-author"><?php echo esc_html( get_the_title( $review ) ); ?></cite>
+	</article>
+	<?php
 }
 
 function tqs_social_links() {

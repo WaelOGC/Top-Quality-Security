@@ -174,6 +174,26 @@ $show_dots   = get_theme_mod( 'tqs_hero_show_dots', true );
 </section>
 <?php endif; ?>
 
+<?php
+$homepage_reviews = tqs_get_published_reviews( array( 'posts_per_page' => 4 ) );
+if ( ! empty( $homepage_reviews ) ) :
+?>
+<!-- REVIEWS -->
+<section class="tqs-reviews-section">
+	<div class="tqs-reviews-outer">
+		<div class="tqs-section-intro">
+			<div class="tqs-section-eyebrow"><?php esc_html_e( 'ERVARINGEN', 'tqs-theme' ); ?></div>
+			<h2 class="tqs-section-h2"><?php esc_html_e( 'Wat Onze Klanten Zeggen', 'tqs-theme' ); ?></h2>
+		</div>
+		<div class="tqs-reviews-grid">
+			<?php foreach ( $homepage_reviews as $review ) : ?>
+				<?php tqs_render_review_card( $review ); ?>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
+<?php endif; ?>
+
 <?php if ( tqs_show_home_section( 'cta' ) ) : ?>
 <!-- FINAL CTA -->
 <section class="tqs-cta-banner">

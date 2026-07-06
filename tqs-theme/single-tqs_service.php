@@ -61,6 +61,20 @@ while ( have_posts() ) : the_post();
 			</div>
 
 			<?php the_content(); ?>
+
+			<?php
+			$service_reviews = tqs_get_service_reviews( get_the_ID() );
+			if ( ! empty( $service_reviews ) ) :
+			?>
+			<section class="tqs-service-reviews" aria-labelledby="tqs-service-reviews-heading">
+				<h2 id="tqs-service-reviews-heading" class="tqs-service-reviews-heading">Wat Klanten Zeggen</h2>
+				<div class="tqs-service-reviews-grid">
+					<?php foreach ( $service_reviews as $review ) : ?>
+						<?php tqs_render_review_card( $review ); ?>
+					<?php endforeach; ?>
+				</div>
+			</section>
+			<?php endif; ?>
 		</div>
 
 		<aside class="tqs-service-sidebar">
