@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#2D0A4E">
+  <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="80" fill="#2D0A4E"/>
+    <rect x="30" y="20" width="60" height="60" rx="8" fill="#C9973A"/>
+    <text x="60" y="55" font-family="sans-serif" font-weight="800" font-size="22" fill="#2D0A4E" text-anchor="middle">TQS</text>
+  </svg>
+</template>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { text-decoration: none; }
+    .tqs-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+    .tqs-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(45,10,78,0.18); border-color: #C9973A !important; }
+    .tqs-link:hover { color: #C9973A !important; }
+    .tqs-navlink:hover { color: #E8C06A !important; }
+    .tqs-btn-gold:hover { background: #E8C06A !important; }
+    .tqs-btn-outline:hover { background: rgba(255,255,255,0.12) !important; }
+    .tqs-social:hover { background: #C9973A !important; border-color: #C9973A !important; }
+    .tqs-drop-item:hover { background: #F9F6FF !important; color: #2D0A4E !important; }
+    .tqs-slide-arrow:hover { background: #C9973A !important; border-color: #C9973A !important; color: #2D0A4E !important; }
+    .tqs-slide-dot:hover { background: #E8C06A !important; }
+    @keyframes tqsFadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes tqsFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes tqsFloat { from { transform: translateY(0px); } to { transform: translateY(-16px); } }
+    @keyframes tqsSlideCrossfade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes tqsSlideFromRight { from { opacity: 0; transform: translateX(46px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes tqsSlideFromLeft { from { opacity: 0; transform: translateX(-46px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes tqsZoomFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .tqs-illustration-float { animation: tqsFloat 4.5s ease-in-out infinite alternate; }
+    .tqs-header-nav, .tqs-header-cta { white-space: nowrap; }
+    .tqs-hamburger { display: none; }
+    @media (max-width: 1080px) {
+      .tqs-header-nav { display: none !important; }
+      .tqs-header-cta { display: none !important; }
+      .tqs-hamburger { display: flex !important; }
+    }
+    @media (max-width: 640px) {
+      .tqs-cta-final { flex-direction: column; align-items: stretch !important; }
+      .tqs-cta-final a { text-align: center; }
+    }
+    .tqs-hero-content { padding: 60px 90px; }
+    @media (max-width: 900px) {
+      .tqs-hero-content { padding: 60px 76px; }
+    }
+    @media (max-width: 560px) {
+      .tqs-hero-content { padding: 40px 24px; }
+    }
+
+    /* ==== RESPONSIVE PASS ==== */
+    @media (max-width: 640px) {
+      .tqs-topbar-row { padding: 8px 20px !important; font-size: 11.5px !important; gap: 12px !important; }
+      .tqs-topbar-location { display: none !important; }
+      .tqs-header-bar { padding: 12px 20px !important; }
+      .tqs-header-brand-text { font-size: 16px !important; }
+      .tqs-header-brand-sub { display: none !important; }
+    }
+    @media (max-width: 400px) {
+      .tqs-topbar-email { display: none !important; }
+    }
+
+    @media (max-width: 768px) {
+      .tqs-hero-section { min-height: 500px !important; }
+      .tqs-hero-h1 { font-size: 32px !important; }
+      .tqs-hero-p { font-size: 14.5px !important; margin-bottom: 26px !important; }
+      .tqs-hero-buttons { flex-direction: column !important; align-items: stretch !important; }
+      .tqs-hero-buttons a { text-align: center; width: 100%; }
+      .tqs-hero-illustration { display: none !important; }
+      .tqs-hero-arrow { top: auto !important; bottom: 16px !important; transform: none !important; }
+      .tqs-arrow-prev { left: 14px !important; }
+      .tqs-arrow-next { right: 14px !important; }
+      .tqs-hero-dots { bottom: 16px !important; padding: 0 76px !important; }
+    }
+    @media (max-width: 420px) {
+      .tqs-hero-section { min-height: 460px !important; }
+      .tqs-hero-h1 { font-size: 26px !important; }
+    }
+
+    @media (max-width: 640px) {
+      .tqs-stats-grid { grid-template-columns: repeat(2,1fr) !important; gap: 24px 16px !important; padding: 32px 20px !important; }
+      .tqs-stats-grid > div { border-right: none !important; padding-right: 0 !important; }
+      .tqs-stat-value { font-size: 30px !important; }
+    }
+
+    .tqs-services-section { padding: 72px 40px; }
+    @media (max-width: 640px) {
+      .tqs-services-section { padding: 48px 20px !important; }
+      .tqs-section-h2 { font-size: 28px !important; }
+      .tqs-service-arrow { width: 40px !important; height: 40px !important; left: 8px !important; right: 8px !important; }
+    }
+
+    .tqs-whyus-outer { grid-template-columns: 0.9fr 1.1fr; }
+    @media (max-width: 900px) {
+      .tqs-whyus-outer { grid-template-columns: 1fr !important; gap: 36px !important; }
+    }
+    @media (max-width: 480px) {
+      .tqs-whyus-cards { grid-template-columns: 1fr !important; }
+    }
+    @media (max-width: 640px) {
+      .tqs-whyus-section { padding: 44px 20px 36px !important; }
+      .tqs-whyus-h2 { font-size: 28px !important; }
+    }
+
+    @media (max-width: 640px) {
+      .tqs-cta-section { padding: 44px 20px !important; }
+      .tqs-cta-h2 { font-size: 25px !important; }
+    }
+
+    .tqs-footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1.2fr; }
+    @media (max-width: 900px) {
+      .tqs-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+    }
+    @media (max-width: 560px) {
+      .tqs-footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+      .tqs-footer { padding: 40px 20px 0 !important; }
+    }
+  </style>
+</helmet>
+
+<div style="font-family: 'Inter', sans-serif; color: #4a3a5e; background: #FFFFFF; width: 100%; overflow-x: hidden;">
+
+  <!-- TOP BAR -->
+  <div class="tqs-topbar-row" style="background: #1A0533; color: #C9973A; font-size: 13px; padding: 8px 40px; display: flex; justify-content: space-between; align-items: center; font-weight: 500;">
+    <div style="display: flex; gap: 24px; align-items: center;">
+      <span style="display:flex; align-items:center; gap:8px;">📞 <span style="color:#E8C06A;">+31 (0)70 123 4567</span></span>
+      <span class="tqs-topbar-email" style="display:flex; align-items:center; gap:8px;">✉ <span style="color:#E8C06A;">info@topqualitysecurity.nl</span></span>
+    </div>
+    <div class="tqs-topbar-location" style="color: #9080A8;">Den Haag, Nederland</div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="tqs-header-bar" style="position: sticky; top: 0; z-index: 100; background: #2D0A4E; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="width:44px; height:44px; border-radius:8px; background: linear-gradient(135deg,#C9973A,#E8C06A); display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:#2D0A4E; font-size:18px; flex-shrink:0;">TQS</div>
+      <div style="line-height:1.1;">
+        <div class="tqs-header-brand-text" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:19px; color:#FFFFFF; letter-spacing:0.2px;">Top Quality Security</div>
+        <div class="tqs-header-brand-sub" style="font-size:11px; color:#C9973A; letter-spacing:1.5px; font-weight:600;">BEVEILIGINGSDIENSTEN</div>
+      </div>
+    </div>
+
+    <nav class="tqs-header-nav" style="display:flex; align-items:center; gap:28px;">
+      <a href="#" class="tqs-navlink" style="color:#FFFFFF; font-size:15px; font-weight:600; transition: color .2s;">Home</a>
+      <a href="#" class="tqs-navlink" style="color:#D8CCE8; font-size:15px; font-weight:500; transition: color .2s;">Wie Zijn Wij</a>
+      <div style="position:relative;" onMouseEnter="{{ openDropdown }}" onMouseLeave="{{ closeDropdown }}">
+        <a href="#diensten" class="tqs-navlink" onClick="{{ toggleDropdown }}" style="color:#D8CCE8; font-size:15px; font-weight:500; display:flex; align-items:center; gap:6px; cursor:pointer;">Onze Diensten <span style="font-size:10px; color:#C9973A;">▼</span></a>
+        <sc-if value="{{ servicesDropdownOpen }}">
+          <div style="position:absolute; top:100%; left:-16px; margin-top:14px; background:#FFFFFF; border-radius:10px; box-shadow:0 20px 40px rgba(0,0,0,0.2); padding:8px; width:240px; animation: tqsFadeIn .15s ease;">
+            <sc-for list="{{ services }}" as="svc" hint-placeholder-count="7">
+              <a href="#diensten" class="tqs-drop-item" style="display:block; padding:10px 14px; border-radius:6px; color:#4a3a5e; font-size:14px; font-weight:500; transition:.15s;">{{ svc.title }}</a>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <a href="#" class="tqs-navlink" style="color:#D8CCE8; font-size:15px; font-weight:500;">Fotogalerij</a>
+      <a href="#" class="tqs-navlink" style="color:#D8CCE8; font-size:15px; font-weight:500;">Contact</a>
+    </nav>
+
+    <a href="#" class="tqs-btn-gold tqs-header-cta" style="background:#C9973A; color:#2D0A4E; font-weight:700; font-size:14px; padding:12px 24px; border-radius:6px; transition: background .2s;">Offerte Aanvragen</a>
+
+    <button class="tqs-hamburger" onClick="{{ toggleMobileMenu }}" style="display:none; flex-direction:column; gap:5px; background:transparent; border:none; cursor:pointer; padding:6px;">
+      <span style="width:26px; height:2.5px; background:#E8C06A; border-radius:2px;"></span>
+      <span style="width:26px; height:2.5px; background:#E8C06A; border-radius:2px;"></span>
+      <span style="width:26px; height:2.5px; background:#E8C06A; border-radius:2px;"></span>
+    </button>
+  </header>
+
+  <sc-if value="{{ mobileMenuOpen }}">
+    <div style="background:#2D0A4E; padding:20px 20px 28px; display:flex; flex-direction:column; gap:2px; border-top:1px solid rgba(255,255,255,0.1); max-height:calc(100vh - 90px); overflow-y:auto;">
+      <a href="#" class="tqs-navlink" style="color:#FFFFFF; font-size:16px; font-weight:600; padding:12px 4px;">Home</a>
+      <a href="#" class="tqs-navlink" style="color:#D8CCE8; font-size:16px; font-weight:500; padding:12px 4px;">Wie Zijn Wij</a>
+      <div>
+        <a href="#" onClick="{{ toggleMobileServices }}" style="color:#D8CCE8; font-size:16px; font-weight:500; padding:12px 4px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">Onze Diensten <span style="font-size:11px; color:#C9973A;">{{ mobileServicesChevron }}</span></a>
+        <sc-if value="{{ mobileServicesOpen }}">
+          <div style="display:flex; flex-direction:column; gap:2px; padding-left:14px; border-left:2px solid rgba(201,151,58,0.3); margin:2px 0 6px 4px;">
+            <sc-for list="{{ services }}" as="svc" hint-placeholder-count="7">
+              <a href="#diensten" onClick="{{ toggleMobileMenu }}" style="color:#B8A8D8; font-size:14.5px; font-weight:500; padding:9px 4px;">{{ svc.title }}</a>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <a href="#" class="tqs-navlink" style="color:#D8CCE8; font-size:16px; font-weight:500; padding:12px 4px;">Fotogalerij</a>
+      <a href="#" class="tqs-navlink" style="color:#D8CCE8; font-size:16px; font-weight:500; padding:12px 4px;">Contact</a>
+      <a href="#" style="background:#C9973A; color:#2D0A4E; font-weight:700; font-size:15px; padding:14px 24px; border-radius:6px; margin-top:14px; text-align:center;">Offerte Aanvragen</a>
+    </div>
+  </sc-if>
+
+  <!-- HERO SLIDER -->
+  <section class="tqs-hero-section" style="position:relative; min-height:640px; display:flex; align-items:center; overflow:hidden;" onMouseEnter="{{ pauseHero }}" onMouseLeave="{{ resumeHero }}">
+    <div key="{{ heroIndex }}" style="{{ heroSlideAnimStyle }}">
+      <div style="{{ heroBgStyle }}"></div>
+      <div class="tqs-hero-illustration" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-end; padding-right:7%; pointer-events:none;">
+        <div class="tqs-illustration-float" style="position:relative;">
+          <svg width="230" height="290" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" style="opacity:0.92;">
+            <ellipse cx="100" cy="250" rx="66" ry="12" fill="#000000" opacity="0.18"></ellipse>
+            <path d="M55 60 Q100 20 145 60 L150 78 L50 78 Z" fill="#C9973A"></path>
+            <rect x="45" y="74" width="110" height="10" rx="5" fill="#E8C06A"></rect>
+            <circle cx="100" cy="97" r="27" fill="#E8DFF5"></circle>
+            <path d="M55 222 L60 142 Q100 120 140 142 L145 222 Z" fill="#B255DE"></path>
+            <rect x="58" y="186" width="84" height="12" fill="#C9973A"></rect>
+            <rect x="90" y="130" width="20" height="30" fill="#2D0A4E" opacity="0.35"></rect>
+          </svg>
+          <div style="position:absolute; top:-8px; right:-16px; width:50px; height:50px; border-radius:50%; background:#C9973A; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 10px 22px rgba(0,0,0,0.28);">{{ currentHero.icon }}</div>
+        </div>
+      </div>
+      <div style="position:absolute; inset:0; background: linear-gradient(100deg, rgba(26,5,51,0.94) 20%, rgba(45,10,78,0.72) 55%, rgba(45,10,78,0.5) 100%);"></div>
+
+      <div style="position:relative; z-index:2; max-width:680px;" class="tqs-hero-content">
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(201,151,58,0.15); border:1px solid #C9973A; color:#E8C06A; font-size:13px; font-weight:600; padding:7px 16px; border-radius:30px; margin-bottom:24px; white-space:nowrap; flex-shrink:0; max-width:100%; overflow:hidden; text-overflow:ellipsis;">
+          {{ currentHero.badge }}
+        </div>
+        <h1 class="tqs-hero-h1" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:52px; line-height:1.12; color:#FFFFFF; margin:0 0 22px;">
+          {{ currentHero.title }} <span style="color:#C9973A;">{{ currentHero.highlight }}</span>
+        </h1>
+        <p class="tqs-hero-p" style="font-size:17px; line-height:1.7; color:#D8CCE8; margin:0 0 36px; max-width:540px;">
+          {{ currentHero.subtitle }}
+        </p>
+        <div class="tqs-hero-buttons" style="display:flex; gap:16px; flex-wrap:wrap;">
+          <a href="#" class="tqs-btn-gold" style="background:#C9973A; color:#2D0A4E; font-weight:700; font-size:15px; padding:16px 32px; border-radius:6px; transition: background .2s;">Offerte Aanvragen</a>
+          <a href="#diensten" class="tqs-btn-outline" style="background:transparent; color:#FFFFFF; font-weight:600; font-size:15px; padding:16px 32px; border-radius:6px; border:1.5px solid rgba(255,255,255,0.5); transition: background .2s;">Onze Diensten →</a>
+        </div>
+      </div>
+    </div>
+
+    <button onClick="{{ prevHero }}" class="tqs-slide-arrow tqs-hero-arrow tqs-arrow-prev" style="position:absolute; left:20px; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3); color:#FFFFFF; font-size:18px; cursor:pointer; z-index:3; transition: all .2s;">‹</button>
+    <button onClick="{{ nextHero }}" class="tqs-slide-arrow tqs-hero-arrow tqs-arrow-next" style="position:absolute; right:20px; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3); color:#FFFFFF; font-size:18px; cursor:pointer; z-index:3; transition: all .2s;">›</button>
+
+    <div class="tqs-hero-dots" style="position:absolute; bottom:26px; left:0; right:0; display:flex; justify-content:center; gap:10px; z-index:3;">
+      <sc-for list="{{ heroDots }}" as="dot" hint-placeholder-count="3">
+        <div onClick="{{ dot.onClick }}" class="tqs-slide-dot" style="{{ dot.style }}"></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <section class="tqs-stats-grid" style="background:#2D0A4E; padding:44px 40px; display:grid; grid-template-columns:repeat(4,1fr); gap:24px;">
+    <sc-for list="{{ stats }}" as="stat" hint-placeholder-count="4">
+      <div style="text-align:center; border-right:1px solid rgba(255,255,255,0.12); padding-right:24px;">
+        <div class="tqs-stat-value" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:38px; color:#E8C06A; margin-bottom:6px;">{{ stat.value }}</div>
+        <div style="font-size:14px; color:#D8CCE8; font-weight:500; letter-spacing:0.3px;">{{ stat.label }}</div>
+      </div>
+    </sc-for>
+  </section>
+
+  <!-- SERVICES SLIDER -->
+  <section id="diensten" class="tqs-services-section" style="background:#F9F6FF;">
+    <div style="max-width:720px; margin:0 auto 40px; text-align:center;">
+      <div style="color:#C9973A; font-weight:700; font-size:14px; letter-spacing:2px; margin-bottom:14px;">ONZE DIENSTEN</div>
+      <h2 class="tqs-section-h2" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:38px; color:#2D0A4E; margin:0 0 18px;">Beveiligingsoplossingen op maat</h2>
+      <p style="font-size:16px; line-height:1.7; color:#9080A8; margin:0;">Voor elke sector een passende aanpak — professioneel, gecertificeerd en altijd paraat.</p>
+    </div>
+
+    <div style="max-width:1100px; margin:0 auto; position:relative;">
+      <div style="position:relative;">
+        <div style="{{ servicesGridStyle }}" key="{{ serviceIndex }}">
+          <sc-for list="{{ currentPageSlots }}" as="slot" hint-placeholder-count="2">
+            <sc-if value="{{ slot.isService }}" hint-placeholder-val="{{ true }}">
+              <div style="position:relative; height:420px; border-radius:16px; overflow:hidden; box-shadow:0 20px 44px rgba(45,10,78,0.18);">
+                <div style="{{ slot.bgStyle }}"></div>
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                  <div class="tqs-illustration-float" style="position:relative; opacity:0.9;">
+                    <svg width="110" height="140" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+                      <ellipse cx="100" cy="250" rx="66" ry="12" fill="#000000" opacity="0.18"></ellipse>
+                      <path d="M55 60 Q100 20 145 60 L150 78 L50 78 Z" fill="#C9973A"></path>
+                      <rect x="45" y="74" width="110" height="10" rx="5" fill="#E8C06A"></rect>
+                      <circle cx="100" cy="97" r="27" fill="#E8DFF5"></circle>
+                      <path d="M55 222 L60 142 Q100 120 140 142 L145 222 Z" fill="#F9F6FF" opacity="0.85"></path>
+                      <rect x="58" y="186" width="84" height="12" fill="#C9973A"></rect>
+                    </svg>
+                    <div style="position:absolute; top:-6px; right:-12px; width:34px; height:34px; border-radius:50%; background:#C9973A; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 6px 14px rgba(0,0,0,0.25);">{{ slot.icon }}</div>
+                  </div>
+                </div>
+                <div style="position:absolute; inset:0; background: linear-gradient(0deg, rgba(26,5,51,0.92) 12%, rgba(26,5,51,0.55) 48%, rgba(26,5,51,0.12) 78%);"></div>
+                <div style="position:absolute; left:0; bottom:0; padding:32px 30px;">
+                  <h3 style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:23px; color:#FFFFFF; margin:0 0 10px;">{{ slot.title }}</h3>
+                  <p style="font-size:14px; line-height:1.6; color:#E8DFF5; margin:0 0 16px; max-width:320px;">{{ slot.desc }}</p>
+                  <a href="#" class="tqs-link" style="color:#E8C06A; font-weight:700; font-size:14px; transition: color .2s;">Meer Info →</a>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ slot.isContact }}" hint-placeholder-val="{{ false }}">
+              <div style="height:420px; border-radius:16px; background: linear-gradient(135deg, #2D0A4E, #8B2FC9); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px;">
+                <div style="font-size:36px; margin-bottom:18px;">📞</div>
+                <h3 style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:21px; color:#FFFFFF; margin:0 0 12px;">Andere sector?</h3>
+                <p style="font-size:14px; line-height:1.6; color:#E8DFF5; margin:0 0 22px; max-width:260px;">Neem contact op voor meer informatie over een oplossing op maat.</p>
+                <a href="#" class="tqs-btn-gold" style="background:#C9973A; color:#2D0A4E; font-weight:700; font-size:14px; padding:12px 26px; border-radius:6px; transition: background .2s;">Neem Contact Op</a>
+              </div>
+            </sc-if>
+          </sc-for>
+        </div>
+
+        <button onClick="{{ prevService }}" class="tqs-slide-arrow tqs-service-arrow" style="position:absolute; left:-22px; top:50%; transform:translateY(-50%); width:42px; height:42px; border-radius:50%; background:#FFFFFF; border:1px solid #EDE4FA; color:#2D0A4E; font-size:18px; cursor:pointer; transition: all .2s; box-shadow:0 8px 20px rgba(45,10,78,0.15);">‹</button>
+        <button onClick="{{ nextService }}" class="tqs-slide-arrow tqs-service-arrow" style="position:absolute; right:-22px; top:50%; transform:translateY(-50%); width:42px; height:42px; border-radius:50%; background:#FFFFFF; border:1px solid #EDE4FA; color:#2D0A4E; font-size:18px; cursor:pointer; transition: all .2s; box-shadow:0 8px 20px rgba(45,10,78,0.15);">›</button>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:center; gap:18px; margin-top:26px;">
+        <div style="display:flex; gap:8px;">
+          <sc-for list="{{ serviceDots }}" as="dot" hint-placeholder-count="4">
+            <div onClick="{{ dot.onClick }}" class="tqs-slide-dot" style="{{ dot.style }}"></div>
+          </sc-for>
+        </div>
+        <div style="font-size:13px; color:#9080A8; font-weight:600;">{{ serviceCounter }} / {{ servicePageCount }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section class="tqs-whyus-section" style="background:#FFFFFF; padding:56px 40px 48px;">
+    <div class="tqs-whyus-outer" style="max-width:1200px; margin:0 auto; display:grid; gap:64px; align-items:center;">
+      <div>
+        <div style="color:#C9973A; font-weight:700; font-size:14px; letter-spacing:2px; margin-bottom:14px;">WAAROM TQS</div>
+        <h2 class="tqs-whyus-h2" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:36px; color:#2D0A4E; margin:0 0 20px; line-height:1.2;">Betrouwbaarheid die u kunt zien</h2>
+        <p style="font-size:16px; line-height:1.75; color:#4a3a5e; margin:0;">Al meer dan tien jaar biedt TQS professionele beveiliging aan bedrijven, evenementen en instellingen door heel Nederland. Onze medewerkers zijn opgeleid, gecertificeerd en altijd representatief.</p>
+      </div>
+      <div class="tqs-whyus-cards" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <sc-for list="{{ whyUs }}" as="item" hint-placeholder-count="4">
+          <div style="padding:28px 24px; border-radius:12px; background:#F9F6FF; border:1px solid #EDE4FA;">
+            <div style="font-size:28px; margin-bottom:16px;">{{ item.icon }}</div>
+            <h4 style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:16.5px; color:#2D0A4E; margin:0 0 8px;">{{ item.title }}</h4>
+            <p style="font-size:13.5px; line-height:1.6; color:#9080A8; margin:0;">{{ item.desc }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="tqs-cta-section" style="background: linear-gradient(120deg, #2D0A4E 0%, #8B2FC9 100%); padding:56px 40px; position:relative; overflow:hidden;">
+    <div style="position:absolute; top:-60px; right:-60px; width:280px; height:280px; border-radius:50%; background:rgba(201,151,58,0.15);"></div>
+    <div style="position:relative; z-index:1; max-width:800px; margin:0 auto; text-align:center;">
+      <h2 class="tqs-cta-h2" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:34px; color:#FFFFFF; margin:0 0 16px;">Klaar voor professionele beveiliging?</h2>
+      <p style="font-size:16px; color:#E8DFF5; margin:0 0 34px;">Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.</p>
+      <div class="tqs-cta-final" style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+        <a href="#" class="tqs-btn-gold" style="background:#C9973A; color:#2D0A4E; font-weight:700; font-size:15px; padding:16px 34px; border-radius:6px; transition: background .2s; white-space:nowrap;">Offerte Aanvragen</a>
+        <a href="#" class="tqs-btn-outline" style="background:transparent; color:#FFFFFF; font-weight:600; font-size:15px; padding:16px 34px; border-radius:6px; border:1.5px solid rgba(255,255,255,0.6); transition: background .2s; white-space:nowrap;">Bel Ons Direct</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="tqs-footer" style="background:#1A0533; padding:56px 40px 0;">
+    <div class="tqs-footer-grid" style="max-width:1200px; margin:0 auto; display:grid; gap:48px; padding-bottom:40px; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+          <div style="width:40px; height:40px; border-radius:8px; background: linear-gradient(135deg,#C9973A,#E8C06A); display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:#2D0A4E; font-size:16px;">TQS</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:17px; color:#FFFFFF;">Top Quality Security</div>
+        </div>
+        <p style="font-size:14px; line-height:1.7; color:#9080A8; margin:0 0 22px; max-width:280px;">Professionele beveiligingsdiensten vanuit Den Haag, actief door heel Nederland. Gecertificeerd, betrouwbaar en 24/7 paraat.</p>
+        <div style="display:flex; gap:10px;">
+          <sc-for list="{{ socials }}" as="s" hint-placeholder-count="4">
+            <a href="#" class="tqs-social" style="width:36px; height:36px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; color:#E8C06A; font-size:14px; transition: all .2s;">{{ s.icon }}</a>
+          </sc-for>
+        </div>
+      </div>
+
+      <div>
+        <h5 style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:14px; color:#FFFFFF; letter-spacing:1px; margin:0 0 20px;">SNELLE LINKS</h5>
+        <div style="display:flex; flex-direction:column; gap:13px;">
+          <a href="#" class="tqs-link" style="color:#9080A8; font-size:14px; transition: color .2s;">Home</a>
+          <a href="#" class="tqs-link" style="color:#9080A8; font-size:14px; transition: color .2s;">Wie Zijn Wij</a>
+          <a href="#" class="tqs-link" style="color:#9080A8; font-size:14px; transition: color .2s;">Fotogalerij</a>
+          <a href="#" class="tqs-link" style="color:#9080A8; font-size:14px; transition: color .2s;">Contact</a>
+        </div>
+      </div>
+
+      <div>
+        <h5 style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:14px; color:#FFFFFF; letter-spacing:1px; margin:0 0 20px;">DIENSTEN</h5>
+        <div style="display:flex; flex-direction:column; gap:13px;">
+          <a href="#diensten" class="tqs-link" style="color:#9080A8; font-size:14px; transition: color .2s;">Retailbeveiliging</a>
+          <a href="#diensten" class="tqs-link" style="color:#9080A8; font-size:14px; transition: color .2s;">Horecabeveiliging</a>
+          <a href="#diensten" class="tqs-link" style="color:#9080A8; font-size:14px; transition: color .2s;">Evenementenbeveiliging</a>
+          <a href="#diensten" class="tqs-link" style="color:#9080A8; font-size:14px; transition: color .2s;">Objectbeveiliging</a>
+        </div>
+      </div>
+
+      <div>
+        <h5 style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:14px; color:#FFFFFF; letter-spacing:1px; margin:0 0 20px;">CONTACT</h5>
+        <div style="display:flex; flex-direction:column; gap:15px;">
+          <div style="font-size:14px; color:#9080A8; display:flex; gap:10px;"><span style="color:#C9973A;">📍</span> Spui 70, 2511 BT Den Haag</div>
+          <div style="font-size:14px; color:#9080A8; display:flex; gap:10px;"><span style="color:#C9973A;">📞</span> +31 (0)70 123 4567</div>
+          <div style="font-size:14px; color:#9080A8; display:flex; gap:10px;"><span style="color:#C9973A;">✉</span> info@topqualitysecurity.nl</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:1200px; margin:0 auto; padding:22px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div style="font-size:13px; color:#9080A8;">© 2026 Top Quality Security. Alle rechten voorbehouden.</div>
+      <div style="display:flex; gap:24px;">
+        <a href="Privacybeleid.dc.html" class="tqs-link" style="color:#9080A8; font-size:13px; transition: color .2s;">Privacybeleid</a>
+        <a href="Algemene Voorwaarden.dc.html" class="tqs-link" style="color:#9080A8; font-size:13px; transition: color .2s;">Algemene Voorwaarden</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const HERO_SLIDES = [
+  {
+    gradient: "linear-gradient(135deg, #1A0533 0%, #2D0A4E 55%, #4a1b7a 100%)",
+    icon: "🛡",
+    caption: "professionele beveiliger aan het werk",
+    badge: "ND 7099 GECERTIFICEERD",
+    title: "Uw veiligheid is onze",
+    highlight: "topprioriteit",
+    subtitle: "Wij staan voor kwaliteit en betrouwbaarheid in beveiliging. Van retail tot evenementen — TQS levert professionele beveiligingsoplossingen door heel Nederland, vanuit Den Haag.",
+  },
+  {
+    gradient: "linear-gradient(135deg, #2D0A4E 0%, #6a2499 55%, #8B2FC9 100%)",
+    icon: "🏬",
+    caption: "winkel- en horecabeveiliging",
+    badge: "RETAIL & HORECA",
+    title: "Specialisten in",
+    highlight: "winkel- en horecabeveiliging",
+    subtitle: "Onze beveiligers zorgen voor een veilige, gastvrije omgeving in winkels, bars en restaurants — alert, benaderbaar en professioneel.",
+  },
+  {
+    gradient: "linear-gradient(135deg, #1A0533 0%, #3d1466 50%, #8B2FC9 100%)",
+    icon: "🎪",
+    caption: "evenement- en objectbeveiliging",
+    badge: "EVENEMENTEN & OBJECTEN",
+    title: "Veiligheid voor elk",
+    highlight: "evenement en pand",
+    subtitle: "Van festivals tot hotels en bedrijfspanden: wij bieden beveiligingsoplossingen die passen bij uw specifieke situatie.",
+  },
+];
+
+const HERO_TRANSITIONS = ["tqsSlideCrossfade", "tqsSlideFromRight", "tqsSlideFromLeft"];
+const SERVICE_TRANSITIONS = ["tqsSlideCrossfade", "tqsSlideFromRight", "tqsZoomFade"];
+
+const SERVICES = [
+  { icon: "🏬", title: "Retailbeveiliging", desc: "Preventie van diefstal en overlast in winkels, met een gastvrije en alerte uitstraling.", gradient: "linear-gradient(150deg, #2D0A4E 0%, #6a2499 100%)" },
+  { icon: "🍷", title: "Horecabeveiliging", desc: "Professionele beveiliging voor bars, clubs en restaurants — rustig optreden, sterk in de-escalatie.", gradient: "linear-gradient(150deg, #1A0533 0%, #4a1b7a 100%)" },
+  { icon: "🎪", title: "Evenementenbeveiliging", desc: "Van festival tot bedrijfsevenement: veiligheid en toegangscontrole voor elk publiek.", gradient: "linear-gradient(150deg, #2D0A4E 0%, #8B2FC9 100%)" },
+  { icon: "🏨", title: "Hotelbeveiliging", desc: "Discrete, representatieve beveiliging die de gastervaring van uw hotel versterkt.", gradient: "linear-gradient(150deg, #1A0533 0%, #6a2499 100%)" },
+  { icon: "🏢", title: "Objectbeveiliging", desc: "Continue bewaking van panden en terreinen, met surveillance en toegangsbeheer.", gradient: "linear-gradient(150deg, #2D0A4E 0%, #3d1466 100%)" },
+  { icon: "🛒", title: "Supermarktbeveiliging", desc: "Zichtbare aanwezigheid ter voorkoming van winkeldiefstal en agressie richting personeel.", gradient: "linear-gradient(150deg, #1A0533 0%, #8B2FC9 100%)" },
+  { icon: "🎰", title: "Casino's Beveiliging", desc: "Gespecialiseerde beveiliging voor casino's, met oog voor discretie en snelle interventie.", gradient: "linear-gradient(150deg, #2D0A4E 0%, #4a1b7a 100%)" },
+];
+
+class Component extends DCLogic {
+  state = {
+    mobileMenuOpen: false,
+    mobileServicesOpen: false,
+    servicesDropdownOpen: false,
+    heroIndex: 0,
+    heroPaused: false,
+    serviceIndex: 0,
+    pageIndex: 0,
+    isMobileServices: false,
+  };
+
+  componentDidMount() {
+    this._heroTimer = setInterval(() => {
+      if (!this.state.heroPaused) {
+        this.setState(s => ({ heroIndex: (s.heroIndex + 1) % HERO_SLIDES.length }));
+      }
+    }, 5500);
+
+    this._mql = window.matchMedia("(max-width: 767px)");
+    this.setState({ isMobileServices: this._mql.matches });
+    this._mqlHandler = (e) => this.setState({ isMobileServices: e.matches, pageIndex: 0 });
+    if (this._mql.addEventListener) this._mql.addEventListener("change", this._mqlHandler);
+    else this._mql.addListener(this._mqlHandler);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._heroTimer);
+    if (this._mql) {
+      if (this._mql.removeEventListener) this._mql.removeEventListener("change", this._mqlHandler);
+      else this._mql.removeListener(this._mqlHandler);
+    }
+  }
+
+  renderVals() {
+    const heroIndex = this.state.heroIndex;
+    const pageIndex = this.state.pageIndex;
+    const currentHero = HERO_SLIDES[heroIndex];
+
+    const chunkSize = this.state.isMobileServices ? 1 : 2;
+    const SERVICE_PAGES = [];
+    for (let i = 0; i < SERVICES.length; i += chunkSize) {
+      SERVICE_PAGES.push(SERVICES.slice(i, i + chunkSize));
+    }
+    const pageCount = SERVICE_PAGES.length;
+    const safePageIndex = Math.min(pageIndex, pageCount - 1);
+    const rawSlots = SERVICE_PAGES[safePageIndex];
+    const currentPageSlots = rawSlots.map(svc => ({
+      isService: true,
+      isContact: false,
+      ...svc,
+      bgStyle: { background: svc.gradient, position: "absolute", inset: 0 },
+    }));
+    if (chunkSize === 2 && currentPageSlots.length < 2) {
+      currentPageSlots.push({ isService: false, isContact: true });
+    }
+
+    const dotBaseStyle = (active) => ({
+      width: active ? "22px" : "9px",
+      height: "9px",
+      borderRadius: "5px",
+      background: active ? "#C9973A" : "rgba(255,255,255,0.4)",
+      cursor: "pointer",
+      transition: "all .25s ease",
+    });
+
+    const serviceDotStyle = (active) => ({
+      width: active ? "20px" : "8px",
+      height: "8px",
+      borderRadius: "5px",
+      background: active ? "#8B2FC9" : "#D8CCE8",
+      cursor: "pointer",
+      transition: "all .25s ease",
+    });
+
+    return {
+      mobileMenuOpen: this.state.mobileMenuOpen,
+      toggleMobileMenu: () => this.setState(s => ({ mobileMenuOpen: !s.mobileMenuOpen })),
+
+      mobileServicesOpen: this.state.mobileServicesOpen,
+      mobileServicesChevron: this.state.mobileServicesOpen ? "\u25b2" : "\u25bc",
+      toggleMobileServices: (e) => { e.preventDefault(); this.setState(s => ({ mobileServicesOpen: !s.mobileServicesOpen })); },
+
+      servicesDropdownOpen: this.state.servicesDropdownOpen,
+      openDropdown: () => this.setState({ servicesDropdownOpen: true }),
+      closeDropdown: () => this.setState({ servicesDropdownOpen: false }),
+      toggleDropdown: (e) => { e.preventDefault(); this.setState(s => ({ servicesDropdownOpen: !s.servicesDropdownOpen })); },
+
+      heroIndex,
+      currentHero,
+      heroBgStyle: { background: currentHero.gradient, position: "absolute", inset: 0 },
+      heroSlideAnimStyle: { position: "absolute", inset: 0, display: "flex", alignItems: "center", animation: HERO_TRANSITIONS[heroIndex % HERO_TRANSITIONS.length] + " 0.55s ease" },
+      pauseHero: () => this.setState({ heroPaused: true }),
+      resumeHero: () => this.setState({ heroPaused: false }),
+      prevHero: () => this.setState(s => ({ heroIndex: (s.heroIndex - 1 + HERO_SLIDES.length) % HERO_SLIDES.length })),
+      nextHero: () => this.setState(s => ({ heroIndex: (s.heroIndex + 1) % HERO_SLIDES.length })),
+      heroDots: HERO_SLIDES.map((_, i) => ({
+        onClick: () => this.setState({ heroIndex: i }),
+        style: dotBaseStyle(i === heroIndex),
+      })),
+
+      services: SERVICES,
+      serviceIndex: safePageIndex,
+      serviceCounter: safePageIndex + 1,
+      servicePageCount: pageCount,
+      currentPageSlots,
+      servicesGridStyle: { display: "grid", gridTemplateColumns: chunkSize === 1 ? "1fr" : "1fr 1fr", gap: "24px", animation: SERVICE_TRANSITIONS[safePageIndex % SERVICE_TRANSITIONS.length] + " 0.5s ease" },
+      prevService: () => this.setState(s => ({ pageIndex: (s.pageIndex - 1 + pageCount) % pageCount })),
+      nextService: () => this.setState(s => ({ pageIndex: (s.pageIndex + 1) % pageCount })),
+      serviceDots: SERVICE_PAGES.map((_, i) => ({
+        onClick: () => this.setState({ pageIndex: i }),
+        style: serviceDotStyle(i === safePageIndex),
+      })),
+
+      stats: [
+        { value: "10+", label: "Jaar Ervaring" },
+        { value: "500+", label: "Tevreden Klanten" },
+        { value: "24/7", label: "Beschikbaar" },
+        { value: "7", label: "Sectoren" },
+      ],
+      whyUs: [
+        { icon: "🛡", title: "ND 7099 Gecertificeerd", desc: "Voldoen aan de hoogste kwaliteitsnorm in de beveiligingsbranche." },
+        { icon: "🎓", title: "Ervaren Personeel", desc: "Goed opgeleide, representatieve beveiligers met jarenlange ervaring." },
+        { icon: "🕐", title: "24/7 Beschikbaar", desc: "Altijd bereikbaar, ook buiten kantoortijden en in het weekend." },
+        { icon: "⚙", title: "Maatwerk Oplossingen", desc: "Beveiligingsplannen afgestemd op de specifieke situatie van uw organisatie." },
+      ],
+      socials: [
+        { icon: "in" }, { icon: "f" }, { icon: "ig" }, { icon: "x" },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>
