@@ -25,6 +25,7 @@ function tqs_theme_version() {
 
 require get_template_directory() . '/inc/theme-options.php';
 require get_template_directory() . '/inc/customizer.php';
+require get_template_directory() . '/inc/cinematic-scroll.php';
 
 /* ==========================================================================
    1. THEME SETUP

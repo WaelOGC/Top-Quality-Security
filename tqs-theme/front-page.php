@@ -65,7 +65,7 @@ $show_dots   = get_theme_mod( 'tqs_hero_show_dots', true );
 
 <?php if ( tqs_show_home_section( 'stats' ) ) : ?>
 <!-- STATS BAR -->
-<section class="tqs-stats">
+<section class="tqs-stats tqs-reveal">
 	<?php foreach ( tqs_get_stats() as $stat ) : if ( empty( $stat['value'] ) ) continue; ?>
 		<div class="tqs-stat">
 			<div class="tqs-stat-value"><?php echo esc_html( $stat['value'] ); ?></div>
@@ -78,13 +78,13 @@ $show_dots   = get_theme_mod( 'tqs_hero_show_dots', true );
 <?php if ( tqs_show_home_section( 'services' ) && ! empty( $services ) ) : ?>
 <!-- SERVICES SLIDER -->
 <section id="diensten" class="tqs-services-section">
-	<div class="tqs-section-intro">
+	<div class="tqs-section-intro tqs-reveal">
 		<div class="tqs-section-eyebrow"><?php echo esc_html( get_theme_mod( 'tqs_services_eyebrow', 'ONZE DIENSTEN' ) ); ?></div>
 		<h2 class="tqs-section-h2"><?php echo esc_html( get_theme_mod( 'tqs_services_title', 'Beveiligingsoplossingen op maat' ) ); ?></h2>
 		<p class="tqs-section-lead"><?php echo esc_html( get_theme_mod( 'tqs_services_lead', 'Voor elke sector een passende aanpak — professioneel, gecertificeerd en altijd paraat.' ) ); ?></p>
 	</div>
 
-	<div class="tqs-services-slider-wrap">
+	<div class="tqs-services-slider-wrap tqs-reveal">
 		<div style="position:relative;">
 			<div id="tqsServicesTrack">
 				<?php
@@ -156,12 +156,12 @@ $show_dots   = get_theme_mod( 'tqs_hero_show_dots', true );
 <!-- WHY US -->
 <section class="tqs-whyus">
 	<div class="tqs-whyus-outer">
-		<div>
+		<div class="tqs-reveal-left">
 			<div class="tqs-section-eyebrow"><?php echo esc_html( get_theme_mod( 'tqs_why_eyebrow', 'WAAROM TQS' ) ); ?></div>
 			<h2 class="tqs-whyus-h2"><?php echo esc_html( get_theme_mod( 'tqs_why_title', 'Betrouwbaarheid die u kunt zien' ) ); ?></h2>
 			<p class="tqs-whyus-text"><?php echo esc_html( get_theme_mod( 'tqs_why_text', 'Al meer dan tien jaar biedt TQS professionele beveiliging aan bedrijven, evenementen en instellingen door heel Nederland. Onze medewerkers zijn opgeleid, gecertificeerd en altijd representatief.' ) ); ?></p>
 		</div>
-		<div class="tqs-whyus-cards">
+		<div class="tqs-whyus-cards tqs-reveal-right">
 			<?php foreach ( $why_us as $item ) : ?>
 				<div class="tqs-whyus-card">
 					<div class="tqs-whyus-card-icon"><i class="fa-solid <?php echo esc_attr( $item['icon'] ); ?>"></i></div>
@@ -179,7 +179,7 @@ $homepage_reviews = tqs_get_published_reviews( array( 'posts_per_page' => 4 ) );
 if ( ! empty( $homepage_reviews ) ) :
 ?>
 <!-- REVIEWS -->
-<section class="tqs-reviews-section">
+<section class="tqs-reviews-section tqs-reveal">
 	<div class="tqs-reviews-outer">
 		<div class="tqs-section-intro">
 			<div class="tqs-section-eyebrow"><?php esc_html_e( 'ERVARINGEN', 'tqs-theme' ); ?></div>
@@ -196,7 +196,7 @@ if ( ! empty( $homepage_reviews ) ) :
 
 <?php if ( tqs_show_home_section( 'cta' ) ) : ?>
 <!-- FINAL CTA -->
-<section class="tqs-cta-banner">
+<section class="tqs-cta-banner tqs-reveal">
 	<div class="tqs-cta-inner">
 		<h2 class="tqs-cta-h2"><?php echo esc_html( get_theme_mod( 'tqs_cta_title', 'Klaar voor professionele beveiliging?' ) ); ?></h2>
 		<p><?php echo esc_html( get_theme_mod( 'tqs_cta_text', 'Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.' ) ); ?></p>

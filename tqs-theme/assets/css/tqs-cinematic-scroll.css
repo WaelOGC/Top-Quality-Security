@@ -1,0 +1,56 @@
+/**
+ * TQS Cinematic Scroll — base states for reveal + hero helpers
+ *
+ * Scoped to body.tqs-cinematic (added only when assets enqueue on the front page).
+ * No-JS / reduced-motion: content stays fully visible (see prefers-reduced-motion + noscript).
+ */
+
+/* Reveal initial states — GSAP animates FROM these; .is-revealed locks final state */
+body.tqs-cinematic .tqs-reveal:not(.is-revealed) {
+	opacity: 0;
+	transform: translate3d(0, 40px, 0);
+	will-change: opacity, transform;
+}
+
+body.tqs-cinematic .tqs-reveal-left:not(.is-revealed) {
+	opacity: 0;
+	transform: translate3d(-56px, 0, 0);
+	will-change: opacity, transform;
+}
+
+body.tqs-cinematic .tqs-reveal-right:not(.is-revealed) {
+	opacity: 0;
+	transform: translate3d(56px, 0, 0);
+	will-change: opacity, transform;
+}
+
+body.tqs-cinematic .tqs-reveal.is-revealed,
+body.tqs-cinematic .tqs-reveal-left.is-revealed,
+body.tqs-cinematic .tqs-reveal-right.is-revealed {
+	opacity: 1;
+	transform: none;
+	will-change: auto;
+}
+
+/* Hero parallax layers — GPU-friendly */
+body.tqs-cinematic .tqs-hero .tqs-hero-slide-bg,
+body.tqs-cinematic .tqs-hero .tqs-hero-content,
+body.tqs-cinematic .tqs-hero .tqs-hero-illustration {
+	will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.tqs-cinematic .tqs-reveal,
+	body.tqs-cinematic .tqs-reveal-left,
+	body.tqs-cinematic .tqs-reveal-right {
+		opacity: 1 !important;
+		transform: none !important;
+		will-change: auto !important;
+	}
+
+	body.tqs-cinematic .tqs-hero .tqs-hero-slide-bg,
+	body.tqs-cinematic .tqs-hero .tqs-hero-content,
+	body.tqs-cinematic .tqs-hero .tqs-hero-illustration {
+		will-change: auto !important;
+	}
+}
