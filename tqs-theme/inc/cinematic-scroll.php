@@ -80,6 +80,13 @@ function tqs_enqueue_cinematic_scroll() {
 		$ver
 	);
 
+	wp_enqueue_style(
+		'tqs-hero-slider',
+		$uri . '/assets/css/tqs-hero-slider.css',
+		array( 'tqs-theme-style', 'tqs-cinematic-scroll' ),
+		$ver
+	);
+
 	wp_enqueue_script(
 		'lenis',
 		'https://unpkg.com/lenis@1.3.26/dist/lenis.min.js',

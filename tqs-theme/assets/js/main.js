@@ -78,14 +78,17 @@
 		});
 
 		/* ==================================================================
-		   2. HERO SLIDER
+		   2. HERO SLIDER (legacy Customizer markup only)
+		   Skip when the new meta-box hero slider owns #tqsHero.
 		   ================================================================== */
-		var $heroSlides = $('#tqsHero .tqs-hero-slide');
+		var $heroRoot = $('#tqsHero');
+		var $heroSlides = $heroRoot.find('.tqs-hero-slide');
 		var $heroDots = $('#tqsHeroDots .tqs-slide-dot');
 		var heroIndex = 0;
 		var heroTimer = null;
 		var heroTransitions = ['tqs-anim-crossfade', 'tqs-anim-from-right', 'tqs-anim-from-left'];
 		var heroPaused = false;
+		var isMetaBoxHero = $heroRoot.length && $heroRoot.is('[data-tqs-hero-slider]');
 
 		function goToHeroSlide(i) {
 			if (!$heroSlides.length) return;
@@ -106,11 +109,11 @@
 			}, interval);
 		}
 
-		if ($heroSlides.length) {
+		if ($heroSlides.length && !isMetaBoxHero) {
 			$('#tqsHeroPrev').on('click', function () { goToHeroSlide(heroIndex - 1); });
 			$('#tqsHeroNext').on('click', function () { goToHeroSlide(heroIndex + 1); });
 			$heroDots.on('click', function () { goToHeroSlide($(this).data('goto')); });
-			$('#tqsHero').on('mouseenter', function () { heroPaused = true; })
+			$heroRoot.on('mouseenter', function () { heroPaused = true; })
 				.on('mouseleave', function () { heroPaused = false; });
 			startHeroTimer();
 		}

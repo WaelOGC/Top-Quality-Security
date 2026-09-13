@@ -6,62 +6,11 @@
  */
 get_header();
 
-$services    = tqs_get_services();
-$hero_slides = tqs_get_hero_slides();
-$why_us      = tqs_get_why_us_cards();
-$show_arrows = get_theme_mod( 'tqs_hero_show_arrows', true );
-$show_dots   = get_theme_mod( 'tqs_hero_show_dots', true );
+$services = tqs_get_services();
+$why_us   = tqs_get_why_us_cards();
+
+tqs_render_hero( get_the_ID() );
 ?>
-
-<?php if ( ! empty( $hero_slides ) ) : ?>
-<!-- HERO SLIDER -->
-<section class="tqs-hero" id="tqsHero" data-autoplay="<?php echo get_theme_mod( 'tqs_hero_autoplay', true ) ? '1' : '0'; ?>">
-	<?php foreach ( $hero_slides as $i => $slide ) :
-		$bg_style = ! empty( $slide['image_url'] )
-			? "background-image:url('" . esc_url( $slide['image_url'] ) . "');background-size:cover;background-position:center;"
-			: 'background:' . esc_attr( $slide['gradient'] ) . ';';
-	?>
-	<div class="tqs-hero-slide<?php echo 0 === $i ? ' is-active' : ''; ?>" data-slide="<?php echo esc_attr( $i ); ?>">
-		<div class="tqs-hero-slide-bg" style="<?php echo esc_attr( $bg_style ); ?>"></div>
-		<div class="tqs-hero-illustration">
-			<div class="tqs-illustration-float" style="position:relative;">
-				<svg width="230" height="290" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" style="opacity:0.92;">
-					<ellipse cx="100" cy="250" rx="66" ry="12" fill="#000000" opacity="0.18"></ellipse>
-					<path d="M55 60 Q100 20 145 60 L150 78 L50 78 Z" fill="#C9973A"></path>
-					<rect x="45" y="74" width="110" height="10" rx="5" fill="#E8C06A"></rect>
-					<circle cx="100" cy="97" r="27" fill="#E8DFF5"></circle>
-					<path d="M55 222 L60 142 Q100 120 140 142 L145 222 Z" fill="#B255DE"></path>
-					<rect x="58" y="186" width="84" height="12" fill="#C9973A"></rect>
-				</svg>
-				<div class="tqs-badge-icon"><?php echo esc_html( $slide['icon'] ); ?></div>
-			</div>
-		</div>
-		<div class="tqs-hero-overlay"></div>
-		<div class="tqs-hero-content">
-			<div class="tqs-hero-badge"><?php echo esc_html( $slide['badge'] ); ?></div>
-			<h1 class="tqs-hero-h1"><?php echo esc_html( $slide['title'] ); ?> <span><?php echo esc_html( $slide['highlight'] ); ?></span></h1>
-			<p class="tqs-hero-p"><?php echo esc_html( $slide['subtitle'] ); ?></p>
-			<div class="tqs-hero-buttons">
-				<a href="<?php echo esc_url( tqs_theme_mod_url( 'tqs_hero_btn1_url', '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold"><?php echo esc_html( get_theme_mod( 'tqs_hero_btn1_text', 'Offerte Aanvragen' ) ); ?></a>
-				<a href="<?php echo esc_url( tqs_theme_mod_url( 'tqs_hero_btn2_url', '/onze-diensten' ) ); ?>" class="tqs-btn tqs-btn-outline"><?php echo esc_html( get_theme_mod( 'tqs_hero_btn2_text', 'Onze Diensten →' ) ); ?></a>
-			</div>
-		</div>
-	</div>
-	<?php endforeach; ?>
-
-	<?php if ( $show_arrows && count( $hero_slides ) > 1 ) : ?>
-	<button class="tqs-slide-arrow tqs-arrow-prev" id="tqsHeroPrev" aria-label="Vorige">‹</button>
-	<button class="tqs-slide-arrow tqs-arrow-next" id="tqsHeroNext" aria-label="Volgende">›</button>
-	<?php endif; ?>
-	<?php if ( $show_dots && count( $hero_slides ) > 1 ) : ?>
-	<div class="tqs-hero-dots" id="tqsHeroDots">
-		<?php foreach ( $hero_slides as $i => $slide ) : ?>
-			<button type="button" class="tqs-slide-dot<?php echo 0 === $i ? ' is-active' : ''; ?>" data-goto="<?php echo esc_attr( $i ); ?>"></button>
-		<?php endforeach; ?>
-	</div>
-	<?php endif; ?>
-</section>
-<?php endif; ?>
 
 <?php if ( tqs_show_home_section( 'stats' ) ) : ?>
 <!-- STATS BAR -->
@@ -74,7 +23,6 @@ $show_dots   = get_theme_mod( 'tqs_hero_show_dots', true );
 	<?php endforeach; ?>
 </section>
 <?php endif; ?>
-
 <?php if ( tqs_show_home_section( 'services' ) && ! empty( $services ) ) : ?>
 <!-- SERVICES SLIDER -->
 <section id="diensten" class="tqs-services-section">

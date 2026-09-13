@@ -1,0 +1,105 @@
+/**
+ * Homepage hero slider — stacked slides + burn/dissolve noise overlay.
+ * Loaded on the front page with cinematic scroll assets.
+ */
+
+.tqs-hero {
+	position: relative;
+	isolation: isolate;
+}
+
+.tqs-hero .tqs-hero-slide {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	opacity: 0;
+	visibility: hidden;
+	z-index: 0;
+	pointer-events: none;
+}
+
+.tqs-hero .tqs-hero-slide.is-active {
+	opacity: 1;
+	visibility: visible;
+	z-index: 1;
+	pointer-events: auto;
+}
+
+/* During transition both slides may be visible */
+.tqs-hero .tqs-hero-slide.is-leaving,
+.tqs-hero .tqs-hero-slide.is-entering {
+	visibility: visible;
+	pointer-events: none;
+}
+
+.tqs-hero .tqs-hero-slide.is-entering {
+	z-index: 2;
+}
+
+.tqs-hero .tqs-hero-slide.is-leaving {
+	z-index: 1;
+}
+
+.tqs-hero .tqs-hero-slide-bg {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	background: linear-gradient(135deg, #1A0533 0%, #2D0A4E 55%, #4a1b7a 100%);
+}
+
+.tqs-hero .tqs-hero-slide-bg img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	transform: scale(1);
+	will-change: transform, opacity;
+}
+
+.tqs-hero .tqs-hero-overlay {
+	z-index: 1;
+}
+
+.tqs-hero .tqs-hero-content {
+	z-index: 2;
+}
+
+.tqs-hero-icon {
+	display: inline-block;
+	line-height: 1;
+	margin-right: 6px;
+	font-size: 1.1em;
+}
+
+.tqs-hero-noise {
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+	pointer-events: none;
+	opacity: 0;
+	mix-blend-mode: overlay;
+}
+
+.tqs-hero-noise-svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+/* No-JS / pre-init: first slide already has .is-active in markup */
+.tqs-hero:not(.tqs-hero--ready) .tqs-hero-slide.is-active {
+	opacity: 1;
+	visibility: visible;
+}
+
+.tqs-page-hero--metabox .tqs-page-hero-cta {
+	margin-top: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.tqs-hero .tqs-hero-slide-bg img {
+		will-change: auto;
+	}
+}

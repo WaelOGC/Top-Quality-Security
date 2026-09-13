@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.0.3';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.0.4';
 	}
 	return $version;
 }
@@ -27,6 +27,7 @@ require get_template_directory() . '/inc/theme-options.php';
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/cinematic-scroll.php';
 require get_template_directory() . '/inc/meta-boxes/hero-meta-box.php';
+require get_template_directory() . '/inc/hero-render.php';
 
 /* ==========================================================================
    1. THEME SETUP
