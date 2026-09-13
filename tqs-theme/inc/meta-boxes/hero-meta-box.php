@@ -8,7 +8,7 @@
  *   _tqs_homepage_hero_slides   array   4 slides (serialized)
  *   _tqs_page_hero              array   single page hero (serialized)
  *
- * Theme mods (global default buttons — convenience UI here; move to Customizer later):
+ * Theme mods (global default buttons — Customizer → Hero — Global Defaults):
  *   tqs_hero_default_btn1_text / tqs_hero_default_btn1_url
  *   tqs_hero_default_btn2_text / tqs_hero_default_btn2_url
  *
@@ -300,11 +300,6 @@ function tqs_render_hero_settings_meta_box( $post ) {
 	$slides    = tqs_get_stored_homepage_hero_slides( $post->ID );
 	$page_hero = tqs_get_stored_page_hero( $post->ID );
 	$emojis    = tqs_hero_emoji_options();
-
-	$btn1_text = get_theme_mod( 'tqs_hero_default_btn1_text', 'Offerte Aanvragen' );
-	$btn1_url  = get_theme_mod( 'tqs_hero_default_btn1_url', '/contact' );
-	$btn2_text = get_theme_mod( 'tqs_hero_default_btn2_text', 'Onze Diensten' );
-	$btn2_url  = get_theme_mod( 'tqs_hero_default_btn2_url', '/onze-diensten' );
 	?>
 	<div id="tqs-hero-settings" class="tqs-hero-settings">
 
@@ -327,30 +322,12 @@ function tqs_render_hero_settings_meta_box( $post ) {
 			</p>
 		</div>
 
-		<!-- Field Group C — always visible -->
+		<!-- Field Group C — informational only (edited in Customizer) -->
 		<div class="tqs-hero-field-group tqs-hero-global-buttons" id="tqs-hero-group-global-buttons">
 			<h3><?php esc_html_e( 'Standaard hero-knoppen (globaal)', 'tqs-theme' ); ?></h3>
-			<p class="description" style="font-style:italic;">
-				<?php esc_html_e( 'Dit zijn de standaardknoppen voor elke Homepage Hero-slide die ze hieronder niet overschrijft.', 'tqs-theme' ); ?>
+			<p class="description" style="font-style:italic;margin-bottom:0;">
+				<?php esc_html_e( 'Deze standaardknoppen (tekst + URL) beheer je via Weergave → Customizer → TQS Theme Settings → Hero — Global Defaults. Ze gelden voor elke Homepage Hero-slide die knoppen hieronder niet overschrijft.', 'tqs-theme' ); ?>
 			</p>
-			<div class="tqs-hero-grid-2">
-				<p>
-					<label for="tqs_hero_default_btn1_text"><strong><?php esc_html_e( 'Knop 1 tekst', 'tqs-theme' ); ?></strong></label>
-					<input type="text" class="widefat" id="tqs_hero_default_btn1_text" name="tqs_hero_default_btn1_text" value="<?php echo esc_attr( $btn1_text ); ?>">
-				</p>
-				<p>
-					<label for="tqs_hero_default_btn1_url"><strong><?php esc_html_e( 'Knop 1 URL', 'tqs-theme' ); ?></strong></label>
-					<input type="text" class="widefat" id="tqs_hero_default_btn1_url" name="tqs_hero_default_btn1_url" value="<?php echo esc_attr( $btn1_url ); ?>" placeholder="<?php esc_attr_e( 'bijv. /contact of https://…', 'tqs-theme' ); ?>">
-				</p>
-				<p>
-					<label for="tqs_hero_default_btn2_text"><strong><?php esc_html_e( 'Knop 2 tekst', 'tqs-theme' ); ?></strong></label>
-					<input type="text" class="widefat" id="tqs_hero_default_btn2_text" name="tqs_hero_default_btn2_text" value="<?php echo esc_attr( $btn2_text ); ?>">
-				</p>
-				<p>
-					<label for="tqs_hero_default_btn2_url"><strong><?php esc_html_e( 'Knop 2 URL', 'tqs-theme' ); ?></strong></label>
-					<input type="text" class="widefat" id="tqs_hero_default_btn2_url" name="tqs_hero_default_btn2_url" value="<?php echo esc_attr( $btn2_url ); ?>" placeholder="<?php esc_attr_e( 'bijv. /onze-diensten of https://…', 'tqs-theme' ); ?>">
-				</p>
-			</div>
 		</div>
 
 		<!-- Field Group A — Homepage Hero -->
@@ -524,19 +501,5 @@ function tqs_save_hero_settings_meta_box( $post_id ) {
 	$page_raw  = isset( $_POST['tqs_page_hero'] ) ? wp_unslash( $_POST['tqs_page_hero'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	$page_hero = tqs_hero_sanitize_page_hero( is_array( $page_raw ) ? $page_raw : array() );
 	update_post_meta( $post_id, '_tqs_page_hero', $page_hero );
-
-	/* Global default buttons — theme mods (site-wide), edited here for convenience. */
-	if ( isset( $_POST['tqs_hero_default_btn1_text'] ) ) {
-		set_theme_mod( 'tqs_hero_default_btn1_text', sanitize_text_field( wp_unslash( $_POST['tqs_hero_default_btn1_text'] ) ) );
-	}
-	if ( isset( $_POST['tqs_hero_default_btn1_url'] ) ) {
-		set_theme_mod( 'tqs_hero_default_btn1_url', tqs_hero_sanitize_url_or_path( wp_unslash( $_POST['tqs_hero_default_btn1_url'] ) ) );
-	}
-	if ( isset( $_POST['tqs_hero_default_btn2_text'] ) ) {
-		set_theme_mod( 'tqs_hero_default_btn2_text', sanitize_text_field( wp_unslash( $_POST['tqs_hero_default_btn2_text'] ) ) );
-	}
-	if ( isset( $_POST['tqs_hero_default_btn2_url'] ) ) {
-		set_theme_mod( 'tqs_hero_default_btn2_url', tqs_hero_sanitize_url_or_path( wp_unslash( $_POST['tqs_hero_default_btn2_url'] ) ) );
-	}
 }
 add_action( 'save_post_page', 'tqs_save_hero_settings_meta_box' );

@@ -101,12 +101,9 @@
 
 		function startHeroTimer() {
 			clearInterval(heroTimer);
-			var interval = (window.tqsData && tqsData.heroAutoplayMs) ? tqsData.heroAutoplayMs : 5500;
-			var autoplay = (window.tqsData && typeof tqsData.heroAutoplay !== 'undefined') ? tqsData.heroAutoplay : true;
-			if (!autoplay) return;
 			heroTimer = setInterval(function () {
 				if (!heroPaused) goToHeroSlide(heroIndex + 1);
-			}, interval);
+			}, 5500);
 		}
 
 		if ($heroSlides.length && !isMetaBoxHero) {

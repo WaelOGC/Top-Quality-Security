@@ -1,6 +1,6 @@
 <?php
 /**
- * WordPress Customizer — TQS Theme Settings panel.
+ * WordPress Customizer — TQS Theme Settings.
  *
  * @package tqs-theme
  */
@@ -9,6 +9,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Register a text/textarea/number/email/url setting + control.
+ *
+ * @param WP_Customize_Manager $wp_customize Customizer.
+ * @param string               $id           Setting ID.
+ * @param mixed                $default      Default value.
+ * @param string               $section      Section ID.
+ * @param string               $label        Control label.
+ * @param string               $type         Control type.
+ * @param callable|string|null $sanitize     Sanitize callback.
+ */
 function tqs_add_setting( $wp_customize, $id, $default, $section, $label, $type = 'text', $sanitize = null ) {
 	if ( null === $sanitize ) {
 		$sanitize = 'textarea' === $type ? 'wp_kses_post' : 'sanitize_text_field';
@@ -24,6 +35,15 @@ function tqs_add_setting( $wp_customize, $id, $default, $section, $label, $type 
 	) );
 }
 
+/**
+ * Register a color setting with live preview transport.
+ *
+ * @param WP_Customize_Manager $wp_customize Customizer.
+ * @param string               $id           Setting ID.
+ * @param string               $default      Default hex.
+ * @param string               $section      Section ID.
+ * @param string               $label        Control label.
+ */
 function tqs_add_color_setting( $wp_customize, $id, $default, $section, $label ) {
 	$wp_customize->add_setting( $id, array(
 		'default'           => $default,
@@ -36,6 +56,14 @@ function tqs_add_color_setting( $wp_customize, $id, $default, $section, $label )
 	) ) );
 }
 
+/**
+ * Register a media image setting.
+ *
+ * @param WP_Customize_Manager $wp_customize Customizer.
+ * @param string               $id           Setting ID.
+ * @param string               $section      Section ID.
+ * @param string               $label        Control label.
+ */
 function tqs_add_image_setting( $wp_customize, $id, $section, $label ) {
 	$wp_customize->add_setting( $id, array(
 		'default'           => 0,
@@ -49,6 +77,15 @@ function tqs_add_image_setting( $wp_customize, $id, $section, $label ) {
 	) ) );
 }
 
+/**
+ * Register a checkbox setting.
+ *
+ * @param WP_Customize_Manager $wp_customize Customizer.
+ * @param string               $id           Setting ID.
+ * @param bool                 $default      Default.
+ * @param string               $section      Section ID.
+ * @param string               $label        Control label.
+ */
 function tqs_add_checkbox( $wp_customize, $id, $default, $section, $label ) {
 	$wp_customize->add_setting( $id, array(
 		'default'           => $default,
@@ -61,16 +98,43 @@ function tqs_add_checkbox( $wp_customize, $id, $default, $section, $label ) {
 	) );
 }
 
+/**
+ * Resolve hero autoplay interval to milliseconds.
+ *
+ * Supports legacy stored millisecond values (> 120) and new second-based values.
+ *
+ * @return int
+ */
+function tqs_get_hero_autoplay_ms() {
+	$raw = absint( get_theme_mod( 'tqs_hero_autoplay_interval', 6 ) );
+	if ( $raw > 120 ) {
+		return max( 2000, $raw );
+	}
+	return max( 2, $raw ) * 1000;
+}
+
+/**
+ * Register all Customizer panels, sections, and controls.
+ *
+ * @param WP_Customize_Manager $wp_customize Customizer.
+ */
 function tqs_customize_register( $wp_customize ) {
 	$wp_customize->add_panel( 'tqs_theme_settings', array(
 		'title'    => __( '🛡️ TQS Theme Settings', 'tqs-theme' ),
 		'priority' => 30,
 	) );
 
-	/* --- Site Identity (brand extras) --- */
+	$wp_customize->add_panel( 'tqs_homepage_panel', array(
+		'title'       => __( 'Homepage Sections', 'tqs-theme' ),
+		'description' => __( 'Instellingen voor de secties op de homepage (onder de hero). De hero zelf beheer je per pagina via Hero Settings in de pagina-editor.', 'tqs-theme' ),
+		'priority'    => 31,
+	) );
+
+	/* --- Site Identity & Branding --- */
 	$wp_customize->add_section( 'tqs_identity_settings', array(
 		'title'       => __( 'Site Identity & Branding', 'tqs-theme' ),
 		'panel'       => 'tqs_theme_settings',
+		'priority'    => 10,
 		'description' => __( 'Upload hier de logo\'s voor header, footer en zoekmachines. Standaard worden top-logo.png en top-Identity-logo.png uit het thema gebruikt. Site-icoon (favicon): Appearance → Site Identity.', 'tqs-theme' ),
 	) );
 	tqs_add_image_setting( $wp_customize, 'tqs_header_logo', 'tqs_identity_settings', __( 'Header logo (zichtbaar op de site)', 'tqs-theme' ) );
@@ -79,10 +143,11 @@ function tqs_customize_register( $wp_customize ) {
 	tqs_add_setting( $wp_customize, 'tqs_brand_sub', 'BEVEILIGINGSDIENSTEN', 'tqs_identity_settings', __( 'Tagline onder logo', 'tqs-theme' ) );
 	tqs_add_image_setting( $wp_customize, 'tqs_og_default_image', 'tqs_identity_settings', __( 'Standaard social/OG afbeelding', 'tqs-theme' ) );
 
-	/* --- Brand Colors --- */
+	/* --- Brand Colors & Fonts --- */
 	$wp_customize->add_section( 'tqs_brand_colors', array(
 		'title'       => __( 'Brand Colors & Fonts', 'tqs-theme' ),
 		'panel'       => 'tqs_theme_settings',
+		'priority'    => 20,
 		'description' => __( 'Laat leeg of gebruik de standaard TQS-kleuren uit style.css. Wijzigingen worden als CSS-variabelen toegepast.', 'tqs-theme' ),
 	) );
 	$color_defaults = tqs_get_brand_color_defaults();
@@ -100,10 +165,11 @@ function tqs_customize_register( $wp_customize ) {
 		tqs_add_color_setting( $wp_customize, $key, $color_defaults[ $key ], 'tqs_brand_colors', $label );
 	}
 
-	/* --- Header --- */
+	/* --- Header & Navigation --- */
 	$wp_customize->add_section( 'tqs_header_settings', array(
-		'title' => __( 'Header & Navigation', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
+		'title'    => __( 'Header & Navigation', 'tqs-theme' ),
+		'panel'    => 'tqs_theme_settings',
+		'priority' => 30,
 	) );
 	tqs_add_setting( $wp_customize, 'tqs_phone', '+31 (0)70 123 4567', 'tqs_header_settings', __( 'Telefoonnummer', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_email', 'info@topqualitysecurity.com', 'tqs_header_settings', __( 'E-mailadres', 'tqs-theme' ) );
@@ -114,105 +180,26 @@ function tqs_customize_register( $wp_customize ) {
 	tqs_add_checkbox( $wp_customize, 'tqs_show_whatsapp_fab', true, 'tqs_header_settings', __( 'Toon WhatsApp-knop (rechtsonder)', 'tqs-theme' ) );
 	tqs_add_checkbox( $wp_customize, 'tqs_show_breadcrumbs', true, 'tqs_header_settings', __( 'Toon breadcrumbs op binnenpagina\'s', 'tqs-theme' ) );
 
-	/* --- Hero Slider --- */
-	$wp_customize->add_section( 'tqs_hero_slider_settings', array(
-		'title' => __( 'Homepage — Hero Slider', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
+	/* --- Hero — Global Defaults --- */
+	$wp_customize->add_section( 'tqs_hero_global_defaults', array(
+		'title'       => __( 'Hero — Global Defaults', 'tqs-theme' ),
+		'panel'       => 'tqs_theme_settings',
+		'priority'    => 40,
+		'description' => __( 'Globale standaardknoppen voor Homepage Hero-slides die knoppen niet overschrijven. Slide-inhoud beheer je per pagina via Hero Settings in de pagina-editor. De standaard hero-afbeelding is een fallback voor binnenpagina\'s zonder eigen afbeelding.', 'tqs-theme' ),
 	) );
-	tqs_add_checkbox( $wp_customize, 'tqs_hero_autoplay', true, 'tqs_hero_slider_settings', __( 'Automatisch doorschuiven', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_hero_autoplay_interval', '5500', 'tqs_hero_slider_settings', __( 'Interval (milliseconden)', 'tqs-theme' ), 'number', 'absint' );
-	tqs_add_checkbox( $wp_customize, 'tqs_hero_show_arrows', true, 'tqs_hero_slider_settings', __( 'Toon pijlen', 'tqs-theme' ) );
-	tqs_add_checkbox( $wp_customize, 'tqs_hero_show_dots', true, 'tqs_hero_slider_settings', __( 'Toon stippen', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_hero_btn1_text', 'Offerte Aanvragen', 'tqs_hero_slider_settings', __( 'Knop 1 tekst', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_hero_btn1_url', '/contact', 'tqs_hero_slider_settings', __( 'Knop 1 URL', 'tqs-theme' ), 'text', 'tqs_sanitize_url_or_path' );
-	tqs_add_setting( $wp_customize, 'tqs_hero_btn2_text', 'Onze Diensten →', 'tqs_hero_slider_settings', __( 'Knop 2 tekst', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_hero_btn2_url', '/onze-diensten', 'tqs_hero_slider_settings', __( 'Knop 2 URL', 'tqs-theme' ), 'text', 'tqs_sanitize_url_or_path' );
-
-	$slide_defaults = tqs_get_default_hero_slides();
-	foreach ( $slide_defaults as $i => $slide ) {
-		$n = $i + 1;
-		$wp_customize->add_section( "tqs_hero_slide_{$i}", array(
-			'title' => sprintf( __( 'Hero Slide %d', 'tqs-theme' ), $n ),
-			'panel' => 'tqs_theme_settings',
-		) );
-		tqs_add_checkbox( $wp_customize, "tqs_slide_{$i}_enabled", true, "tqs_hero_slide_{$i}", __( 'Slide inschakelen', 'tqs-theme' ) );
-		tqs_add_image_setting( $wp_customize, "tqs_slide_{$i}_image", "tqs_hero_slide_{$i}", __( 'Achtergrondafbeelding (optioneel)', 'tqs-theme' ) );
-		tqs_add_setting( $wp_customize, "tqs_slide_{$i}_gradient", $slide['gradient'], "tqs_hero_slide_{$i}", __( 'Gradient fallback (CSS)', 'tqs-theme' ), 'textarea', 'sanitize_text_field' );
-		tqs_add_setting( $wp_customize, "tqs_slide_{$i}_icon", $slide['icon'], "tqs_hero_slide_{$i}", __( 'Icoon / emoji', 'tqs-theme' ) );
-		tqs_add_setting( $wp_customize, "tqs_slide_{$i}_badge", $slide['badge'], "tqs_hero_slide_{$i}", __( 'Badge tekst', 'tqs-theme' ) );
-		tqs_add_setting( $wp_customize, "tqs_slide_{$i}_title", $slide['title'], "tqs_hero_slide_{$i}", __( 'Titel', 'tqs-theme' ) );
-		tqs_add_setting( $wp_customize, "tqs_slide_{$i}_highlight", $slide['highlight'], "tqs_hero_slide_{$i}", __( 'Titel highlight (goud)', 'tqs-theme' ) );
-		tqs_add_setting( $wp_customize, "tqs_slide_{$i}_subtitle", $slide['subtitle'], "tqs_hero_slide_{$i}", __( 'Subtitel', 'tqs-theme' ), 'textarea' );
-	}
-
-	// Legacy fallback hero image (inner pages).
-	$wp_customize->add_section( 'tqs_hero_settings', array(
-		'title' => __( 'Default Hero Image', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
-		'description' => __( 'Standaard hero-achtergrond voor binnenpagina\'s wanneer geen pagina-specifieke afbeelding is ingesteld.', 'tqs-theme' ),
-	) );
-	tqs_add_image_setting( $wp_customize, 'tqs_hero_image', 'tqs_hero_settings', __( 'Standaard hero achtergrondafbeelding', 'tqs-theme' ) );
-
-	/* --- Stats Bar --- */
-	$wp_customize->add_section( 'tqs_stats_settings', array(
-		'title' => __( 'Homepage — Stats Bar', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
-	) );
-	tqs_add_checkbox( $wp_customize, 'tqs_show_stats', true, 'tqs_stats_settings', __( 'Toon stats bar', 'tqs-theme' ) );
-	$default_stats = array(
-		array( 'value' => '10+',  'label' => 'Jaar Ervaring' ),
-		array( 'value' => '500+', 'label' => 'Tevreden Klanten' ),
-		array( 'value' => '24/7', 'label' => 'Beschikbaar' ),
-		array( 'value' => '7',    'label' => 'Sectoren' ),
-	);
-	foreach ( $default_stats as $i => $stat ) {
-		tqs_add_setting( $wp_customize, "tqs_stat_{$i}_value", $stat['value'], 'tqs_stats_settings', sprintf( __( 'Statistiek %d — Waarde', 'tqs-theme' ), $i + 1 ) );
-		tqs_add_setting( $wp_customize, "tqs_stat_{$i}_label", $stat['label'], 'tqs_stats_settings', sprintf( __( 'Statistiek %d — Label', 'tqs-theme' ), $i + 1 ) );
-	}
-
-	/* --- Services Section --- */
-	$wp_customize->add_section( 'tqs_services_section', array(
-		'title' => __( 'Homepage — Services Section', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
-	) );
-	tqs_add_checkbox( $wp_customize, 'tqs_show_services', true, 'tqs_services_section', __( 'Toon diensten sectie', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_services_eyebrow', 'ONZE DIENSTEN', 'tqs_services_section', __( 'Eyebrow tekst', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_services_title', 'Beveiligingsoplossingen op maat', 'tqs_services_section', __( 'Sectietitel', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_services_lead', 'Voor elke sector een passende aanpak — professioneel, gecertificeerd en altijd paraat.', 'tqs_services_section', __( 'Intro tekst', 'tqs-theme' ), 'textarea' );
-
-	/* --- Why Us --- */
-	$wp_customize->add_section( 'tqs_why_us_section', array(
-		'title' => __( 'Homepage — Why Us', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
-	) );
-	tqs_add_checkbox( $wp_customize, 'tqs_show_why_us', true, 'tqs_why_us_section', __( 'Toon Why Us sectie', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_why_eyebrow', 'WAAROM TQS', 'tqs_why_us_section', __( 'Eyebrow tekst', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_why_title', 'Betrouwbaarheid die u kunt zien', 'tqs_why_us_section', __( 'Sectietitel', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_why_text', 'Al meer dan tien jaar biedt TQS professionele beveiliging aan bedrijven, evenementen en instellingen door heel Nederland. Onze medewerkers zijn opgeleid, gecertificeerd en altijd representatief.', 'tqs_why_us_section', __( 'Intro tekst', 'tqs-theme' ), 'textarea' );
-	$why_defaults = tqs_get_default_why_us_cards();
-	foreach ( $why_defaults as $i => $card ) {
-		$n = $i + 1;
-		tqs_add_setting( $wp_customize, "tqs_why_{$i}_icon", $card['icon'], 'tqs_why_us_section', sprintf( __( 'Kaart %d — Font Awesome icoon', 'tqs-theme' ), $n ) );
-		tqs_add_setting( $wp_customize, "tqs_why_{$i}_title", $card['title'], 'tqs_why_us_section', sprintf( __( 'Kaart %d — Titel', 'tqs-theme' ), $n ) );
-		tqs_add_setting( $wp_customize, "tqs_why_{$i}_desc", $card['desc'], 'tqs_why_us_section', sprintf( __( 'Kaart %d — Beschrijving', 'tqs-theme' ), $n ), 'textarea' );
-	}
-
-	/* --- CTA Banner --- */
-	$wp_customize->add_section( 'tqs_cta_section', array(
-		'title' => __( 'Homepage — CTA Banner', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
-	) );
-	tqs_add_checkbox( $wp_customize, 'tqs_show_cta', true, 'tqs_cta_section', __( 'Toon CTA banner', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_cta_title', 'Klaar voor professionele beveiliging?', 'tqs_cta_section', __( 'Titel', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_cta_text', 'Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.', 'tqs_cta_section', __( 'Tekst', 'tqs-theme' ), 'textarea' );
-	tqs_add_setting( $wp_customize, 'tqs_cta_btn1_text', 'Offerte Aanvragen', 'tqs_cta_section', __( 'Knop 1 tekst', 'tqs-theme' ) );
-	tqs_add_setting( $wp_customize, 'tqs_cta_btn1_url', '/contact', 'tqs_cta_section', __( 'Knop 1 URL', 'tqs-theme' ), 'text', 'tqs_sanitize_url_or_path' );
-	tqs_add_setting( $wp_customize, 'tqs_cta_btn2_text', 'Bel Ons Direct', 'tqs_cta_section', __( 'Knop 2 tekst', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_hero_default_btn1_text', 'Offerte Aanvragen', 'tqs_hero_global_defaults', __( 'Standaard knop 1 tekst', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_hero_default_btn1_url', '/contact', 'tqs_hero_global_defaults', __( 'Standaard knop 1 URL', 'tqs-theme' ), 'text', 'tqs_sanitize_url_or_path' );
+	tqs_add_setting( $wp_customize, 'tqs_hero_default_btn2_text', 'Onze Diensten', 'tqs_hero_global_defaults', __( 'Standaard knop 2 tekst', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_hero_default_btn2_url', '/onze-diensten', 'tqs_hero_global_defaults', __( 'Standaard knop 2 URL', 'tqs-theme' ), 'text', 'tqs_sanitize_url_or_path' );
+	tqs_add_checkbox( $wp_customize, 'tqs_hero_autoplay', true, 'tqs_hero_global_defaults', __( 'Homepage hero automatisch doorschuiven', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_hero_autoplay_interval', '6', 'tqs_hero_global_defaults', __( 'Hero autoplay interval (seconden)', 'tqs-theme' ), 'number', 'absint' );
+	tqs_add_image_setting( $wp_customize, 'tqs_hero_image', 'tqs_hero_global_defaults', __( 'Standaard hero achtergrondafbeelding (binnenpagina\'s)', 'tqs-theme' ) );
 
 	/* --- Company Information --- */
 	$wp_customize->add_section( 'tqs_company_settings', array(
-		'title' => __( 'Company Information', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
+		'title'    => __( 'Company Information', 'tqs-theme' ),
+		'panel'    => 'tqs_theme_settings',
+		'priority' => 50,
 	) );
 	tqs_add_setting( $wp_customize, 'tqs_kvk', '', 'tqs_company_settings', __( 'KvK nummer', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_btw', '', 'tqs_company_settings', __( 'BTW nummer', 'tqs-theme' ) );
@@ -223,8 +210,9 @@ function tqs_customize_register( $wp_customize ) {
 
 	/* --- Contact & Forms --- */
 	$wp_customize->add_section( 'tqs_contact_settings', array(
-		'title' => __( 'Contact & Forms', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
+		'title'    => __( 'Contact & Forms', 'tqs-theme' ),
+		'panel'    => 'tqs_theme_settings',
+		'priority' => 60,
 	) );
 	tqs_add_setting( $wp_customize, 'tqs_contact_recipient', '', 'tqs_contact_settings', __( 'Formulier ontvanger (leeg = e-mail header)', 'tqs-theme' ), 'email', 'sanitize_email' );
 	tqs_add_setting( $wp_customize, 'tqs_form_success_msg', 'Bedankt voor uw bericht! Wij nemen zo spoedig mogelijk contact met u op.', 'tqs_contact_settings', __( 'Succesmelding formulier', 'tqs-theme' ), 'textarea' );
@@ -232,10 +220,11 @@ function tqs_customize_register( $wp_customize ) {
 	tqs_add_checkbox( $wp_customize, 'tqs_show_contact_map', true, 'tqs_contact_settings', __( 'Toon kaart op contactpagina', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_maps_embed_url', '', 'tqs_contact_settings', __( 'Google Maps embed URL (optioneel)', 'tqs-theme' ), 'url', 'esc_url_raw' );
 
-	/* --- Gallery (Fotogalerij) --- */
+	/* --- Gallery --- */
 	$wp_customize->add_section( 'tqs_gallery_settings', array(
 		'title'       => __( 'Galerij Instellingen', 'tqs-theme' ),
 		'panel'       => 'tqs_theme_settings',
+		'priority'    => 70,
 		'description' => __( 'Standaardweergave van de fotogalerij-pagina. Per item kunt u in Gallery nog een eigen weergavestijl instellen.', 'tqs-theme' ),
 	) );
 	$wp_customize->add_setting( 'tqs_gallery_columns', array(
@@ -275,8 +264,9 @@ function tqs_customize_register( $wp_customize ) {
 
 	/* --- Footer --- */
 	$wp_customize->add_section( 'tqs_footer_settings', array(
-		'title' => __( 'Footer Settings', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
+		'title'    => __( 'Footer Settings', 'tqs-theme' ),
+		'panel'    => 'tqs_theme_settings',
+		'priority' => 80,
 	) );
 	tqs_add_setting( $wp_customize, 'tqs_footer_tagline', 'Professionele beveiligingsdiensten vanuit Den Haag, actief door heel Nederland. Gecertificeerd, betrouwbaar en 24/7 paraat.', 'tqs_footer_settings', __( 'Footer tagline', 'tqs-theme' ), 'textarea' );
 	tqs_add_setting( $wp_customize, 'tqs_copyright', '© {year} Top Quality Security. Alle rechten voorbehouden.', 'tqs_footer_settings', __( 'Copyright tekst ({year} = huidig jaar)', 'tqs-theme' ) );
@@ -294,8 +284,9 @@ function tqs_customize_register( $wp_customize ) {
 
 	/* --- SEO & Analytics --- */
 	$wp_customize->add_section( 'tqs_seo_settings', array(
-		'title' => __( 'SEO & Analytics', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
+		'title'    => __( 'SEO & Analytics', 'tqs-theme' ),
+		'panel'    => 'tqs_theme_settings',
+		'priority' => 90,
 	) );
 	tqs_add_setting( $wp_customize, 'tqs_home_meta_description', 'Top Quality Security levert professionele beveiligingsdiensten door heel Nederland, vanuit Den Haag. ND 7099 gecertificeerd, betrouwbaar en 24/7 beschikbaar.', 'tqs_seo_settings', __( 'Homepage meta description', 'tqs-theme' ), 'textarea' );
 	tqs_add_setting( $wp_customize, 'tqs_ga_id', '', 'tqs_seo_settings', __( 'Google Analytics 4 ID (bv. G-XXXXXXXX)', 'tqs-theme' ) );
@@ -305,8 +296,9 @@ function tqs_customize_register( $wp_customize ) {
 
 	/* --- 404 Page --- */
 	$wp_customize->add_section( 'tqs_404_settings', array(
-		'title' => __( '404 Page', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
+		'title'    => __( '404 Page', 'tqs-theme' ),
+		'panel'    => 'tqs_theme_settings',
+		'priority' => 100,
 	) );
 	tqs_add_setting( $wp_customize, 'tqs_404_title', 'Pagina Niet Gevonden', 'tqs_404_settings', __( 'Titel', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_404_message', 'De pagina die u zoekt bestaat niet (meer) of is verplaatst.', 'tqs_404_settings', __( 'Bericht', 'tqs-theme' ), 'textarea' );
@@ -314,8 +306,9 @@ function tqs_customize_register( $wp_customize ) {
 
 	/* --- GDPR Cookie Banner --- */
 	$wp_customize->add_section( 'tqs_cookie_settings', array(
-		'title' => __( 'GDPR Cookie Banner', 'tqs-theme' ),
-		'panel' => 'tqs_theme_settings',
+		'title'    => __( 'GDPR Cookie Banner', 'tqs-theme' ),
+		'panel'    => 'tqs_theme_settings',
+		'priority' => 110,
 	) );
 	tqs_add_checkbox( $wp_customize, 'tqs_cookie_enabled', true, 'tqs_cookie_settings', __( 'Cookiebanner inschakelen', 'tqs-theme' ) );
 	$wp_customize->add_setting( 'tqs_cookie_text', array(
@@ -330,5 +323,65 @@ function tqs_customize_register( $wp_customize ) {
 	tqs_add_setting( $wp_customize, 'tqs_cookie_accept_text', 'Accepteren', 'tqs_cookie_settings', __( 'Accepteer knoptekst', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_cookie_decline_text', 'Weigeren', 'tqs_cookie_settings', __( 'Weiger knoptekst', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_cookie_expiry_days', '180', 'tqs_cookie_settings', __( 'Cookie geldigheid (dagen)', 'tqs-theme' ), 'number', 'absint' );
+
+	/* ================================================================== */
+	/* Homepage Sections panel                                            */
+	/* ================================================================== */
+
+	$wp_customize->add_section( 'tqs_stats_settings', array(
+		'title'    => __( 'Stats Bar', 'tqs-theme' ),
+		'panel'    => 'tqs_homepage_panel',
+		'priority' => 10,
+	) );
+	tqs_add_checkbox( $wp_customize, 'tqs_show_stats', true, 'tqs_stats_settings', __( 'Toon stats bar', 'tqs-theme' ) );
+	$default_stats = array(
+		array( 'value' => '10+',  'label' => 'Jaar Ervaring' ),
+		array( 'value' => '500+', 'label' => 'Tevreden Klanten' ),
+		array( 'value' => '24/7', 'label' => 'Beschikbaar' ),
+		array( 'value' => '7',    'label' => 'Sectoren' ),
+	);
+	foreach ( $default_stats as $i => $stat ) {
+		tqs_add_setting( $wp_customize, "tqs_stat_{$i}_value", $stat['value'], 'tqs_stats_settings', sprintf( __( 'Statistiek %d — Waarde', 'tqs-theme' ), $i + 1 ) );
+		tqs_add_setting( $wp_customize, "tqs_stat_{$i}_label", $stat['label'], 'tqs_stats_settings', sprintf( __( 'Statistiek %d — Label', 'tqs-theme' ), $i + 1 ) );
+	}
+
+	$wp_customize->add_section( 'tqs_services_section', array(
+		'title'    => __( 'Services Section', 'tqs-theme' ),
+		'panel'    => 'tqs_homepage_panel',
+		'priority' => 20,
+	) );
+	tqs_add_checkbox( $wp_customize, 'tqs_show_services', true, 'tqs_services_section', __( 'Toon diensten sectie', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_services_eyebrow', 'ONZE DIENSTEN', 'tqs_services_section', __( 'Eyebrow tekst', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_services_title', 'Beveiligingsoplossingen op maat', 'tqs_services_section', __( 'Sectietitel', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_services_lead', 'Voor elke sector een passende aanpak — professioneel, gecertificeerd en altijd paraat.', 'tqs_services_section', __( 'Intro tekst', 'tqs-theme' ), 'textarea' );
+
+	$wp_customize->add_section( 'tqs_why_us_section', array(
+		'title'    => __( 'Why Us', 'tqs-theme' ),
+		'panel'    => 'tqs_homepage_panel',
+		'priority' => 30,
+	) );
+	tqs_add_checkbox( $wp_customize, 'tqs_show_why_us', true, 'tqs_why_us_section', __( 'Toon Why Us sectie', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_why_eyebrow', 'WAAROM TQS', 'tqs_why_us_section', __( 'Eyebrow tekst', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_why_title', 'Betrouwbaarheid die u kunt zien', 'tqs_why_us_section', __( 'Sectietitel', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_why_text', 'Al meer dan tien jaar biedt TQS professionele beveiliging aan bedrijven, evenementen en instellingen door heel Nederland. Onze medewerkers zijn opgeleid, gecertificeerd en altijd representatief.', 'tqs_why_us_section', __( 'Intro tekst', 'tqs-theme' ), 'textarea' );
+	$why_defaults = tqs_get_default_why_us_cards();
+	foreach ( $why_defaults as $i => $card ) {
+		$n = $i + 1;
+		tqs_add_setting( $wp_customize, "tqs_why_{$i}_icon", $card['icon'], 'tqs_why_us_section', sprintf( __( 'Kaart %d — Font Awesome icoon', 'tqs-theme' ), $n ) );
+		tqs_add_setting( $wp_customize, "tqs_why_{$i}_title", $card['title'], 'tqs_why_us_section', sprintf( __( 'Kaart %d — Titel', 'tqs-theme' ), $n ) );
+		tqs_add_setting( $wp_customize, "tqs_why_{$i}_desc", $card['desc'], 'tqs_why_us_section', sprintf( __( 'Kaart %d — Beschrijving', 'tqs-theme' ), $n ), 'textarea' );
+	}
+
+	$wp_customize->add_section( 'tqs_cta_section', array(
+		'title'    => __( 'CTA Banner', 'tqs-theme' ),
+		'panel'    => 'tqs_homepage_panel',
+		'priority' => 40,
+	) );
+	tqs_add_checkbox( $wp_customize, 'tqs_show_cta', true, 'tqs_cta_section', __( 'Toon CTA banner', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_cta_title', 'Klaar voor professionele beveiliging?', 'tqs_cta_section', __( 'Titel', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_cta_text', 'Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.', 'tqs_cta_section', __( 'Tekst', 'tqs-theme' ), 'textarea' );
+	tqs_add_setting( $wp_customize, 'tqs_cta_btn1_text', 'Offerte Aanvragen', 'tqs_cta_section', __( 'Knop 1 tekst', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_cta_btn1_url', '/contact', 'tqs_cta_section', __( 'Knop 1 URL', 'tqs-theme' ), 'text', 'tqs_sanitize_url_or_path' );
+	tqs_add_setting( $wp_customize, 'tqs_cta_btn2_text', 'Bel Ons Direct', 'tqs_cta_section', __( 'Knop 2 tekst', 'tqs-theme' ) );
 }
 add_action( 'customize_register', 'tqs_customize_register' );

@@ -118,6 +118,15 @@ function tqs_enqueue_cinematic_scroll() {
 		$ver,
 		true
 	);
+
+	wp_localize_script(
+		'tqs-cinematic-scroll',
+		'tqsHeroData',
+		array(
+			'autoplay'   => (bool) get_theme_mod( 'tqs_hero_autoplay', true ),
+			'autoplayMs' => function_exists( 'tqs_get_hero_autoplay_ms' ) ? tqs_get_hero_autoplay_ms() : 6000,
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'tqs_enqueue_cinematic_scroll', 20 );
 

@@ -110,7 +110,9 @@
 		var autoTimer = null;
 		var TRANSITION_MS = reduced ? 300 : 1000;
 		var COOLDOWN_MS = reduced ? 320 : 1050;
-		var AUTO_MS = 6000;
+		var heroCfg = (typeof window.tqsHeroData === 'object' && window.tqsHeroData) ? window.tqsHeroData : {};
+		var autoplayEnabled = (typeof heroCfg.autoplay === 'undefined') ? true : !!heroCfg.autoplay;
+		var AUTO_MS = Math.max(2000, parseInt(heroCfg.autoplayMs, 10) || 6000);
 		var SWIPE_MIN = 48;
 		var noise = hero.querySelector('.tqs-hero-noise');
 		var hasGsap = typeof gsap !== 'undefined';
@@ -269,6 +271,10 @@
 		function restartAutoTimer() {
 			if (autoTimer) {
 				window.clearInterval(autoTimer);
+				autoTimer = null;
+			}
+			if (!autoplayEnabled) {
+				return;
 			}
 			autoTimer = window.setInterval(function () {
 				if (Date.now() - lastInteractAt < AUTO_MS - 50) {

@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.0.4';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.0.5';
 	}
 	return $version;
 }
@@ -81,8 +81,6 @@ function tqs_theme_enqueue_assets() {
 		'reviewNonce'        => wp_create_nonce( 'tqs_review_nonce' ),
 		'whatsapp'           => preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', '31636286183' ) ),
 		'cookieExpiry'       => absint( get_theme_mod( 'tqs_cookie_expiry_days', 180 ) ),
-		'heroAutoplay'       => (bool) get_theme_mod( 'tqs_hero_autoplay', true ),
-		'heroAutoplayMs'     => absint( get_theme_mod( 'tqs_hero_autoplay_interval', 5500 ) ),
 		'formErrorMsg'       => get_theme_mod( 'tqs_form_error_msg', __( 'Er ging iets mis. Probeer het later opnieuw of bel ons direct.', 'tqs-theme' ) ),
 		'reviewSuccessMsg'   => __( 'Bedankt voor je beoordeling! Deze wordt binnenkort gecontroleerd en gepubliceerd.', 'tqs-theme' ),
 		'reviewErrorMsg'     => __( 'Er ging iets mis. Probeer het later opnieuw.', 'tqs-theme' ),
