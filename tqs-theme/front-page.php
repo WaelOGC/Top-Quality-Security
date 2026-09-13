@@ -102,12 +102,26 @@ tqs_render_hero( get_the_ID() );
 
 <?php if ( tqs_show_home_section( 'why_us' ) ) : ?>
 <!-- WHY US -->
-<section class="tqs-whyus">
+<?php
+$whyus_manager_id  = absint( get_theme_mod( 'tqs_whyus_manager_image', 0 ) );
+$whyus_manager_url = $whyus_manager_id ? wp_get_attachment_image_url( $whyus_manager_id, 'large' ) : '';
+?>
+<section class="tqs-whyus<?php echo $whyus_manager_url ? ' has-manager-portrait' : ''; ?>">
 	<div class="tqs-whyus-outer">
-		<div class="tqs-reveal-left">
-			<div class="tqs-section-eyebrow"><?php echo esc_html( get_theme_mod( 'tqs_why_eyebrow', 'WAAROM TQS' ) ); ?></div>
-			<h2 class="tqs-whyus-h2"><?php echo esc_html( get_theme_mod( 'tqs_why_title', 'Betrouwbaarheid die u kunt zien' ) ); ?></h2>
-			<p class="tqs-whyus-text"><?php echo esc_html( get_theme_mod( 'tqs_why_text', 'Al meer dan tien jaar biedt TQS professionele beveiliging aan bedrijven, evenementen en instellingen door heel Nederland. Onze medewerkers zijn opgeleid, gecertificeerd en altijd representatief.' ) ); ?></p>
+		<div class="tqs-whyus-col-left tqs-reveal-left">
+			<?php if ( $whyus_manager_url ) : ?>
+			<div class="tqs-whyus-portrait">
+				<div class="tqs-whyus-portrait-blob" aria-hidden="true"></div>
+				<figure class="tqs-whyus-portrait-frame">
+					<img src="<?php echo esc_url( $whyus_manager_url ); ?>" alt="<?php echo esc_attr( get_theme_mod( 'tqs_why_title', 'Betrouwbaarheid die u kunt zien' ) ); ?>" loading="lazy" decoding="async">
+				</figure>
+			</div>
+			<?php endif; ?>
+			<div class="tqs-whyus-copy">
+				<div class="tqs-section-eyebrow"><?php echo esc_html( get_theme_mod( 'tqs_why_eyebrow', 'WAAROM TQS' ) ); ?></div>
+				<h2 class="tqs-whyus-h2"><?php echo esc_html( get_theme_mod( 'tqs_why_title', 'Betrouwbaarheid die u kunt zien' ) ); ?></h2>
+				<p class="tqs-whyus-text"><?php echo esc_html( get_theme_mod( 'tqs_why_text', 'Al meer dan tien jaar biedt TQS professionele beveiliging aan bedrijven, evenementen en instellingen door heel Nederland. Onze medewerkers zijn opgeleid, gecertificeerd en altijd representatief.' ) ); ?></p>
+			</div>
 		</div>
 		<div class="tqs-whyus-cards tqs-reveal-right">
 			<?php foreach ( $why_us as $item ) : ?>
@@ -144,7 +158,15 @@ if ( ! empty( $homepage_reviews ) ) :
 
 <?php if ( tqs_show_home_section( 'cta' ) ) : ?>
 <!-- FINAL CTA -->
-<section class="tqs-cta-banner tqs-reveal">
+<?php
+$cta_bg_id  = absint( get_theme_mod( 'tqs_cta_bg_image', 0 ) );
+$cta_bg_url = $cta_bg_id ? wp_get_attachment_image_url( $cta_bg_id, 'full' ) : '';
+?>
+<section class="tqs-cta-banner tqs-reveal<?php echo $cta_bg_url ? ' has-bg-image' : ''; ?>">
+	<?php if ( $cta_bg_url ) : ?>
+		<div class="tqs-cta-bg-image" style="background-image:url('<?php echo esc_url( $cta_bg_url ); ?>');" aria-hidden="true"></div>
+		<div class="tqs-cta-bg-overlay" aria-hidden="true"></div>
+	<?php endif; ?>
 	<div class="tqs-cta-inner">
 		<h2 class="tqs-cta-h2"><?php echo esc_html( get_theme_mod( 'tqs_cta_title', 'Klaar voor professionele beveiliging?' ) ); ?></h2>
 		<p><?php echo esc_html( get_theme_mod( 'tqs_cta_text', 'Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.' ) ); ?></p>

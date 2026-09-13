@@ -4,7 +4,7 @@ Theme URI: https://topqualitysecurity.com/
 Author: Top Quality Security Dev Team
 Author URI: https://topqualitysecurity.com/
 Description: Custom standalone WordPress theme for Top Quality Security — a professional security services company in Den Haag, Netherlands. Elementor-compatible, SEO-optimised, GDPR-compliant.
-Version: 2.0.6
+Version: 2.1.0
 Requires at least: 6.0
 Requires PHP: 8.0
 Text Domain: tqs-theme
@@ -236,17 +236,82 @@ button { font-family: inherit; cursor: pointer; }
 /* ==========================================================================
    9. WHY US
    ========================================================================== */
-.tqs-whyus { background: var(--tqs-white); padding: 56px 40px 48px; }
-.tqs-whyus-outer { max-width: var(--container-max); margin: 0 auto; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; align-items: center; }
+.tqs-whyus {
+	position: relative;
+	background:
+		radial-gradient(ellipse 80% 60% at 10% 20%, rgba(139, 47, 201, 0.07) 0%, transparent 55%),
+		radial-gradient(ellipse 70% 50% at 90% 80%, rgba(201, 151, 58, 0.06) 0%, transparent 50%),
+		linear-gradient(180deg, var(--tqs-light) 0%, var(--tqs-white) 45%, var(--tqs-light) 100%);
+	padding: 64px 40px 56px;
+	overflow: hidden;
+}
+.tqs-whyus-outer {
+	max-width: var(--container-max);
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: 0.95fr 1.05fr;
+	gap: 56px;
+	align-items: center;
+}
+.tqs-whyus-col-left {
+	display: flex;
+	flex-direction: column;
+	gap: 28px;
+}
+.tqs-whyus-portrait {
+	position: relative;
+	max-width: 320px;
+}
+.tqs-whyus-portrait-blob {
+	position: absolute;
+	inset: -12% -18% -8% -12%;
+	background: radial-gradient(ellipse at 40% 40%, rgba(139, 47, 201, 0.28) 0%, rgba(45, 10, 78, 0.12) 45%, transparent 70%);
+	border-radius: 60% 40% 55% 45%;
+	z-index: 0;
+	transform: rotate(-6deg);
+}
+.tqs-whyus-portrait-frame {
+	position: relative;
+	z-index: 1;
+	margin: 0;
+	border-radius: 14px;
+	overflow: hidden;
+	border: 2px solid var(--tqs-gold);
+	box-shadow:
+		0 0 0 6px rgba(201, 151, 58, 0.12),
+		0 18px 40px rgba(26, 5, 51, 0.18);
+	background: var(--tqs-light);
+}
+.tqs-whyus-portrait-frame img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 4 / 5;
+	object-fit: cover;
+	object-position: center top;
+}
 .tqs-whyus-h2 { font-weight: 800; font-size: 36px; color: var(--tqs-primary); margin: 0 0 20px; line-height: 1.2; }
 .tqs-whyus-text { font-size: 16px; line-height: 1.75; color: var(--tqs-text); margin: 0; }
 .tqs-whyus-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.tqs-whyus-card { padding: 28px 24px; border-radius: 12px; background: var(--tqs-light); border: 1px solid var(--tqs-border); }
-.tqs-whyus-card-icon { font-size: 28px; margin-bottom: 16px; }
+.tqs-whyus-card {
+	padding: 28px 24px;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.92);
+	border: 1px solid var(--tqs-border);
+	box-shadow: 0 8px 24px rgba(45, 10, 78, 0.04);
+}
+.tqs-whyus-card-icon { font-size: 28px; margin-bottom: 16px; color: var(--tqs-gold); }
 .tqs-whyus-card h4 { font-weight: 700; font-size: 16.5px; color: var(--tqs-primary); margin: 0 0 8px; }
 .tqs-whyus-card p { font-size: 13.5px; line-height: 1.6; color: var(--tqs-muted); margin: 0; }
-@media (max-width: 900px) { .tqs-whyus-outer { grid-template-columns: 1fr !important; gap: 36px !important; } }
-@media (max-width: 640px) { .tqs-whyus { padding: 44px 20px 36px !important; } .tqs-whyus-h2 { font-size: 28px !important; } }
+@media (max-width: 900px) {
+	.tqs-whyus-outer { grid-template-columns: 1fr !important; gap: 36px !important; }
+	.tqs-whyus-portrait { max-width: 280px; margin: 0 auto; }
+	.tqs-whyus-copy { text-align: center; }
+}
+@media (max-width: 640px) {
+	.tqs-whyus { padding: 44px 20px 36px !important; }
+	.tqs-whyus-h2 { font-size: 28px !important; }
+}
 @media (max-width: 480px) { .tqs-whyus-cards { grid-template-columns: 1fr !important; } }
 
 /* --- Reviews (service page + homepage) --- */
@@ -273,8 +338,24 @@ button { font-family: inherit; cursor: pointer; }
    10. FINAL CTA BANNER
    ========================================================================== */
 .tqs-cta-banner { background: linear-gradient(120deg, var(--tqs-primary) 0%, var(--tqs-secondary) 100%); padding: 56px 40px; position: relative; overflow: hidden; }
-.tqs-cta-banner::before { content: ""; position: absolute; top: -60px; right: -60px; width: 280px; height: 280px; border-radius: 50%; background: rgba(201,151,58,0.15); }
-.tqs-cta-inner { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; text-align: center; }
+.tqs-cta-banner::before { content: ""; position: absolute; top: -60px; right: -60px; width: 280px; height: 280px; border-radius: 50%; background: rgba(201,151,58,0.15); z-index: 1; }
+.tqs-cta-bg-image {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+.tqs-cta-bg-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: linear-gradient(120deg, rgba(45, 10, 78, 0.78) 0%, rgba(139, 47, 201, 0.68) 100%);
+	pointer-events: none;
+}
+.tqs-cta-banner.has-bg-image::before { opacity: 0.45; }
+.tqs-cta-inner { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; text-align: center; }
 .tqs-cta-h2 { font-weight: 800; font-size: 34px; color: var(--tqs-white); margin: 0 0 16px; }
 .tqs-cta-inner > p { font-size: 16px; color: #E8DFF5; margin: 0 0 34px; }
 .tqs-cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }

@@ -372,6 +372,7 @@ function tqs_customize_register( $wp_customize ) {
 		'priority' => 30,
 	) );
 	tqs_add_checkbox( $wp_customize, 'tqs_show_why_us', true, 'tqs_why_us_section', __( 'Toon Why Us sectie', 'tqs-theme' ) );
+	tqs_add_image_setting( $wp_customize, 'tqs_whyus_manager_image', 'tqs_why_us_section', __( 'Operationeel manager portret (lichte achtergrond)', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_why_eyebrow', 'WAAROM TQS', 'tqs_why_us_section', __( 'Eyebrow tekst', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_why_title', 'Betrouwbaarheid die u kunt zien', 'tqs_why_us_section', __( 'Sectietitel', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_why_text', 'Al meer dan tien jaar biedt TQS professionele beveiliging aan bedrijven, evenementen en instellingen door heel Nederland. Onze medewerkers zijn opgeleid, gecertificeerd en altijd representatief.', 'tqs_why_us_section', __( 'Intro tekst', 'tqs-theme' ), 'textarea' );
@@ -389,6 +390,7 @@ function tqs_customize_register( $wp_customize ) {
 		'priority' => 40,
 	) );
 	tqs_add_checkbox( $wp_customize, 'tqs_show_cta', true, 'tqs_cta_section', __( 'Toon CTA banner', 'tqs-theme' ) );
+	tqs_add_image_setting( $wp_customize, 'tqs_cta_bg_image', 'tqs_cta_section', __( 'CTA achtergrondafbeelding (optioneel)', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_cta_title', 'Klaar voor professionele beveiliging?', 'tqs_cta_section', __( 'Titel', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_cta_text', 'Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.', 'tqs_cta_section', __( 'Tekst', 'tqs-theme' ), 'textarea' );
 	tqs_add_setting( $wp_customize, 'tqs_cta_btn1_text', 'Offerte Aanvragen', 'tqs_cta_section', __( 'Knop 1 tekst', 'tqs-theme' ) );
