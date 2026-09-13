@@ -1,0 +1,126 @@
+/**
+ * Hero Settings meta box — Page edit screen only.
+ */
+
+#tqs_hero_settings_box .inside {
+	margin: 0;
+	padding: 0;
+}
+
+.tqs-hero-settings {
+	padding: 12px 14px 16px;
+}
+
+.tqs-hero-settings-top {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 32px;
+	align-items: flex-start;
+	margin-bottom: 8px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #dcdcde;
+}
+
+.tqs-hero-settings-top > p {
+	margin: 0 0 8px;
+	min-width: 240px;
+	flex: 1;
+}
+
+.tqs-hero-type-select {
+	min-width: 280px;
+	max-width: 100%;
+}
+
+.tqs-hero-field-group {
+	margin-top: 18px;
+	padding-top: 4px;
+}
+
+.tqs-hero-field-group h3 {
+	margin: 0 0 8px;
+	font-size: 14px;
+	color: #2D0A4E;
+}
+
+.tqs-hero-global-buttons {
+	background: #F9F6FF;
+	border: 1px solid #e8dff5;
+	border-radius: 6px;
+	padding: 12px 14px 4px;
+}
+
+.tqs-hero-grid-2 {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0 16px;
+}
+
+@media screen and (max-width: 782px) {
+	.tqs-hero-grid-2 {
+		grid-template-columns: 1fr;
+	}
+}
+
+.tqs-hero-slide-box {
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	margin: 0 0 12px;
+	background: #fff;
+}
+
+.tqs-hero-slide-box > summary {
+	cursor: pointer;
+	padding: 10px 14px;
+	background: #f6f7f7;
+	border-radius: 6px;
+	list-style: none;
+}
+
+.tqs-hero-slide-box > summary::-webkit-details-marker {
+	display: none;
+}
+
+.tqs-hero-slide-box[open] > summary {
+	border-bottom: 1px solid #dcdcde;
+	border-radius: 6px 6px 0 0;
+	background: #F9F6FF;
+}
+
+.tqs-hero-slide-body {
+	padding: 12px 14px 4px;
+}
+
+.tqs-hero-image-preview {
+	margin: 0 0 8px;
+}
+
+.tqs-hero-image-preview img {
+	display: block;
+	max-width: 280px;
+	width: 100%;
+	height: auto;
+	border-radius: 6px;
+	border: 1px solid #dcdcde;
+}
+
+.tqs-hero-image-actions {
+	margin: 0 0 12px;
+}
+
+.tqs-hero-image-actions .button {
+	margin-right: 6px;
+}
+
+.tqs-hero-emoji-select {
+	min-width: 200px;
+	font-size: 16px;
+}
+
+.tqs-hero-slide-btn-fields {
+	margin-top: 4px;
+	padding: 8px 12px 0;
+	background: #f6f7f7;
+	border-radius: 4px;
+	border-left: 3px solid #C9973A;
+}
