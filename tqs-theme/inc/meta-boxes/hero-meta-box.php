@@ -47,28 +47,49 @@ function tqs_hero_emoji_options() {
 }
 
 /**
- * Default empty structure for 4 homepage hero slides.
+ * Default structure for 4 homepage hero slides (Dutch copy for slides 1–2).
  *
  * @return array<int, array<string, mixed>>
  */
 function tqs_hero_default_homepage_slides() {
-	$slides = array();
-	for ( $i = 0; $i < 4; $i++ ) {
-		$slides[] = array(
-			'enabled'          => ( 0 === $i ),
-			'image_id'         => 0,
-			'badge'            => '',
-			'icon'             => '🛡️',
-			'title'            => '',
-			'highlight'        => '',
-			'subtitle'         => '',
-			'override_buttons' => false,
-			'btn1_text'        => '',
-			'btn1_url'         => '',
-			'btn2_text'        => '',
-			'btn2_url'         => '',
-		);
-	}
+	$base = array(
+		'enabled'          => false,
+		'image_id'         => 0,
+		'badge'            => '',
+		'icon'             => '🛡️',
+		'title'            => '',
+		'highlight'        => '',
+		'subtitle'         => '',
+		'override_buttons' => false,
+		'btn1_text'        => '',
+		'btn1_url'         => '',
+		'btn2_text'        => '',
+		'btn2_url'         => '',
+	);
+
+	$slides = array(
+		array_merge(
+			$base,
+			array(
+				'enabled'  => true,
+				'badge'    => 'ND 7099 - Erkend Leerbedrijf',
+				'title'    => 'Wij Staan Voor Kwaliteit In Beveiliging',
+				'subtitle' => 'Professionele beveiligers die uw pand, winkel of bedrijf volledig uit handen nemen, zodat u zich kunt richten op waar u echt goed in bent.',
+			)
+		),
+		array_merge(
+			$base,
+			array(
+				'enabled'  => true,
+				'badge'    => 'Security - Facility - Services',
+				'title'    => 'Ervaring Die Het Verschil Maakt',
+				'subtitle' => 'Onze getrainde beveiligers zorgen dagelijks voor de veiligheid van vele grote bedrijven in Nederland, met oog voor elke specifieke situatie.',
+			)
+		),
+		$base,
+		$base,
+	);
+
 	return $slides;
 }
 
@@ -183,16 +204,36 @@ function tqs_hero_sanitize_type( $type ) {
 
 /**
  * Get stored homepage slides (always 4 entries).
+ * Empty badge/title/subtitle fall back to theme defaults so shipped Dutch copy
+ * appears without overwriting admin-edited values.
  *
  * @param int $post_id Post ID.
  * @return array<int, array<string, mixed>>
  */
 function tqs_get_stored_homepage_hero_slides( $post_id ) {
-	$stored = get_post_meta( $post_id, '_tqs_homepage_hero_slides', true );
+	$defaults = tqs_hero_default_homepage_slides();
+	$stored   = get_post_meta( $post_id, '_tqs_homepage_hero_slides', true );
 	if ( empty( $stored ) || ! is_array( $stored ) ) {
-		return tqs_hero_default_homepage_slides();
+		return $defaults;
 	}
-	return tqs_hero_sanitize_homepage_slides( $stored );
+
+	$slides = tqs_hero_sanitize_homepage_slides( $stored );
+	$text_keys = array( 'badge', 'title', 'highlight', 'subtitle' );
+
+	for ( $i = 0; $i < 4; $i++ ) {
+		if ( ! isset( $slides[ $i ], $defaults[ $i ] ) ) {
+			continue;
+		}
+		foreach ( $text_keys as $key ) {
+			$current = isset( $slides[ $i ][ $key ] ) ? trim( (string) $slides[ $i ][ $key ] ) : '';
+			$fallback = isset( $defaults[ $i ][ $key ] ) ? (string) $defaults[ $i ][ $key ] : '';
+			if ( '' === $current && '' !== $fallback ) {
+				$slides[ $i ][ $key ] = $fallback;
+			}
+		}
+	}
+
+	return $slides;
 }
 
 /**

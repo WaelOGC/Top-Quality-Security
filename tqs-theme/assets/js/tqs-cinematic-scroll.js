@@ -96,8 +96,8 @@
 		var pointerInside = false;
 		var lastInteractAt = Date.now();
 		var autoTimer = null;
-		var TRANSITION_MS = reduced ? 280 : 1100;
-		var COOLDOWN_MS = reduced ? 300 : 1200;
+		var TRANSITION_MS = reduced ? 0 : 1400;
+		var COOLDOWN_MS = reduced ? 0 : 1500;
 		var heroCfg = (typeof window.tqsHeroData === 'object' && window.tqsHeroData) ? window.tqsHeroData : {};
 		var autoplayEnabled = (typeof heroCfg.autoplay === 'undefined') ? true : !!heroCfg.autoplay;
 		var AUTO_MS = Math.max(2000, parseInt(heroCfg.autoplayMs, 10) || 6000);
@@ -158,17 +158,42 @@
 			var inContent = incoming.querySelector('.tqs-hero-content');
 			var inBg = incoming.querySelector('.tqs-hero-slide-bg img');
 			var outBg = outgoing.querySelector('.tqs-hero-slide-bg img');
-			var ease = 'power1.out';
+			var ease = 'power2.inOut';
 			var variant = reduced ? { type: 'fade' } : nextVariant();
 
-			if (!hasGsap) {
-				incoming.style.opacity = '0';
-				outgoing.style.transition = 'opacity ' + duration + 's ease';
-				incoming.style.transition = 'opacity ' + duration + 's ease';
-				window.requestAnimationFrame(function () {
+			/* Reduced motion: instant swap, no animation */
+			if (reduced) {
+				if (hasGsap) {
+					gsap.set(outgoing, { opacity: 0 });
+					gsap.set(incoming, { opacity: 1 });
+					if (outContent) {
+						gsap.set(outContent, { clearProps: 'opacity' });
+					}
+					if (inContent) {
+						gsap.set(inContent, { clearProps: 'opacity' });
+					}
+				} else {
 					outgoing.style.opacity = '0';
 					incoming.style.opacity = '1';
+				}
+				if (typeof onDone === 'function') {
+					onDone();
+				}
+				return;
+			}
+
+			if (!hasGsap) {
+				/* Incoming fades over opaque outgoing — no mid-fade dip to white */
+				incoming.style.opacity = '0';
+				outgoing.style.opacity = '1';
+				incoming.style.transition = 'opacity ' + duration + 's ease-in-out';
+				outgoing.style.transition = 'opacity ' + (duration * 0.25) + 's ease-in';
+				window.requestAnimationFrame(function () {
+					incoming.style.opacity = '1';
 				});
+				window.setTimeout(function () {
+					outgoing.style.opacity = '0';
+				}, duration * 750);
 				window.setTimeout(onDone, duration * 1000);
 				return;
 			}
@@ -180,25 +205,37 @@
 				gsap.set(outBg, { clearProps: 'transform' });
 			}
 
+			/*
+			 * Flash-free dissolve: keep outgoing fully opaque underneath while
+			 * incoming fades in on top, then drop outgoing only at the end.
+			 */
+			gsap.set(outgoing, { opacity: 1 });
+			gsap.set(incoming, { opacity: 0 });
+
 			var tl = gsap.timeline({ onComplete: onDone });
-			tl.to(outgoing, { opacity: 0, duration: duration, ease: ease }, 0);
 			tl.fromTo(incoming, { opacity: 0 }, { opacity: 1, duration: duration, ease: ease }, 0);
+			tl.to(outgoing, { opacity: 0, duration: duration * 0.28, ease: 'power1.in' }, duration * 0.72);
 
 			if (outContent) {
-				tl.to(outContent, { opacity: 0, duration: duration * 0.55, ease: 'power1.in' }, 0);
+				tl.to(outContent, { opacity: 0, duration: duration * 0.45, ease: 'power1.in' }, duration * 0.15);
 			}
 			if (inContent) {
-				tl.fromTo(inContent, { opacity: 0 }, { opacity: 1, duration: duration * 0.7, ease: 'power1.out' }, duration * 0.25);
+				tl.fromTo(
+					inContent,
+					{ opacity: 0 },
+					{ opacity: 1, duration: duration * 0.55, ease: 'power2.out' },
+					duration * 0.35
+				);
 			}
 
-			if (!reduced && inBg && variant.type === 'zoom') {
+			if (inBg && variant.type === 'zoom') {
 				tl.fromTo(
 					inBg,
 					{ scale: 1.04 },
 					{ scale: 1, duration: duration, ease: 'power2.out' },
 					0
 				);
-			} else if (!reduced && inBg && variant.type === 'slide') {
+			} else if (inBg && variant.type === 'slide') {
 				tl.fromTo(
 					inBg,
 					{ xPercent: variant.dir * -3.5, scale: 1.02 },

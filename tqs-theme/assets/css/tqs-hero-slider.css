@@ -6,6 +6,8 @@
 .tqs-hero {
 	position: relative;
 	isolation: isolate;
+	/* Opaque underlay prevents white flash while slides crossfade */
+	background: #1A0533;
 }
 
 .tqs-hero .tqs-hero-slide {

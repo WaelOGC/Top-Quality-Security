@@ -4,7 +4,7 @@ Theme URI: https://topqualitysecurity.com/
 Author: Top Quality Security Dev Team
 Author URI: https://topqualitysecurity.com/
 Description: Custom standalone WordPress theme for Top Quality Security — a professional security services company in Den Haag, Netherlands. Elementor-compatible, SEO-optimised, GDPR-compliant.
-Version: 2.2.0
+Version: 2.3.0
 Requires at least: 6.0
 Requires PHP: 8.0
 Text Domain: tqs-theme
@@ -141,7 +141,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ==========================================================================
    6. HERO SLIDER (Homepage)
    ========================================================================== */
-.tqs-hero { position: relative; min-height: 640px; display: flex; align-items: center; overflow: hidden; }
+.tqs-hero { position: relative; min-height: 640px; display: flex; align-items: center; overflow: hidden; background: #1A0533; }
 .tqs-hero-slide { position: absolute; inset: 0; display: none; align-items: center; }
 .tqs-hero-slide.is-active { display: flex; }
 .tqs-hero-slide-bg { position: absolute; inset: 0; }
@@ -251,7 +251,7 @@ button { font-family: inherit; cursor: pointer; }
 	display: grid;
 	grid-template-columns: 0.95fr 1.05fr;
 	gap: 56px;
-	align-items: center;
+	align-items: stretch;
 }
 .tqs-whyus-col-left {
 	display: flex;
@@ -297,21 +297,44 @@ button { font-family: inherit; cursor: pointer; }
 }
 .tqs-whyus-h2 { font-weight: 800; font-size: 36px; color: var(--tqs-primary); margin: 0 0 20px; line-height: 1.2; }
 .tqs-whyus-text { font-size: 16px; line-height: 1.75; color: var(--tqs-text); margin: 0; }
-.tqs-whyus-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.tqs-whyus-cards {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr 1fr;
+	gap: 32px;
+	align-self: stretch;
+	height: 100%;
+	min-height: 100%;
+}
 .tqs-whyus-card {
-	padding: 28px 24px;
+	padding: 40px 28px 44px;
 	border-radius: 12px;
 	background: rgba(255, 255, 255, 0.92);
 	border: 1px solid var(--tqs-border);
 	box-shadow: 0 8px 24px rgba(45, 10, 78, 0.04);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	height: 100%;
+	box-sizing: border-box;
 }
-.tqs-whyus-card-icon { font-size: 28px; margin-bottom: 16px; color: var(--tqs-gold); }
-.tqs-whyus-card h4 { font-weight: 700; font-size: 16.5px; color: var(--tqs-primary); margin: 0 0 8px; }
-.tqs-whyus-card p { font-size: 13.5px; line-height: 1.6; color: var(--tqs-muted); margin: 0; }
+.tqs-whyus-card-icon { font-size: 28px; margin-bottom: 18px; color: var(--tqs-gold); }
+.tqs-whyus-card h4 { font-weight: 700; font-size: 16.5px; color: var(--tqs-primary); margin: 0 0 10px; }
+.tqs-whyus-card p { font-size: 13.5px; line-height: 1.65; color: var(--tqs-muted); margin: 0; }
 @media (max-width: 900px) {
 	.tqs-whyus-outer { grid-template-columns: 1fr !important; gap: 36px !important; }
 	.tqs-whyus-portrait { max-width: 280px; margin: 0 auto; }
 	.tqs-whyus-copy { text-align: center; }
+	.tqs-whyus-cards {
+		height: auto;
+		min-height: 0;
+		grid-template-rows: auto;
+		gap: 24px;
+	}
+	.tqs-whyus-card {
+		height: auto;
+		padding: 32px 24px 36px;
+	}
 }
 @media (max-width: 640px) {
 	.tqs-whyus { padding: 44px 20px 36px !important; }
