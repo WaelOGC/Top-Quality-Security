@@ -129,7 +129,7 @@ while ( have_posts() ) : the_post();
 		<?php if ( ! $hide_hero ) :
 			$hero_img = tqs_get_hero_image_url();
 		?>
-		<section class="tqs-page-hero" <?php if ( $hero_img ) : ?>style="background-image:url('<?php echo esc_url( $hero_img ); ?>'); background-size:cover; background-position:center;"<?php endif; ?>>
+		<section class="tqs-page-hero<?php echo $hero_img ? ' tqs-page-hero--has-image' : ''; ?>"<?php if ( $hero_img ) : ?> style="background-image:url('<?php echo esc_url( $hero_img ); ?>');"<?php endif; ?>>
 			<div class="tqs-page-hero-inner">
 				<?php tqs_breadcrumbs( array( array( 'label' => $display_title ) ) ); ?>
 				<h1 class="tqs-page-title"><?php echo esc_html( $display_title ); ?></h1>

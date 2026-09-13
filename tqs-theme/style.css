@@ -4,7 +4,7 @@ Theme URI: https://topqualitysecurity.com/
 Author: Top Quality Security Dev Team
 Author URI: https://topqualitysecurity.com/
 Description: Custom standalone WordPress theme for Top Quality Security — a professional security services company in Den Haag, Netherlands. Elementor-compatible, SEO-optimised, GDPR-compliant.
-Version: 2.1.0
+Version: 2.2.0
 Requires at least: 6.0
 Requires PHP: 8.0
 Text Domain: tqs-theme
@@ -163,7 +163,7 @@ button { font-family: inherit; cursor: pointer; }
 
 @media (max-width: 900px) { .tqs-hero-content { padding: 60px 76px; } }
 @media (max-width: 768px) {
-  .tqs-hero { min-height: 500px !important; }
+  .tqs-hero { min-height: 440px !important; }
   .tqs-hero-h1 { font-size: 32px !important; }
   .tqs-hero-p { font-size: 14.5px !important; margin-bottom: 26px !important; }
   .tqs-hero-buttons { flex-direction: column !important; align-items: stretch !important; }
@@ -175,7 +175,7 @@ button { font-family: inherit; cursor: pointer; }
   .tqs-hero-dots { bottom: 16px !important; padding: 0 76px !important; }
 }
 @media (max-width: 560px) { .tqs-hero-content { padding: 40px 24px !important; } }
-@media (max-width: 420px) { .tqs-hero { min-height: 460px !important; } .tqs-hero-h1 { font-size: 26px !important; } }
+@media (max-width: 420px) { .tqs-hero { min-height: 400px !important; } .tqs-hero-h1 { font-size: 26px !important; } }
 
 /* ==========================================================================
    7. STATS BAR
@@ -288,7 +288,12 @@ button { font-family: inherit; cursor: pointer; }
 	height: auto;
 	aspect-ratio: 4 / 5;
 	object-fit: cover;
-	object-position: center top;
+	object-position: center 12%;
+}
+@media (max-width: 640px) {
+	.tqs-whyus-portrait-frame img {
+		object-position: center 10%;
+	}
 }
 .tqs-whyus-h2 { font-weight: 800; font-size: 36px; color: var(--tqs-primary); margin: 0 0 20px; line-height: 1.2; }
 .tqs-whyus-text { font-size: 16px; line-height: 1.75; color: var(--tqs-text); margin: 0; }
@@ -344,8 +349,21 @@ button { font-family: inherit; cursor: pointer; }
 	inset: 0;
 	z-index: 0;
 	background-size: cover;
-	background-position: center;
+	/* Desktop: guard + skyline — keep silhouette in lower-left third, not empty sky */
+	background-position: 42% 45%;
 	background-repeat: no-repeat;
+}
+@media (max-width: 900px) {
+	.tqs-cta-bg-image {
+		background-position: 28% 42%;
+	}
+}
+@media (max-width: 640px) {
+	.tqs-cta-bg-image {
+		/* Narrow portrait: pin the guard silhouette into frame (not empty sky) */
+		background-size: cover;
+		background-position: 16% 38%;
+	}
 }
 .tqs-cta-bg-overlay {
 	position: absolute;
@@ -381,6 +399,22 @@ button { font-family: inherit; cursor: pointer; }
 .tqs-page-hero { background: linear-gradient(120deg, var(--tqs-dark) 0%, var(--tqs-primary) 100%); padding: 64px 40px; position: relative; overflow: hidden; }
 .tqs-page-hero::after { content: ""; position: absolute; top: -80px; right: -60px; width: 320px; height: 320px; border-radius: 50%; background: rgba(139,47,201,0.18); }
 .tqs-page-hero-inner { position: relative; z-index: 1; max-width: var(--container-max); margin: 0 auto; }
+.tqs-page-hero--has-image {
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center 22%;
+}
+@media (max-width: 900px) {
+	.tqs-page-hero--has-image {
+		background-position: center 20%;
+	}
+}
+@media (max-width: 640px) {
+	.tqs-page-hero--has-image {
+		background-size: cover;
+		background-position: center 16%;
+	}
+}
 .tqs-breadcrumb { font-size: 13.5px; color: var(--tqs-muted-light); margin-bottom: 18px; }
 .tqs-breadcrumb a { color: var(--tqs-muted-light); }
 .tqs-breadcrumb a:hover { color: var(--tqs-gold-light); }
@@ -412,7 +446,10 @@ button { font-family: inherit; cursor: pointer; }
 .tqs-service-single { background: var(--tqs-white); padding: 64px 40px; }
 .tqs-service-single-grid { max-width: var(--container-max); margin: 0 auto; display: grid; grid-template-columns: 2.2fr 1fr; gap: 48px; align-items: start; }
 .tqs-service-hero-media { border-radius: 16px; overflow: hidden; margin-bottom: 32px; height: 320px; position: relative; }
-.tqs-service-hero-media img { width: 100%; height: 100%; object-fit: cover; }
+.tqs-service-hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+@media (max-width: 640px) {
+	.tqs-service-hero-media img { object-position: center 16%; }
+}
 .tqs-service-hero-media .tqs-service-card-illustration { background: linear-gradient(150deg, var(--tqs-primary) 0%, var(--tqs-secondary) 100%); position: absolute; inset: 0; }
 .tqs-service-h2 { font-weight: 800; font-size: 26px; color: var(--tqs-primary); margin: 36px 0 16px; }
 .tqs-service-content p { font-size: 16px; line-height: 1.8; color: var(--tqs-text); margin: 0 0 16px; }

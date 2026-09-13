@@ -99,8 +99,4 @@ if ( $used_fallback ) {
 		</div>
 	</div>
 	<?php endforeach; ?>
-
-	<div class="tqs-hero-burn-canvas-wrap" aria-hidden="true">
-		<canvas class="tqs-hero-burn-canvas"></canvas>
-	</div>
 </section>

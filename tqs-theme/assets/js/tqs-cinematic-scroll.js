@@ -5,7 +5,7 @@
  *   .tqs-reveal / .tqs-reveal-left / .tqs-reveal-right
  *
  * Hero:
- *   .tqs-hero[data-tqs-hero-slider] — wheel/swipe + canvas burn transition
+ *   .tqs-hero[data-tqs-hero-slider] — wheel/swipe + varied crossfade
  *
  * Guards: prefers-reduced-motion, Elementor editor/preview.
  */
@@ -75,289 +75,7 @@
 	}
 
 	/* ------------------------------------------------------------------ */
-	/* Value noise (lightweight, no deps)                                  */
-	/* ------------------------------------------------------------------ */
-
-	function hash2(x, y) {
-		var n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
-		return n - Math.floor(n);
-	}
-
-	function smoothstep(t) {
-		return t * t * (3 - 2 * t);
-	}
-
-	function valueNoise2D(x, y) {
-		var x0 = Math.floor(x);
-		var y0 = Math.floor(y);
-		var fx = smoothstep(x - x0);
-		var fy = smoothstep(y - y0);
-		var a = hash2(x0, y0);
-		var b = hash2(x0 + 1, y0);
-		var c = hash2(x0, y0 + 1);
-		var d = hash2(x0 + 1, y0 + 1);
-		var u = a + (b - a) * fx;
-		var v = c + (d - c) * fx;
-		return u + (v - u) * fy;
-	}
-
-	function fbm(x, y) {
-		var sum = 0;
-		var amp = 0.5;
-		var freq = 1;
-		for (var i = 0; i < 4; i++) {
-			sum += valueNoise2D(x * freq, y * freq) * amp;
-			freq *= 2;
-			amp *= 0.5;
-		}
-		return sum;
-	}
-
-	/* ------------------------------------------------------------------ */
-	/* Hero burn canvas                                                    */
-	/* ------------------------------------------------------------------ */
-
-	function createBurnController(hero) {
-		var wrap = hero.querySelector('.tqs-hero-burn-canvas-wrap');
-		var canvas = wrap ? wrap.querySelector('.tqs-hero-burn-canvas') : null;
-		if (!wrap || !canvas || !canvas.getContext) {
-			return null;
-		}
-
-		var ctx = canvas.getContext('2d');
-		var maskCanvas = document.createElement('canvas');
-		var maskCtx = maskCanvas.getContext('2d');
-		var w = 0;
-		var h = 0;
-		var mw = 0;
-		var mh = 0;
-		var dpr = 1;
-		var animId = 0;
-		var embers = [];
-		var noiseSeed = Math.random() * 1000;
-		var activeOutgoing = null;
-
-		function clearOutgoingMask() {
-			if (!activeOutgoing) {
-				return;
-			}
-			activeOutgoing.style.maskImage = '';
-			activeOutgoing.style.webkitMaskImage = '';
-			activeOutgoing.style.maskSize = '';
-			activeOutgoing.style.webkitMaskSize = '';
-			activeOutgoing.style.maskMode = '';
-			activeOutgoing = null;
-		}
-
-		function resize() {
-			dpr = Math.min(window.devicePixelRatio || 1, 2);
-			var rect = hero.getBoundingClientRect();
-			w = Math.max(1, Math.floor(rect.width));
-			h = Math.max(1, Math.floor(rect.height));
-			canvas.width = Math.floor(w * dpr);
-			canvas.height = Math.floor(h * dpr);
-			canvas.style.width = w + 'px';
-			canvas.style.height = h + 'px';
-			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-			mw = Math.max(96, Math.floor(w / 8));
-			mh = Math.max(54, Math.floor(h / 8));
-			maskCanvas.width = mw;
-			maskCanvas.height = mh;
-		}
-
-		function stop() {
-			if (animId) {
-				cancelAnimationFrame(animId);
-				animId = 0;
-			}
-			wrap.classList.remove('is-active');
-			ctx.clearRect(0, 0, w, h);
-			embers = [];
-			clearOutgoingMask();
-		}
-
-		function spawnEmbers(edgePoints, intensity) {
-			var count = Math.min(8, Math.floor(edgePoints.length * 0.08 * intensity));
-			for (var i = 0; i < count; i++) {
-				var p = edgePoints[Math.floor(Math.random() * edgePoints.length)];
-				if (!p) {
-					continue;
-				}
-				embers.push({
-					x: p.x + (Math.random() - 0.5) * 8,
-					y: p.y + (Math.random() - 0.5) * 8,
-					vx: (Math.random() - 0.5) * 0.6,
-					vy: -0.8 - Math.random() * 1.4,
-					life: 1,
-					decay: 0.012 + Math.random() * 0.02,
-					r: 1.2 + Math.random() * 2.2,
-				});
-			}
-			if (embers.length > 80) {
-				embers = embers.slice(embers.length - 80);
-			}
-		}
-
-		function applyMaskToOutgoing(progress) {
-			if (!activeOutgoing || !maskCtx) {
-				return;
-			}
-
-			var threshold = 1.15 - progress * 1.35;
-			var imageData = maskCtx.createImageData(mw, mh);
-			var data = imageData.data;
-
-			for (var y = 0; y < mh; y++) {
-				for (var x = 0; x < mw; x++) {
-					var nx = x / mw;
-					var ny = y / mh;
-					var n = fbm(nx * 3.2 + noiseSeed, ny * 2.4 + noiseSeed * 0.3);
-					var radial = Math.sqrt(Math.pow(nx - 0.5, 2) + Math.pow(ny - 0.55, 2));
-					var field = n * 0.72 + (1 - radial) * 0.28;
-					var burn = field - threshold;
-					/* Luminance mask: white = keep outgoing, black = reveal incoming */
-					var keep = burn <= 0 ? 255 : Math.max(0, Math.floor(255 * (1 - Math.min(1, burn * 3.2))));
-					var idx = (y * mw + x) * 4;
-					data[idx] = keep;
-					data[idx + 1] = keep;
-					data[idx + 2] = keep;
-					data[idx + 3] = 255;
-				}
-			}
-
-			maskCtx.putImageData(imageData, 0, 0);
-
-			var url = maskCanvas.toDataURL('image/png');
-			activeOutgoing.style.maskImage = 'url("' + url + '")';
-			activeOutgoing.style.webkitMaskImage = 'url("' + url + '")';
-			activeOutgoing.style.maskSize = '100% 100%';
-			activeOutgoing.style.webkitMaskSize = '100% 100%';
-			activeOutgoing.style.maskMode = 'luminance';
-		}
-
-		function drawGlowFrame(progress) {
-			ctx.clearRect(0, 0, w, h);
-			var cols = Math.max(48, Math.floor(w / 10));
-			var rows = Math.max(28, Math.floor(h / 10));
-			var cellW = w / cols;
-			var cellH = h / rows;
-			var threshold = 1.15 - progress * 1.35;
-			var edgePoints = [];
-
-			for (var y = 0; y < rows; y++) {
-				for (var x = 0; x < cols; x++) {
-					var nx = x / cols;
-					var ny = y / rows;
-					var n = fbm(nx * 3.2 + noiseSeed, ny * 2.4 + noiseSeed * 0.3);
-					var radial = Math.sqrt(Math.pow(nx - 0.5, 2) + Math.pow(ny - 0.55, 2));
-					var field = n * 0.72 + (1 - radial) * 0.28;
-					var burn = field - threshold;
-
-					if (burn <= 0) {
-						continue;
-					}
-
-					var intensity = Math.min(1, burn * 2.4);
-					var px = x * cellW;
-					var py = y * cellH;
-
-					/* Leading edge only — thin burn rim */
-					if (intensity > 0.55) {
-						continue;
-					}
-
-					edgePoints.push({ x: px + cellW * 0.5, y: py + cellH * 0.5 });
-
-					ctx.globalCompositeOperation = 'source-over';
-					ctx.fillStyle = 'rgba(45, 10, 78, ' + (0.2 + intensity * 0.45) + ')';
-					ctx.fillRect(px, py, cellW + 1, cellH + 1);
-
-					ctx.globalCompositeOperation = 'lighter';
-					var mid = Math.min(1, intensity / 0.45);
-					var gold = Math.max(0, (intensity - 0.25) / 0.35);
-					ctx.fillStyle = 'rgba(139, 47, 201, ' + (0.35 + mid * 0.5) + ')';
-					ctx.fillRect(px, py, cellW + 1, cellH + 1);
-					if (gold > 0) {
-						ctx.fillStyle = 'rgba(201, 151, 58, ' + (gold * 0.7) + ')';
-						ctx.fillRect(px + cellW * 0.1, py + cellH * 0.1, cellW * 0.8, cellH * 0.8);
-					}
-				}
-			}
-
-			if (progress > 0.08 && progress < 0.92) {
-				spawnEmbers(edgePoints, progress);
-			}
-
-			ctx.globalCompositeOperation = 'lighter';
-			for (var i = embers.length - 1; i >= 0; i--) {
-				var e = embers[i];
-				e.x += e.vx;
-				e.y += e.vy;
-				e.vy -= 0.02;
-				e.life -= e.decay;
-				if (e.life <= 0) {
-					embers.splice(i, 1);
-					continue;
-				}
-				var a = e.life;
-				var grd = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.r * 3);
-				grd.addColorStop(0, 'rgba(201, 151, 58, ' + (0.9 * a) + ')');
-				grd.addColorStop(0.45, 'rgba(139, 47, 201, ' + (0.55 * a) + ')');
-				grd.addColorStop(1, 'rgba(45, 10, 78, 0)');
-				ctx.fillStyle = grd;
-				ctx.beginPath();
-				ctx.arc(e.x, e.y, e.r * 3, 0, Math.PI * 2);
-				ctx.fill();
-			}
-			ctx.globalCompositeOperation = 'source-over';
-		}
-
-		function play(durationMs, onDone, outgoingEl) {
-			stop();
-			noiseSeed = Math.random() * 1000;
-			activeOutgoing = outgoingEl || null;
-			resize();
-			wrap.classList.add('is-active');
-			var start = performance.now();
-			var maskEvery = 2;
-			var frame = 0;
-
-			function tick(now) {
-				var t = Math.min(1, (now - start) / durationMs);
-				var eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-				if (frame % maskEvery === 0) {
-					applyMaskToOutgoing(eased);
-				}
-				drawGlowFrame(eased);
-				frame++;
-				if (t < 1) {
-					animId = requestAnimationFrame(tick);
-				} else {
-					clearOutgoingMask();
-					wrap.classList.remove('is-active');
-					ctx.clearRect(0, 0, w, h);
-					embers = [];
-					animId = 0;
-					if (typeof onDone === 'function') {
-						onDone();
-					}
-				}
-			}
-
-			animId = requestAnimationFrame(tick);
-		}
-
-		window.addEventListener('resize', function () {
-			if (wrap.classList.contains('is-active')) {
-				resize();
-			}
-		}, { passive: true });
-
-		return { play: play, stop: stop, resize: resize };
-	}
-
-	/* ------------------------------------------------------------------ */
-	/* Hero slider                                                         */
+	/* Hero slider — varied crossfade                                      */
 	/* ------------------------------------------------------------------ */
 
 	function initHeroSlider(hero) {
@@ -378,14 +96,15 @@
 		var pointerInside = false;
 		var lastInteractAt = Date.now();
 		var autoTimer = null;
-		var TRANSITION_MS = reduced ? 300 : 1200;
-		var COOLDOWN_MS = reduced ? 320 : 1250;
+		var TRANSITION_MS = reduced ? 280 : 1100;
+		var COOLDOWN_MS = reduced ? 300 : 1200;
 		var heroCfg = (typeof window.tqsHeroData === 'object' && window.tqsHeroData) ? window.tqsHeroData : {};
 		var autoplayEnabled = (typeof heroCfg.autoplay === 'undefined') ? true : !!heroCfg.autoplay;
 		var AUTO_MS = Math.max(2000, parseInt(heroCfg.autoplayMs, 10) || 6000);
 		var SWIPE_MIN = 48;
 		var hasGsap = typeof gsap !== 'undefined';
-		var burn = (!reduced) ? createBurnController(hero) : null;
+		var variantIndex = 0;
+		var slideDir = 1;
 
 		slides.forEach(function (slide, i) {
 			if (i === 0) {
@@ -405,6 +124,21 @@
 			}
 		});
 
+		function nextVariant() {
+			/* Cycle: plain → zoom settle → slide-in (L/R alternate) */
+			var kind = variantIndex % 3;
+			variantIndex += 1;
+			if (kind === 1) {
+				return { type: 'zoom' };
+			}
+			if (kind === 2) {
+				var dir = slideDir;
+				slideDir *= -1;
+				return { type: 'slide', dir: dir };
+			}
+			return { type: 'fade' };
+		}
+
 		function updatePointer(clientX, clientY) {
 			var rect = hero.getBoundingClientRect();
 			pointerInside =
@@ -419,10 +153,13 @@
 			restartAutoTimer();
 		}
 
-		function crossfadeOnly(outgoing, incoming, duration, onDone) {
+		function runCrossfade(outgoing, incoming, duration, onDone) {
 			var outContent = outgoing.querySelector('.tqs-hero-content');
 			var inContent = incoming.querySelector('.tqs-hero-content');
+			var inBg = incoming.querySelector('.tqs-hero-slide-bg img');
+			var outBg = outgoing.querySelector('.tqs-hero-slide-bg img');
 			var ease = 'power1.out';
+			var variant = reduced ? { type: 'fade' } : nextVariant();
 
 			if (!hasGsap) {
 				incoming.style.opacity = '0';
@@ -436,14 +173,38 @@
 				return;
 			}
 
+			if (inBg) {
+				gsap.set(inBg, { clearProps: 'transform' });
+			}
+			if (outBg) {
+				gsap.set(outBg, { clearProps: 'transform' });
+			}
+
 			var tl = gsap.timeline({ onComplete: onDone });
 			tl.to(outgoing, { opacity: 0, duration: duration, ease: ease }, 0);
 			tl.fromTo(incoming, { opacity: 0 }, { opacity: 1, duration: duration, ease: ease }, 0);
+
 			if (outContent) {
 				tl.to(outContent, { opacity: 0, duration: duration * 0.55, ease: 'power1.in' }, 0);
 			}
 			if (inContent) {
 				tl.fromTo(inContent, { opacity: 0 }, { opacity: 1, duration: duration * 0.7, ease: 'power1.out' }, duration * 0.25);
+			}
+
+			if (!reduced && inBg && variant.type === 'zoom') {
+				tl.fromTo(
+					inBg,
+					{ scale: 1.04 },
+					{ scale: 1, duration: duration, ease: 'power2.out' },
+					0
+				);
+			} else if (!reduced && inBg && variant.type === 'slide') {
+				tl.fromTo(
+					inBg,
+					{ xPercent: variant.dir * -3.5, scale: 1.02 },
+					{ xPercent: 0, scale: 1, duration: duration, ease: 'power2.out' },
+					0
+				);
 			}
 		}
 
@@ -480,10 +241,10 @@
 					gsap.set(outgoing, { opacity: 0 });
 					gsap.set(incoming, { opacity: 1 });
 					if (outBg) {
-						gsap.set(outBg, { scale: 1, clearProps: 'transform' });
+						gsap.set(outBg, { clearProps: 'transform' });
 					}
 					if (inBg) {
-						gsap.set(inBg, { scale: 1 });
+						gsap.set(inBg, { clearProps: 'transform' });
 					}
 					if (outContent) {
 						gsap.set(outContent, { opacity: 1, clearProps: 'opacity' });
@@ -501,33 +262,7 @@
 				}, Math.max(0, COOLDOWN_MS - TRANSITION_MS));
 			}
 
-			if (reduced || !burn) {
-				crossfadeOnly(outgoing, incoming, duration, finish);
-				return;
-			}
-
-			/* Incoming under; outgoing masked away to reveal burn gaps */
-			if (hasGsap) {
-				gsap.set(incoming, { opacity: 1 });
-				gsap.set(outgoing, { opacity: 1 });
-				if (inContent) {
-					gsap.set(inContent, { opacity: 0 });
-				}
-				if (inBg) {
-					gsap.fromTo(inBg, { scale: 1.04 }, { scale: 1, duration: duration, ease: 'power2.out' });
-				}
-				if (outContent) {
-					gsap.to(outContent, { opacity: 0, duration: duration * 0.45, ease: 'power1.in', delay: duration * 0.2 });
-				}
-				if (inContent) {
-					gsap.to(inContent, { opacity: 1, duration: duration * 0.5, ease: 'power1.out', delay: duration * 0.4 });
-				}
-			} else {
-				incoming.style.opacity = '1';
-				outgoing.style.opacity = '1';
-			}
-
-			burn.play(TRANSITION_MS, finish, outgoing);
+			runCrossfade(outgoing, incoming, duration, finish);
 		}
 
 		function next() {
@@ -757,7 +492,6 @@
 			revealIn(right, { opacity: 0, x: 64, y: 0 });
 		});
 
-		/* Refresh after layout/images settle so triggers fire correctly */
 		window.setTimeout(function () {
 			ScrollTrigger.refresh();
 		}, 200);

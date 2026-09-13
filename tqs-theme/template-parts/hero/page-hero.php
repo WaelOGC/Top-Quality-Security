@@ -24,7 +24,7 @@ $btn_url   = isset( $hero['btn_url'] ) && function_exists( 'tqs_hero_resolve_url
 	? tqs_hero_resolve_url( $hero['btn_url'] )
 	: '';
 ?>
-<section class="tqs-page-hero tqs-page-hero--metabox"<?php if ( $image_url ) : ?> style="background-image:url('<?php echo esc_url( $image_url ); ?>');background-size:cover;background-position:center;"<?php endif; ?>>
+<section class="tqs-page-hero tqs-page-hero--metabox<?php echo $image_url ? ' tqs-page-hero--has-image' : ''; ?>"<?php if ( $image_url ) : ?> style="background-image:url('<?php echo esc_url( $image_url ); ?>');"<?php endif; ?>>
 	<div class="tqs-page-hero-inner">
 		<?php if ( '' !== trim( $title ) ) : ?>
 			<h1 class="tqs-page-title"><?php echo esc_html( $title ); ?></h1>
