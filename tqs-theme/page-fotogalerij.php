@@ -177,12 +177,4 @@ $placeholder_tiles = array(
 	</div>
 </section>
 
-<!-- LIGHTBOX -->
-<div class="tqs-lightbox" id="tqsLightbox">
-	<button class="tqs-lightbox-close" id="tqsLightboxClose" aria-label="Sluiten">&times;</button>
-	<button class="tqs-lightbox-prev" id="tqsLightboxPrev" aria-label="Vorige">‹</button>
-	<img src="" alt="" id="tqsLightboxImg">
-	<button class="tqs-lightbox-next" id="tqsLightboxNext" aria-label="Volgende">›</button>
-</div>
-
 <?php get_footer(); ?>

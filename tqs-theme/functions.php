@@ -1635,3 +1635,97 @@ function tqs_should_hide_header() {
 function tqs_should_hide_footer() {
 	return is_singular() && '1' === get_post_meta( get_the_ID(), '_tqs_hide_footer', true );
 }
+
+/* ==========================================================================
+   12. GALLERY LIGHTBOX (global — Fotogalerij page + Elementor widget)
+   ========================================================================== */
+/**
+ * Output shared lightbox markup once per page.
+ */
+function tqs_render_gallery_lightbox_markup() {
+	static $rendered = false;
+	if ( $rendered ) {
+		return;
+	}
+	$rendered = true;
+	?>
+	<div class="tqs-lightbox" id="tqsLightbox">
+		<button class="tqs-lightbox-close" id="tqsLightboxClose" aria-label="<?php esc_attr_e( 'Sluiten', 'tqs-theme' ); ?>">&times;</button>
+		<button class="tqs-lightbox-prev" id="tqsLightboxPrev" aria-label="<?php esc_attr_e( 'Vorige', 'tqs-theme' ); ?>">‹</button>
+		<img src="" alt="" id="tqsLightboxImg">
+		<button class="tqs-lightbox-next" id="tqsLightboxNext" aria-label="<?php esc_attr_e( 'Volgende', 'tqs-theme' ); ?>">›</button>
+	</div>
+	<?php
+}
+
+/**
+ * Print lightbox on Fotogalerij and any page that may use the gallery widget.
+ */
+function tqs_maybe_render_gallery_lightbox() {
+	if ( is_page_template( 'page-fotogalerij.php' ) ) {
+		tqs_render_gallery_lightbox_markup();
+		return;
+	}
+	if ( ! class_exists( '\Elementor\Plugin' ) ) {
+		return;
+	}
+	$post_id = get_the_ID();
+	if ( ! $post_id ) {
+		return;
+	}
+	$document = \Elementor\Plugin::$instance->documents->get( $post_id );
+	if ( $document && $document->is_built_with_elementor() ) {
+		tqs_render_gallery_lightbox_markup();
+	}
+}
+add_action( 'wp_footer', 'tqs_maybe_render_gallery_lightbox', 5 );
+
+/* ==========================================================================
+   13. ELEMENTOR — custom category + TQS Gallery Grid widget
+   ========================================================================== */
+/**
+ * Register "Top Quality Security" widget category.
+ *
+ * Uses elementor/elements/categories_registered (current hook; not deprecated).
+ *
+ * @param \Elementor\Elements_Manager $elements_manager Elements manager.
+ */
+function tqs_elementor_register_category( $elements_manager ) {
+	$elements_manager->add_category(
+		'top-quality-security',
+		array(
+			'title' => esc_html__( 'Top Quality Security', 'tqs-theme' ),
+			'icon'  => 'fa fa-shield',
+		)
+	);
+}
+
+/**
+ * Register TQS Gallery Grid widget when Elementor is loaded.
+ *
+ * @param \Elementor\Widgets_Manager $widgets_manager Widgets manager.
+ */
+function tqs_elementor_register_widgets( $widgets_manager ) {
+	require_once get_template_directory() . '/inc/elementor/class-tqs-gallery-widget.php';
+	$widgets_manager->register( new TQS_Gallery_Widget() );
+}
+
+/**
+ * Bootstrap Elementor integrations after Elementor loads.
+ */
+function tqs_elementor_init() {
+	add_action( 'elementor/elements/categories_registered', 'tqs_elementor_register_category' );
+	add_action( 'elementor/widgets/register', 'tqs_elementor_register_widgets' );
+}
+add_action( 'elementor/loaded', 'tqs_elementor_init' );
+
+/**
+ * Enqueue theme assets in the Elementor editor iframe for widget preview.
+ */
+function tqs_elementor_editor_assets() {
+	wp_enqueue_style( 'tqs-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', array(), '6.5.1' );
+	wp_enqueue_style( 'tqs-theme-style', get_stylesheet_uri(), array(), tqs_theme_version() );
+	wp_enqueue_script( 'tqs-main', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), tqs_theme_version(), true );
+}
+add_action( 'elementor/editor/after_enqueue_scripts', 'tqs_elementor_editor_assets' );
+add_action( 'elementor/preview/enqueue_styles', 'tqs_elementor_editor_assets' );

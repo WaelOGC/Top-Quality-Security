@@ -206,16 +206,22 @@
 		}
 
 		/* ==================================================================
-		   5b. GALLERY CATEGORY FILTER (Fotogalerij)
+		   5b. GALLERY CATEGORY FILTER (Fotogalerij + Elementor widget)
 		   ================================================================== */
-		var $galleryFilters = $('#tqsGalleryFilters');
-		if ($galleryFilters.length) {
+		$('.tqs-gallery-section').each(function () {
+			var $section = $(this);
+			var $galleryFilters = $section.find('.tqs-gallery-filters');
+			var $galleryGrid = $section.find('.tqs-gallery-grid');
+			if (!$galleryFilters.length || !$galleryGrid.length) {
+				return;
+			}
+
 			$galleryFilters.on('click', '.tqs-gallery-filter', function () {
 				var filter = $(this).data('filter');
 				$galleryFilters.find('.tqs-gallery-filter').removeClass('is-active');
 				$(this).addClass('is-active');
 
-				var $tiles = $('#tqsGalleryGrid .tqs-gallery-tile').not('[data-placeholder="1"]');
+				var $tiles = $galleryGrid.find('.tqs-gallery-tile').not('[data-placeholder="1"]');
 				if (filter === 'all') {
 					$tiles.removeClass('is-hidden');
 					return;
@@ -226,7 +232,7 @@
 					$(this).toggleClass('is-hidden', cats.indexOf(filter) === -1);
 				});
 			});
-		}
+		});
 
 		/* ==================================================================
 		   5c. GALLERY BEFORE/AFTER SLIDER (Fotogalerij)
@@ -292,38 +298,49 @@
 		}
 
 		/* ==================================================================
-		   6. GALLERY LIGHTBOX (Fotogalerij) — grid/featured tiles only when enabled
+		   6. GALLERY LIGHTBOX (Fotogalerij + Elementor widget) — per grid when enabled
 		   ================================================================== */
-		var $galleryGrid = $('#tqsGalleryGrid');
 		var $lightbox = $('#tqsLightbox');
-		if ($galleryGrid.length && $lightbox.length) {
-			var $galleryTiles = $galleryGrid.find('.tqs-gallery-tile:not([data-placeholder="1"]):not([data-style="before_after"])');
+		if ($lightbox.length) {
 			var $lightboxImg = $('#tqsLightboxImg');
+			var activeGrid = null;
+			var activeTiles = null;
 			var lightboxIndex = 0;
 
-			function galleryLightboxEnabled() {
-				return String($galleryGrid.attr('data-lightbox')) !== '0';
+			function galleryLightboxEnabled($grid) {
+				return String($grid.attr('data-lightbox')) !== '0';
 			}
 
 			function openLightbox(index) {
-				if (!galleryLightboxEnabled() || !$galleryTiles.length) {
+				if (!activeGrid || !activeTiles || !activeTiles.length || !galleryLightboxEnabled(activeGrid)) {
 					return;
 				}
 				lightboxIndex = index;
-				var full = $galleryTiles.eq(lightboxIndex).data('full');
+				var full = activeTiles.eq(lightboxIndex).data('full');
 				$lightboxImg.attr('src', full);
 				$lightbox.addClass('is-open');
 			}
+
 			function closeLightbox() {
 				$lightbox.removeClass('is-open');
+				activeGrid = null;
+				activeTiles = null;
 			}
 
-			$galleryTiles.on('click', function () {
-				if (!galleryLightboxEnabled()) {
-					return;
-				}
-				openLightbox($(this).data('index'));
+			$('.tqs-gallery-grid').each(function () {
+				var $galleryGrid = $(this);
+				var $galleryTiles = $galleryGrid.find('.tqs-gallery-tile:not([data-placeholder="1"]):not([data-style="before_after"])');
+
+				$galleryTiles.on('click', function () {
+					if (!galleryLightboxEnabled($galleryGrid)) {
+						return;
+					}
+					activeGrid = $galleryGrid;
+					activeTiles = $galleryTiles;
+					openLightbox($(this).data('index'));
+				});
 			});
+
 			$('#tqsLightboxClose').on('click', closeLightbox);
 			$lightbox.on('click', function (e) {
 				if (e.target === this) {
@@ -331,10 +348,16 @@
 				}
 			});
 			$('#tqsLightboxPrev').on('click', function () {
-				openLightbox((lightboxIndex - 1 + $galleryTiles.length) % $galleryTiles.length);
+				if (!activeTiles || !activeTiles.length) {
+					return;
+				}
+				openLightbox((lightboxIndex - 1 + activeTiles.length) % activeTiles.length);
 			});
 			$('#tqsLightboxNext').on('click', function () {
-				openLightbox((lightboxIndex + 1) % $galleryTiles.length);
+				if (!activeTiles || !activeTiles.length) {
+					return;
+				}
+				openLightbox((lightboxIndex + 1) % activeTiles.length);
 			});
 			$(document).on('keydown', function (e) {
 				if (!$lightbox.hasClass('is-open')) {
