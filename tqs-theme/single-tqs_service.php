@@ -81,7 +81,7 @@ while ( have_posts() ) : the_post();
 			<div class="tqs-cta-card">
 				<h3>Offerte Aanvragen voor <?php the_title(); ?></h3>
 				<p>Ontvang binnen één werkdag een vrijblijvend voorstel op maat.</p>
-				<a href="<?php echo esc_url( home_url( '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold" style="width:100%; text-align:center; padding:14px;">Offerte Aanvragen</a>
+				<a href="<?php echo esc_url( tqs_theme_mod_url( 'tqs_cta_btn1_url', '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold" style="width:100%; text-align:center; padding:14px;"><?php echo esc_html( get_theme_mod( 'tqs_cta_btn1_text', 'Offerte Aanvragen' ) ); ?></a>
 			</div>
 
 			<?php if ( ! empty( $related ) ) : ?>
@@ -101,11 +101,11 @@ while ( have_posts() ) : the_post();
 
 <section class="tqs-cta-banner">
 	<div class="tqs-cta-inner">
-		<h2 class="tqs-cta-h2">Klaar voor professionele beveiliging?</h2>
-		<p>Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.</p>
+		<h2 class="tqs-cta-h2"><?php echo esc_html( get_theme_mod( 'tqs_cta_title', 'Klaar voor professionele beveiliging?' ) ); ?></h2>
+		<p><?php echo esc_html( get_theme_mod( 'tqs_cta_text', 'Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.' ) ); ?></p>
 		<div class="tqs-cta-buttons">
-			<a href="<?php echo esc_url( home_url( '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold">Offerte Aanvragen</a>
-			<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', get_theme_mod( 'tqs_phone', '+31 (0)70 123 4567' ) ) ); ?>" class="tqs-btn tqs-btn-outline">Bel Ons Direct</a>
+			<a href="<?php echo esc_url( tqs_theme_mod_url( 'tqs_cta_btn1_url', '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold"><?php echo esc_html( get_theme_mod( 'tqs_cta_btn1_text', 'Offerte Aanvragen' ) ); ?></a>
+			<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', get_theme_mod( 'tqs_phone', '+31 (0)70 123 4567' ) ) ); ?>" class="tqs-btn tqs-btn-outline"><?php echo esc_html( get_theme_mod( 'tqs_cta_btn2_text', 'Bel Ons Direct' ) ); ?></a>
 		</div>
 	</div>
 </section>

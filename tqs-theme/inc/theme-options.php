@@ -26,41 +26,6 @@ function tqs_get_brand_color_defaults() {
 }
 
 /**
- * Default hero slide data (homepage slider).
- */
-function tqs_get_default_hero_slides() {
-	return array(
-		array(
-			'enabled'   => true,
-			'gradient'  => 'linear-gradient(135deg, #1A0533 0%, #2D0A4E 55%, #4a1b7a 100%)',
-			'icon'      => '🛡',
-			'badge'     => 'ND 7099 GECERTIFICEERD',
-			'title'     => 'Uw veiligheid is onze',
-			'highlight' => 'topprioriteit',
-			'subtitle'  => 'Wij staan voor kwaliteit en betrouwbaarheid in beveiliging. Van retail tot evenementen — TQS levert professionele beveiligingsoplossingen door heel Nederland, vanuit Den Haag.',
-		),
-		array(
-			'enabled'   => true,
-			'gradient'  => 'linear-gradient(135deg, #2D0A4E 0%, #6a2499 55%, #8B2FC9 100%)',
-			'icon'      => '🏬',
-			'badge'     => 'RETAIL & HORECA',
-			'title'     => 'Specialisten in',
-			'highlight' => 'winkel- en horecabeveiliging',
-			'subtitle'  => 'Onze beveiligers zorgen voor een veilige, gastvrije omgeving in winkels, bars en restaurants — alert, benaderbaar en professioneel.',
-		),
-		array(
-			'enabled'   => true,
-			'gradient'  => 'linear-gradient(135deg, #1A0533 0%, #3d1466 50%, #8B2FC9 100%)',
-			'icon'      => '🎪',
-			'badge'     => 'EVENEMENTEN & OBJECTEN',
-			'title'     => 'Veiligheid voor elk',
-			'highlight' => 'evenement en pand',
-			'subtitle'  => 'Van festivals tot hotels en bedrijfspanden: wij bieden beveiligingsoplossingen die passen bij uw specifieke situatie.',
-		),
-	);
-}
-
-/**
  * Default "Why Us" cards.
  */
 function tqs_get_default_why_us_cards() {
@@ -126,36 +91,6 @@ function tqs_get_stats() {
 		);
 	}
 	return $stats;
-}
-
-/**
- * Active homepage hero slides from Customizer.
- */
-function tqs_get_hero_slides() {
-	$defaults = tqs_get_default_hero_slides();
-	$slides   = array();
-
-	for ( $i = 0; $i < 3; $i++ ) {
-		$default = $defaults[ $i ];
-		if ( ! get_theme_mod( "tqs_slide_{$i}_enabled", $default['enabled'] ) ) {
-			continue;
-		}
-
-		$image_id  = absint( get_theme_mod( "tqs_slide_{$i}_image", 0 ) );
-		$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'tqs-hero' ) : '';
-
-		$slides[] = array(
-			'gradient'  => get_theme_mod( "tqs_slide_{$i}_gradient", $default['gradient'] ),
-			'image_url' => $image_url,
-			'icon'      => get_theme_mod( "tqs_slide_{$i}_icon", $default['icon'] ),
-			'badge'     => get_theme_mod( "tqs_slide_{$i}_badge", $default['badge'] ),
-			'title'     => get_theme_mod( "tqs_slide_{$i}_title", $default['title'] ),
-			'highlight' => get_theme_mod( "tqs_slide_{$i}_highlight", $default['highlight'] ),
-			'subtitle'  => get_theme_mod( "tqs_slide_{$i}_subtitle", $default['subtitle'] ),
-		);
-	}
-
-	return ! empty( $slides ) ? $slides : $defaults;
 }
 
 /**

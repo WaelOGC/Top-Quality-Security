@@ -75,9 +75,9 @@ tqs_render_hero( get_the_ID() );
 					<?php if ( count( $page_services ) < 2 ) : ?>
 					<div class="tqs-service-contact-slide">
 						<div style="font-size:36px;">📞</div>
-						<h3>Andere sector?</h3>
-						<p>Neem contact op voor meer informatie over een oplossing op maat.</p>
-						<a href="<?php echo esc_url( home_url( '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold" style="padding:12px 26px;font-size:14px;">Neem Contact Op</a>
+						<h3><?php echo esc_html( get_theme_mod( 'tqs_services_filler_title', 'Andere sector?' ) ); ?></h3>
+						<p><?php echo esc_html( get_theme_mod( 'tqs_services_filler_text', 'Neem contact op voor meer informatie over een oplossing op maat.' ) ); ?></p>
+						<a href="<?php echo esc_url( tqs_theme_mod_url( 'tqs_services_filler_btn_url', '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold" style="padding:12px 26px;font-size:14px;"><?php echo esc_html( get_theme_mod( 'tqs_services_filler_btn_text', 'Neem Contact Op' ) ); ?></a>
 					</div>
 					<?php endif; ?>
 				</div>

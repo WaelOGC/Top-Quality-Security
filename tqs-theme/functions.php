@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.0.5';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.0.6';
 	}
 	return $version;
 }
@@ -1015,61 +1015,19 @@ function tqs_maybe_seed_sample_reviews() {
 add_action( 'admin_init', 'tqs_maybe_seed_sample_reviews' );
 
 /* ==========================================================================
-   5. META BOXES — Page Hero Image + Page Options
+   5. META BOXES — Page Options + Gallery
    ========================================================================== */
 function tqs_add_meta_boxes() {
 	$screens = array( 'page', 'tqs_service' );
 	foreach ( $screens as $screen ) {
-		add_meta_box( 'tqs_hero_image_box', __( '🖼️ Page Hero Image', 'tqs-theme' ), 'tqs_render_hero_image_box', $screen, 'side', 'default' );
 		add_meta_box( 'tqs_page_options_box', __( '⚙️ Page Options', 'tqs-theme' ), 'tqs_render_page_options_box', $screen, 'side', 'default' );
 	}
 	add_meta_box( 'tqs_gallery_box', __( '🖼️ Galerij Afbeeldingen', 'tqs-theme' ), 'tqs_render_gallery_box', 'page', 'normal', 'high' );
 }
 add_action( 'add_meta_boxes', 'tqs_add_meta_boxes' );
 
-function tqs_render_hero_image_box( $post ) {
-	wp_nonce_field( 'tqs_save_meta', 'tqs_meta_nonce' );
-	$image_id = get_post_meta( $post->ID, '_tqs_hero_image_id', true );
-	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'medium' ) : '';
-	?>
-	<div class="tqs-hero-meta-box">
-		<input type="hidden" name="tqs_hero_image_id" id="tqs_hero_image_id" value="<?php echo esc_attr( $image_id ); ?>">
-		<div id="tqs_hero_image_preview" style="margin-bottom:10px;">
-			<?php if ( $image_url ) : ?>
-				<img src="<?php echo esc_url( $image_url ); ?>" style="max-width:100%;height:auto;border-radius:6px;">
-			<?php endif; ?>
-		</div>
-		<button type="button" class="button" id="tqs_upload_hero_btn"><?php esc_html_e( 'Kies Afbeelding', 'tqs-theme' ); ?></button>
-		<button type="button" class="button" id="tqs_remove_hero_btn" <?php echo $image_id ? '' : 'style="display:none;"'; ?>><?php esc_html_e( 'Verwijderen', 'tqs-theme' ); ?></button>
-		<p class="description"><?php esc_html_e( 'Valt terug op: uitgelichte afbeelding → Customizer hero → gradient achtergrond. Aanbevolen: min. 1280×500px.', 'tqs-theme' ); ?></p>
-	</div>
-	<script>
-	jQuery(function($){
-		var frame;
-		$('#tqs_upload_hero_btn').on('click', function(e){
-			e.preventDefault();
-			if ( frame ) { frame.open(); return; }
-			frame = wp.media({ title: 'Kies Hero Afbeelding', multiple: false, library: { type: 'image' } });
-			frame.on('select', function(){
-				var att = frame.state().get('selection').first().toJSON();
-				$('#tqs_hero_image_id').val(att.id);
-				$('#tqs_hero_image_preview').html('<img src="'+att.url+'" style="max-width:100%;height:auto;border-radius:6px;">');
-				$('#tqs_remove_hero_btn').show();
-			});
-			frame.open();
-		});
-		$('#tqs_remove_hero_btn').on('click', function(e){
-			e.preventDefault();
-			$('#tqs_hero_image_id').val('');
-			$('#tqs_hero_image_preview').html('');
-			$(this).hide();
-		});
-	});
-	</script>
-	<?php
-}
-
 function tqs_render_page_options_box( $post ) {
+	wp_nonce_field( 'tqs_save_meta', 'tqs_meta_nonce' );
 	$hero_title_override = get_post_meta( $post->ID, '_tqs_hero_title_override', true );
 	$hide_hero   = get_post_meta( $post->ID, '_tqs_hide_hero', true );
 	$hide_header = get_post_meta( $post->ID, '_tqs_hide_header', true );
@@ -1150,9 +1108,6 @@ function tqs_save_meta_boxes( $post_id ) {
 		return;
 	}
 
-	if ( isset( $_POST['tqs_hero_image_id'] ) ) {
-		update_post_meta( $post_id, '_tqs_hero_image_id', absint( $_POST['tqs_hero_image_id'] ) );
-	}
 	if ( isset( $_POST['tqs_hero_title_override'] ) ) {
 		update_post_meta( $post_id, '_tqs_hero_title_override', sanitize_text_field( $_POST['tqs_hero_title_override'] ) );
 	}

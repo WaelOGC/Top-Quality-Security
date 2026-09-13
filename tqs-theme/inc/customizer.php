@@ -215,6 +215,12 @@ function tqs_customize_register( $wp_customize ) {
 		'priority' => 60,
 	) );
 	tqs_add_setting( $wp_customize, 'tqs_contact_recipient', '', 'tqs_contact_settings', __( 'Formulier ontvanger (leeg = e-mail header)', 'tqs-theme' ), 'email', 'sanitize_email' );
+	tqs_add_setting( $wp_customize, 'tqs_contact_hero_subtitle', 'Vragen over onze diensten of een offerte op maat? Neem contact op — wij reageren binnen één werkdag.', 'tqs_contact_settings', __( 'Contact pagina — hero subtitel', 'tqs-theme' ), 'textarea' );
+	tqs_add_setting( $wp_customize, 'tqs_contact_form_title', 'Stuur Ons Een Bericht', 'tqs_contact_settings', __( 'Contact formulier — titel', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_contact_form_sub', 'Vul het formulier in en wij nemen zo spoedig mogelijk contact met u op.', 'tqs_contact_settings', __( 'Contact formulier — intro', 'tqs-theme' ), 'textarea' );
+	tqs_add_setting( $wp_customize, 'tqs_contact_hours_note', '24/7 bereikbaar voor lopende opdrachten', 'tqs_contact_settings', __( 'Openingstijden — notitie', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_contact_whatsapp_title', 'Chat via WhatsApp', 'tqs_contact_settings', __( 'WhatsApp kaart — titel', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_contact_whatsapp_sub', 'Snel antwoord tijdens kantooruren', 'tqs_contact_settings', __( 'WhatsApp kaart — subtitel', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_form_success_msg', 'Bedankt voor uw bericht! Wij nemen zo spoedig mogelijk contact met u op.', 'tqs_contact_settings', __( 'Succesmelding formulier', 'tqs-theme' ), 'textarea' );
 	tqs_add_setting( $wp_customize, 'tqs_form_error_msg', 'Er ging iets mis bij het verzenden. Probeer het later opnieuw of bel ons direct.', 'tqs_contact_settings', __( 'Foutmelding formulier', 'tqs-theme' ), 'textarea' );
 	tqs_add_checkbox( $wp_customize, 'tqs_show_contact_map', true, 'tqs_contact_settings', __( 'Toon kaart op contactpagina', 'tqs-theme' ) );
@@ -261,6 +267,7 @@ function tqs_customize_register( $wp_customize ) {
 		'section' => 'tqs_gallery_settings',
 		'type'    => 'checkbox',
 	) );
+	tqs_add_setting( $wp_customize, 'tqs_gallery_hero_subtitle', 'Een impressie van ons werk in de praktijk.', 'tqs_gallery_settings', __( 'Fotogalerij — hero subtitel', 'tqs-theme' ), 'textarea' );
 
 	/* --- Footer --- */
 	$wp_customize->add_section( 'tqs_footer_settings', array(
@@ -354,6 +361,10 @@ function tqs_customize_register( $wp_customize ) {
 	tqs_add_setting( $wp_customize, 'tqs_services_eyebrow', 'ONZE DIENSTEN', 'tqs_services_section', __( 'Eyebrow tekst', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_services_title', 'Beveiligingsoplossingen op maat', 'tqs_services_section', __( 'Sectietitel', 'tqs-theme' ) );
 	tqs_add_setting( $wp_customize, 'tqs_services_lead', 'Voor elke sector een passende aanpak — professioneel, gecertificeerd en altijd paraat.', 'tqs_services_section', __( 'Intro tekst', 'tqs-theme' ), 'textarea' );
+	tqs_add_setting( $wp_customize, 'tqs_services_filler_title', 'Andere sector?', 'tqs_services_section', __( 'Vulslide — titel (oneven aantal diensten)', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_services_filler_text', 'Neem contact op voor meer informatie over een oplossing op maat.', 'tqs_services_section', __( 'Vulslide — tekst', 'tqs-theme' ), 'textarea' );
+	tqs_add_setting( $wp_customize, 'tqs_services_filler_btn_text', 'Neem Contact Op', 'tqs_services_section', __( 'Vulslide — knoptekst', 'tqs-theme' ) );
+	tqs_add_setting( $wp_customize, 'tqs_services_filler_btn_url', '/contact', 'tqs_services_section', __( 'Vulslide — knop URL', 'tqs-theme' ), 'text', 'tqs_sanitize_url_or_path' );
 
 	$wp_customize->add_section( 'tqs_why_us_section', array(
 		'title'    => __( 'Why Us', 'tqs-theme' ),

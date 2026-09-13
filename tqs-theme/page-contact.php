@@ -17,9 +17,9 @@ $wa       = preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', 
 
 <section class="tqs-page-hero">
 	<div class="tqs-page-hero-inner">
-		<?php tqs_breadcrumbs( array( array( 'label' => 'Contact' ) ) ); ?>
-		<h1 class="tqs-page-title">Contact</h1>
-		<p class="tqs-page-subtitle">Vragen over onze diensten of een offerte op maat? Neem contact op — wij reageren binnen één werkdag.</p>
+		<?php tqs_breadcrumbs( array( array( 'label' => get_the_title() ) ) ); ?>
+		<h1 class="tqs-page-title"><?php the_title(); ?></h1>
+		<p class="tqs-page-subtitle"><?php echo esc_html( get_theme_mod( 'tqs_contact_hero_subtitle', 'Vragen over onze diensten of een offerte op maat? Neem contact op — wij reageren binnen één werkdag.' ) ); ?></p>
 	</div>
 </section>
 
@@ -49,8 +49,8 @@ $wa       = preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', 
 
 <div class="tqs-contact-main">
 	<div>
-		<h2 class="tqs-contact-form-title">Stuur Ons Een Bericht</h2>
-		<p class="tqs-contact-form-sub">Vul het formulier in en wij nemen zo spoedig mogelijk contact met u op.</p>
+		<h2 class="tqs-contact-form-title"><?php echo esc_html( get_theme_mod( 'tqs_contact_form_title', 'Stuur Ons Een Bericht' ) ); ?></h2>
+		<p class="tqs-contact-form-sub"><?php echo esc_html( get_theme_mod( 'tqs_contact_form_sub', 'Vul het formulier in en wij nemen zo spoedig mogelijk contact met u op.' ) ); ?></p>
 
 		<div class="tqs-form-message" id="tqsFormMessage"></div>
 
@@ -115,14 +115,14 @@ $wa       = preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', 
 			?>
 				<div class="tqs-hours-row"><span><?php echo esc_html( trim( $parts[0] ) ); ?></span> <strong><?php echo esc_html( isset( $parts[1] ) ? trim( $parts[1] ) : '' ); ?></strong></div>
 			<?php endforeach; ?>
-			<div class="tqs-hours-note">24/7 bereikbaar voor lopende opdrachten</div>
+			<div class="tqs-hours-note"><?php echo esc_html( get_theme_mod( 'tqs_contact_hours_note', '24/7 bereikbaar voor lopende opdrachten' ) ); ?></div>
 		</div>
 
 		<a href="https://wa.me/<?php echo esc_attr( $wa ); ?>" target="_blank" rel="noopener" class="tqs-whatsapp-card">
 			<div class="tqs-whatsapp-card-icon"><i class="fa-brands fa-whatsapp" style="color:#fff;"></i></div>
 			<div class="tqs-whatsapp-card-text">
-				<div class="title">Chat via WhatsApp</div>
-				<div class="sub">Snel antwoord tijdens kantooruren</div>
+				<div class="title"><?php echo esc_html( get_theme_mod( 'tqs_contact_whatsapp_title', 'Chat via WhatsApp' ) ); ?></div>
+				<div class="sub"><?php echo esc_html( get_theme_mod( 'tqs_contact_whatsapp_sub', 'Snel antwoord tijdens kantooruren' ) ); ?></div>
 			</div>
 		</a>
 

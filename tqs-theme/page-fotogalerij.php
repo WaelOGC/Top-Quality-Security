@@ -95,9 +95,9 @@ $placeholder_tiles = array(
 
 <section class="tqs-page-hero">
 	<div class="tqs-page-hero-inner">
-		<?php tqs_breadcrumbs( array( array( 'label' => 'Fotogalerij' ) ) ); ?>
-		<h1 class="tqs-page-title">Fotogalerij</h1>
-		<p class="tqs-page-subtitle">Een impressie van ons werk in de praktijk.</p>
+		<?php tqs_breadcrumbs( array( array( 'label' => get_the_title() ) ) ); ?>
+		<h1 class="tqs-page-title"><?php the_title(); ?></h1>
+		<p class="tqs-page-subtitle"><?php echo esc_html( get_theme_mod( 'tqs_gallery_hero_subtitle', 'Een impressie van ons werk in de praktijk.' ) ); ?></p>
 	</div>
 </section>
 
@@ -168,11 +168,11 @@ $placeholder_tiles = array(
 
 <section class="tqs-cta-banner">
 	<div class="tqs-cta-inner">
-		<h2 class="tqs-cta-h2">Klaar voor professionele beveiliging?</h2>
-		<p>Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.</p>
+		<h2 class="tqs-cta-h2"><?php echo esc_html( get_theme_mod( 'tqs_cta_title', 'Klaar voor professionele beveiliging?' ) ); ?></h2>
+		<p><?php echo esc_html( get_theme_mod( 'tqs_cta_text', 'Vraag vandaag nog een vrijblijvende offerte aan en ontdek wat TQS voor u kan betekenen.' ) ); ?></p>
 		<div class="tqs-cta-buttons">
-			<a href="<?php echo esc_url( home_url( '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold">Offerte Aanvragen</a>
-			<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', get_theme_mod( 'tqs_phone', '+31 (0)70 123 4567' ) ) ); ?>" class="tqs-btn tqs-btn-outline">Bel Ons Direct</a>
+			<a href="<?php echo esc_url( tqs_theme_mod_url( 'tqs_cta_btn1_url', '/contact' ) ); ?>" class="tqs-btn tqs-btn-gold"><?php echo esc_html( get_theme_mod( 'tqs_cta_btn1_text', 'Offerte Aanvragen' ) ); ?></a>
+			<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', get_theme_mod( 'tqs_phone', '+31 (0)70 123 4567' ) ) ); ?>" class="tqs-btn tqs-btn-outline"><?php echo esc_html( get_theme_mod( 'tqs_cta_btn2_text', 'Bel Ons Direct' ) ); ?></a>
 		</div>
 	</div>
 </section>
