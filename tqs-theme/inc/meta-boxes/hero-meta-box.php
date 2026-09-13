@@ -1,3 +1,4 @@
+<?php
 /**
  * Hero Settings meta box — Pages (admin UI + storage only).
  *
