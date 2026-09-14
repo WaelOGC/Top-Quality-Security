@@ -136,4 +136,6 @@ $wa       = preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', 
 
 <div style="height:64px;"></div>
 
+<?php get_template_part( 'template-parts/sections/cta', 'section' ); ?>
+
 <?php get_footer(); ?>
