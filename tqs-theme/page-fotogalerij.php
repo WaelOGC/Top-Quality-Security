@@ -93,13 +93,7 @@ $placeholder_tiles = array(
 );
 ?>
 
-<section class="tqs-page-hero">
-	<div class="tqs-page-hero-inner">
-		<?php tqs_breadcrumbs( array( array( 'label' => get_the_title() ) ) ); ?>
-		<h1 class="tqs-page-title"><?php the_title(); ?></h1>
-		<p class="tqs-page-subtitle"><?php echo esc_html( get_theme_mod( 'tqs_gallery_hero_subtitle', 'Een impressie van ons werk in de praktijk.' ) ); ?></p>
-	</div>
-</section>
+<?php tqs_render_hero( get_the_ID() ); ?>
 
 <section class="tqs-gallery-section">
 	<?php if ( $gallery_show_filters && ! empty( $gallery_tiles ) && ! empty( $filter_terms ) ) : ?>

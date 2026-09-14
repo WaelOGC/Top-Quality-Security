@@ -1,51 +1,33 @@
 <?php
 /**
  * Generic page template
- * Special layout auto-applied for "Wie Zijn Wij" (about) and legal pages.
+ * About layout when `_tqs_about_layout` / about meta is set; legal pages by slug.
  *
  * @package tqs-theme
  */
 get_header();
 
-while ( have_posts() ) : the_post();
+while ( have_posts() ) :
+	the_post();
 
-	$slug = get_post_field( 'post_name' );
-	$hide_hero = '1' === get_post_meta( get_the_ID(), '_tqs_hide_hero', true );
-	$title_override = get_post_meta( get_the_ID(), '_tqs_hero_title_override', true );
-	$display_title = $title_override ?: get_the_title();
+	$post_id = get_the_ID();
+	$slug    = get_post_field( 'post_name', $post_id );
 
-	if ( 'wie-zijn-wij' === $slug ) :
+	if ( function_exists( 'tqs_is_about_layout_page' ) && tqs_is_about_layout_page( $post_id ) ) :
 
-		$values = array(
-			array( 'icon' => 'fa-handshake', 'title' => 'Betrouwbaarheid', 'desc' => 'Wij komen afspraken na en zijn er wanneer het erop aankomt.' ),
-			array( 'icon' => 'fa-user-graduate', 'title' => 'Professionaliteit', 'desc' => 'Opgeleid, gecertificeerd en representatief in elke situatie.' ),
-			array( 'icon' => 'fa-eye', 'title' => 'Alertheid', 'desc' => 'Scherp opmerkzaam, zonder de sfeer te verstoren.' ),
-			array( 'icon' => 'fa-comments', 'title' => 'Klantgerichtheid', 'desc' => 'Maatwerk oplossingen die aansluiten bij uw organisatie.' ),
-		);
-		$guarantees = array(
-			array( 'icon' => 'fa-user-shield', 'title' => 'Gescreend Personeel', 'desc' => 'Alle beveiligers doorlopen een strenge screening.' ),
-			array( 'icon' => 'fa-file-shield', 'title' => 'ND 7099 Gecertificeerd', 'desc' => 'Voldoen aan de hoogste kwaliteitsnorm in de branche.' ),
-			array( 'icon' => 'fa-clock', 'title' => '24/7 Bereikbaarheid', 'desc' => 'Altijd te bereiken, ook buiten kantoortijden.' ),
-			array( 'icon' => 'fa-gears', 'title' => 'Maatwerk Aanpak', 'desc' => 'Elke opdracht krijgt een plan op maat.' ),
-		);
-		$hero_img = tqs_get_hero_image_url();
+		$values     = function_exists( 'tqs_get_about_values' ) ? tqs_get_about_values( $post_id ) : array();
+		$guarantees = function_exists( 'tqs_get_about_guarantees' ) ? tqs_get_about_guarantees( $post_id ) : array();
+		$story_img  = function_exists( 'tqs_get_story_image_url' ) ? tqs_get_story_image_url( $post_id ) : '';
+		$page_title = get_the_title();
+
+		tqs_render_hero( $post_id );
 		?>
-
-		<?php if ( ! $hide_hero ) : ?>
-		<section class="tqs-page-hero">
-			<div class="tqs-page-hero-inner">
-				<?php tqs_breadcrumbs( array( array( 'label' => $display_title ) ) ); ?>
-				<h1 class="tqs-page-title"><?php echo esc_html( $display_title ); ?></h1>
-				<p class="tqs-page-subtitle">Maak kennis met TQS — een gecertificeerde beveiligingspartner met een persoonlijke aanpak.</p>
-			</div>
-		</section>
-		<?php endif; ?>
 
 		<section class="tqs-story-section">
 			<div class="tqs-story-grid">
 				<div class="tqs-story-media">
-					<?php if ( $hero_img ) : ?>
-						<img src="<?php echo esc_url( $hero_img ); ?>" alt="<?php echo esc_attr( $display_title ); ?>">
+					<?php if ( $story_img ) : ?>
+						<img src="<?php echo esc_url( $story_img ); ?>" alt="<?php echo esc_attr( $page_title ); ?>">
 					<?php else : ?>
 						<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
 							<div class="tqs-illustration-float" style="position:relative; display:flex; gap:8px;">
@@ -69,6 +51,7 @@ while ( have_posts() ) : the_post();
 			</div>
 		</section>
 
+		<?php if ( ! empty( $values ) ) : ?>
 		<section class="tqs-values-section">
 			<div class="tqs-values-header">
 				<div class="tqs-section-eyebrow">ONZE KERNWAARDEN</div>
@@ -84,7 +67,9 @@ while ( have_posts() ) : the_post();
 				<?php endforeach; ?>
 			</div>
 		</section>
+		<?php endif; ?>
 
+		<?php if ( ! empty( $guarantees ) ) : ?>
 		<section class="tqs-guarantee-band">
 			<div class="tqs-guarantee-grid">
 				<?php foreach ( $guarantees as $g ) : ?>
@@ -96,6 +81,7 @@ while ( have_posts() ) : the_post();
 				<?php endforeach; ?>
 			</div>
 		</section>
+		<?php endif; ?>
 
 		<section class="tqs-cta-banner">
 			<div class="tqs-cta-inner">
@@ -110,12 +96,7 @@ while ( have_posts() ) : the_post();
 
 	<?php elseif ( in_array( $slug, array( 'privacybeleid', 'algemene-voorwaarden' ), true ) ) : ?>
 
-		<section class="tqs-page-hero" style="padding:44px 40px;">
-			<div class="tqs-page-hero-inner">
-				<?php tqs_breadcrumbs( array( array( 'label' => $display_title ) ) ); ?>
-				<h1 class="tqs-page-title" style="font-size:38px;"><?php echo esc_html( $display_title ); ?></h1>
-			</div>
-		</section>
+		<?php tqs_render_hero( $post_id ); ?>
 
 		<section class="tqs-legal-section">
 			<div class="tqs-legal-content">
@@ -126,16 +107,7 @@ while ( have_posts() ) : the_post();
 
 	<?php else : ?>
 
-		<?php if ( ! $hide_hero ) :
-			$hero_img = tqs_get_hero_image_url();
-		?>
-		<section class="tqs-page-hero<?php echo $hero_img ? ' tqs-page-hero--has-image' : ''; ?>"<?php if ( $hero_img ) : ?> style="background-image:url('<?php echo esc_url( $hero_img ); ?>');"<?php endif; ?>>
-			<div class="tqs-page-hero-inner">
-				<?php tqs_breadcrumbs( array( array( 'label' => $display_title ) ) ); ?>
-				<h1 class="tqs-page-title"><?php echo esc_html( $display_title ); ?></h1>
-			</div>
-		</section>
-		<?php endif; ?>
+		<?php tqs_render_hero( $post_id ); ?>
 
 		<section class="tqs-legal-section">
 			<div class="tqs-legal-content" style="max-width:880px;">

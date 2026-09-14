@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.3.0';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.4.0';
 	}
 	return $version;
 }
@@ -27,7 +27,9 @@ require get_template_directory() . '/inc/theme-options.php';
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/cinematic-scroll.php';
 require get_template_directory() . '/inc/meta-boxes/hero-meta-box.php';
+require get_template_directory() . '/inc/meta-boxes/about-meta-box.php';
 require get_template_directory() . '/inc/hero-render.php';
+require get_template_directory() . '/inc/hero-migration.php';
 
 /* ==========================================================================
    1. THEME SETUP
@@ -1028,16 +1030,10 @@ add_action( 'add_meta_boxes', 'tqs_add_meta_boxes' );
 
 function tqs_render_page_options_box( $post ) {
 	wp_nonce_field( 'tqs_save_meta', 'tqs_meta_nonce' );
-	$hero_title_override = get_post_meta( $post->ID, '_tqs_hero_title_override', true );
-	$hide_hero   = get_post_meta( $post->ID, '_tqs_hide_hero', true );
 	$hide_header = get_post_meta( $post->ID, '_tqs_hide_header', true );
 	$hide_footer = get_post_meta( $post->ID, '_tqs_hide_footer', true );
 	?>
-	<p>
-		<label for="tqs_hero_title_override"><strong><?php esc_html_e( 'Hero titel override', 'tqs-theme' ); ?></strong></label><br>
-		<input type="text" class="widefat" id="tqs_hero_title_override" name="tqs_hero_title_override" value="<?php echo esc_attr( $hero_title_override ); ?>">
-	</p>
-	<p><label><input type="checkbox" name="tqs_hide_hero" value="1" <?php checked( $hide_hero, '1' ); ?>> <?php esc_html_e( 'Verberg hero sectie', 'tqs-theme' ); ?></label></p>
+	<p class="description"><?php esc_html_e( 'Hero-instellingen staan in de “Hero Settings” meta box. Gebruik “Toon Hero” daar om de hero te verbergen.', 'tqs-theme' ); ?></p>
 	<p><label><input type="checkbox" name="tqs_hide_header" value="1" <?php checked( $hide_header, '1' ); ?>> <?php esc_html_e( 'Verberg header (Elementor full-canvas)', 'tqs-theme' ); ?></label></p>
 	<p><label><input type="checkbox" name="tqs_hide_footer" value="1" <?php checked( $hide_footer, '1' ); ?>> <?php esc_html_e( 'Verberg footer (Elementor full-canvas)', 'tqs-theme' ); ?></label></p>
 	<?php
@@ -1108,10 +1104,6 @@ function tqs_save_meta_boxes( $post_id ) {
 		return;
 	}
 
-	if ( isset( $_POST['tqs_hero_title_override'] ) ) {
-		update_post_meta( $post_id, '_tqs_hero_title_override', sanitize_text_field( $_POST['tqs_hero_title_override'] ) );
-	}
-	update_post_meta( $post_id, '_tqs_hide_hero', isset( $_POST['tqs_hide_hero'] ) ? '1' : '' );
 	update_post_meta( $post_id, '_tqs_hide_header', isset( $_POST['tqs_hide_header'] ) ? '1' : '' );
 	update_post_meta( $post_id, '_tqs_hide_footer', isset( $_POST['tqs_hide_footer'] ) ? '1' : '' );
 

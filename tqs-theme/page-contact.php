@@ -15,13 +15,7 @@ $hours_lines = array_filter( array_map( 'trim', explode( "\n", $hours ) ) );
 $wa       = preg_replace( '/[^0-9]/', '', get_theme_mod( 'tqs_whatsapp_number', '31636286183' ) );
 ?>
 
-<section class="tqs-page-hero">
-	<div class="tqs-page-hero-inner">
-		<?php tqs_breadcrumbs( array( array( 'label' => get_the_title() ) ) ); ?>
-		<h1 class="tqs-page-title"><?php the_title(); ?></h1>
-		<p class="tqs-page-subtitle"><?php echo esc_html( get_theme_mod( 'tqs_contact_hero_subtitle', 'Vragen over onze diensten of een offerte op maat? Neem contact op — wij reageren binnen één werkdag.' ) ); ?></p>
-	</div>
-</section>
+<?php tqs_render_hero( get_the_ID() ); ?>
 
 <div class="tqs-contact-info-row">
 	<div class="tqs-contact-info-card">

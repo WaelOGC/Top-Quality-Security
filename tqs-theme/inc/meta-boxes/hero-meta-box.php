@@ -1,6 +1,6 @@
 <?php
 /**
- * Hero Settings meta box — Pages (admin UI + storage only).
+ * Hero Settings meta box — Pages and Services (admin UI + storage).
  *
  * Post meta:
  *   _tqs_hero_type              string  none|homepage_hero|page_hero
@@ -199,7 +199,17 @@ function tqs_hero_sanitize_page_hero( $raw ) {
 function tqs_hero_sanitize_type( $type ) {
 	$type    = sanitize_text_field( (string) $type );
 	$allowed = array( 'none', 'homepage_hero', 'page_hero' );
-	return in_array( $type, $allowed, true ) ? $type : 'none';
+	/* Default for empty/invalid: page hero so new pages show a hero out of the box. */
+	return in_array( $type, $allowed, true ) ? $type : 'page_hero';
+}
+
+/**
+ * Post types that support Hero Settings.
+ *
+ * @return string[]
+ */
+function tqs_hero_settings_post_types() {
+	return array( 'page', 'tqs_service' );
 }
 
 /**
@@ -237,36 +247,44 @@ function tqs_get_stored_homepage_hero_slides( $post_id ) {
 }
 
 /**
- * Get stored page hero.
+ * Get stored page hero (falls back title to post title when empty).
  *
  * @param int $post_id Post ID.
  * @return array<string, mixed>
  */
 function tqs_get_stored_page_hero( $post_id ) {
-	$stored = get_post_meta( $post_id, '_tqs_page_hero', true );
-	if ( empty( $stored ) || ! is_array( $stored ) ) {
-		return tqs_hero_default_page_hero();
+	$post_id = absint( $post_id );
+	$stored  = get_post_meta( $post_id, '_tqs_page_hero', true );
+	$hero    = ( empty( $stored ) || ! is_array( $stored ) )
+		? tqs_hero_default_page_hero()
+		: tqs_hero_sanitize_page_hero( $stored );
+
+	if ( '' === trim( (string) $hero['title'] ) && $post_id ) {
+		$hero['title'] = get_the_title( $post_id );
 	}
-	return tqs_hero_sanitize_page_hero( $stored );
+
+	return $hero;
 }
 
 /**
- * Register meta box under the editor (normal / high).
+ * Register meta box under the editor for all supported post types.
  */
 function tqs_register_hero_settings_meta_box() {
-	add_meta_box(
-		'tqs_hero_settings_box',
-		__( 'Hero Settings', 'tqs-theme' ),
-		'tqs_render_hero_settings_meta_box',
-		'page',
-		'normal',
-		'high'
-	);
+	foreach ( tqs_hero_settings_post_types() as $post_type ) {
+		add_meta_box(
+			'tqs_hero_settings_box',
+			__( 'Hero Settings', 'tqs-theme' ),
+			'tqs_render_hero_settings_meta_box',
+			$post_type,
+			'normal',
+			'high'
+		);
+	}
 }
 add_action( 'add_meta_boxes', 'tqs_register_hero_settings_meta_box' );
 
 /**
- * Enqueue media + admin script on page edit screens only.
+ * Enqueue media + admin script on supported edit screens.
  *
  * @param string $hook Admin hook suffix.
  */
@@ -276,7 +294,7 @@ function tqs_enqueue_hero_settings_admin_assets( $hook ) {
 	}
 
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-	if ( ! $screen || 'page' !== $screen->post_type || 'post' !== $screen->base ) {
+	if ( ! $screen || 'post' !== $screen->base || ! in_array( $screen->post_type, tqs_hero_settings_post_types(), true ) ) {
 		return;
 	}
 
@@ -332,7 +350,10 @@ function tqs_hero_render_image_field( $input_name, $input_id, $image_id, $button
 function tqs_render_hero_settings_meta_box( $post ) {
 	wp_nonce_field( 'tqs_save_hero_settings', 'tqs_hero_settings_nonce' );
 
-	$hero_type    = tqs_hero_sanitize_type( get_post_meta( $post->ID, '_tqs_hero_type', true ) );
+	$raw_type = get_post_meta( $post->ID, '_tqs_hero_type', true );
+	$hero_type = ( '' === $raw_type || false === $raw_type )
+		? 'page_hero'
+		: tqs_hero_sanitize_type( $raw_type );
 	$hero_enabled = get_post_meta( $post->ID, '_tqs_hero_enabled', true );
 	/* Default enabled when meta never saved. */
 	if ( '' === $hero_enabled && ! metadata_exists( 'post', $post->ID, '_tqs_hero_enabled' ) ) {
@@ -525,11 +546,12 @@ function tqs_save_hero_settings_meta_box( $post_id ) {
 		return;
 	}
 
-	if ( 'page' !== get_post_type( $post_id ) ) {
+	$post_type = get_post_type( $post_id );
+	if ( ! in_array( $post_type, tqs_hero_settings_post_types(), true ) ) {
 		return;
 	}
 
-	$hero_type = isset( $_POST['tqs_hero_type'] ) ? tqs_hero_sanitize_type( wp_unslash( $_POST['tqs_hero_type'] ) ) : 'none';
+	$hero_type = isset( $_POST['tqs_hero_type'] ) ? tqs_hero_sanitize_type( wp_unslash( $_POST['tqs_hero_type'] ) ) : 'page_hero';
 	update_post_meta( $post_id, '_tqs_hero_type', $hero_type );
 
 	$hero_enabled = isset( $_POST['tqs_hero_enabled'] ) ? '1' : '';
@@ -543,4 +565,4 @@ function tqs_save_hero_settings_meta_box( $post_id ) {
 	$page_hero = tqs_hero_sanitize_page_hero( is_array( $page_raw ) ? $page_raw : array() );
 	update_post_meta( $post_id, '_tqs_page_hero', $page_hero );
 }
-add_action( 'save_post_page', 'tqs_save_hero_settings_meta_box' );
+add_action( 'save_post', 'tqs_save_hero_settings_meta_box' );

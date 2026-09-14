@@ -24,18 +24,7 @@ while ( have_posts() ) : the_post();
 	}
 ?>
 
-<section class="tqs-page-hero">
-	<div class="tqs-page-hero-inner">
-		<?php tqs_breadcrumbs( array(
-			array( 'label' => 'Onze Diensten', 'url' => get_post_type_archive_link( 'tqs_service' ) ),
-			array( 'label' => get_the_title() ),
-		) ); ?>
-		<h1 class="tqs-page-title"><?php the_title(); ?></h1>
-		<?php if ( get_the_excerpt() ) : ?>
-			<p class="tqs-page-subtitle"><?php echo esc_html( get_the_excerpt() ); ?></p>
-		<?php endif; ?>
-	</div>
-</section>
+<?php tqs_render_hero( get_the_ID() ); ?>
 
 <section class="tqs-service-single">
 	<div class="tqs-service-single-grid">

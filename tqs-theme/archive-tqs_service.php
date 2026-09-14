@@ -8,13 +8,7 @@ get_header();
 $services = tqs_get_services();
 ?>
 
-<section class="tqs-page-hero">
-	<div class="tqs-page-hero-inner">
-		<?php tqs_breadcrumbs( array( array( 'label' => 'Onze Diensten' ) ) ); ?>
-		<h1 class="tqs-page-title"><?php echo esc_html( get_theme_mod( 'tqs_archive_services_title', 'Onze Diensten' ) ); ?></h1>
-		<p class="tqs-page-subtitle"><?php echo esc_html( get_theme_mod( 'tqs_archive_services_lead', 'Van winkelvloer tot evenemententerrein — TQS levert beveiligingsoplossingen op maat voor iedere sector, met gecertificeerd en professioneel personeel.' ) ); ?></p>
-	</div>
-</section>
+<?php tqs_render_services_archive_hero(); ?>
 
 <section class="tqs-services-archive">
 	<div class="tqs-services-grid">

@@ -145,11 +145,13 @@ function tqs_get_hero_slide_buttons( $slide ) {
 /**
  * Render the page hero from Hero Settings meta (homepage or page hero).
  *
- * Legacy pages without `_tqs_hero_type` meta are left untouched (outputs nothing).
+ * When `_tqs_hero_type` is missing, defaults to page_hero so new pages work
+ * before the editor has been saved.
  *
  * @param int|null $post_id Post ID.
+ * @param array    $args    Optional. breadcrumbs trail override.
  */
-function tqs_render_hero( $post_id = null ) {
+function tqs_render_hero( $post_id = null, $args = array() ) {
 	$post_id = $post_id ? absint( $post_id ) : (int) get_the_ID();
 	if ( ! $post_id ) {
 		return;
@@ -159,13 +161,13 @@ function tqs_render_hero( $post_id = null ) {
 		return;
 	}
 
-	if ( ! metadata_exists( 'post', $post_id, '_tqs_hero_type' ) ) {
-		return;
+	if ( metadata_exists( 'post', $post_id, '_tqs_hero_type' ) ) {
+		$hero_type = function_exists( 'tqs_hero_sanitize_type' )
+			? tqs_hero_sanitize_type( get_post_meta( $post_id, '_tqs_hero_type', true ) )
+			: (string) get_post_meta( $post_id, '_tqs_hero_type', true );
+	} else {
+		$hero_type = 'page_hero';
 	}
-
-	$hero_type = function_exists( 'tqs_hero_sanitize_type' )
-		? tqs_hero_sanitize_type( get_post_meta( $post_id, '_tqs_hero_type', true ) )
-		: (string) get_post_meta( $post_id, '_tqs_hero_type', true );
 
 	if ( 'none' === $hero_type || '' === $hero_type ) {
 		return;
@@ -196,12 +198,50 @@ function tqs_render_hero( $post_id = null ) {
 		$page_hero = function_exists( 'tqs_get_stored_page_hero' )
 			? tqs_get_stored_page_hero( $post_id )
 			: array();
-		get_template_part(
-			'template-parts/hero/page',
-			'hero',
-			array(
-				'hero' => $page_hero,
-			)
+		$tpl_args  = array(
+			'hero' => $page_hero,
 		);
+		if ( ! empty( $args['breadcrumbs'] ) && is_array( $args['breadcrumbs'] ) ) {
+			$tpl_args['breadcrumbs'] = $args['breadcrumbs'];
+		}
+		get_template_part( 'template-parts/hero/page', 'hero', $tpl_args );
 	}
+}
+
+/**
+ * Render a page-hero template from an explicit data array (archives, etc.).
+ *
+ * @param array<string, mixed> $hero         Hero field array.
+ * @param array                $breadcrumbs  Optional breadcrumb trail.
+ */
+function tqs_render_page_hero_data( $hero, $breadcrumbs = array() ) {
+	$args = array(
+		'hero' => is_array( $hero ) ? $hero : array(),
+	);
+	if ( ! empty( $breadcrumbs ) ) {
+		$args['breadcrumbs'] = $breadcrumbs;
+	}
+	get_template_part( 'template-parts/hero/page', 'hero', $args );
+}
+
+/**
+ * Services archive hero (theme mods → unified page-hero markup).
+ */
+function tqs_render_services_archive_hero() {
+	$title = (string) get_theme_mod( 'tqs_archive_services_title', 'Onze Diensten' );
+	$lead  = (string) get_theme_mod(
+		'tqs_archive_services_lead',
+		'Van winkelvloer tot evenemententerrein — TQS levert beveiligingsoplossingen op maat voor iedere sector, met gecertificeerd en professioneel personeel.'
+	);
+
+	tqs_render_page_hero_data(
+		array(
+			'image_id' => 0,
+			'title'    => $title,
+			'subtitle' => $lead,
+			'btn_text' => '',
+			'btn_url'  => '',
+		),
+		array( array( 'label' => $title ) )
+	);
 }
