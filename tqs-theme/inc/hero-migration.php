@@ -265,3 +265,87 @@ function tqs_run_hero_meta_migration_v240() {
 	update_option( 'tqs_hero_meta_migrated_v240', 1, false );
 }
 add_action( 'init', 'tqs_run_hero_meta_migration_v240', 20 );
+
+/**
+ * Resolve the front page post ID (static homepage or "home" slug).
+ *
+ * @return int
+ */
+function tqs_get_front_page_id() {
+	$front_id = (int) get_option( 'page_on_front' );
+	if ( $front_id ) {
+		return $front_id;
+	}
+	$home = get_page_by_path( 'home' );
+	return $home ? (int) $home->ID : 0;
+}
+
+/**
+ * Add homepage hero slide 3 (kade team photo) via Hero Settings meta.
+ */
+function tqs_migrate_homepage_hero_slide3_v250() {
+	$front_id = tqs_get_front_page_id();
+	if ( ! $front_id ) {
+		return;
+	}
+
+	$slide_image_id = tqs_ensure_theme_image_attachment( 'assets/images/tqs-hero-beveiligingsteam-kade-nacht.jpg' );
+	if ( ! $slide_image_id ) {
+		return;
+	}
+
+	$defaults = function_exists( 'tqs_hero_default_homepage_slides' )
+		? tqs_hero_default_homepage_slides()
+		: array();
+	$stored   = get_post_meta( $front_id, '_tqs_homepage_hero_slides', true );
+	$slides   = ( empty( $stored ) || ! is_array( $stored ) )
+		? $defaults
+		: tqs_hero_sanitize_homepage_slides( $stored );
+
+	if ( ! isset( $slides[2] ) || ! is_array( $slides[2] ) ) {
+		$slides[2] = isset( $defaults[2] ) ? $defaults[2] : array();
+	}
+
+	$slides[2] = array_merge(
+		$slides[2],
+		array(
+			'enabled'  => true,
+			'image_id' => $slide_image_id,
+			'icon'     => '🏢',
+			'badge'    => 'Landelijk Actief',
+			'title'    => 'Actief Door Heel Nederland',
+			'subtitle' => 'Van Den Haag tot in elke uithoek van het land — ons team staat klaar waar u ons nodig heeft.',
+		)
+	);
+
+	if ( function_exists( 'tqs_hero_sanitize_homepage_slides' ) ) {
+		$slides = tqs_hero_sanitize_homepage_slides( $slides );
+	}
+
+	update_post_meta( $front_id, '_tqs_homepage_hero_slides', $slides );
+}
+
+/**
+ * Set CTA background via Customizer theme mod (attachment from theme asset).
+ */
+function tqs_migrate_cta_bg_image_v250() {
+	$cta_id = tqs_ensure_theme_image_attachment( 'assets/images/tqs-cta-achtergrond-beveiliger-uitkijk-nacht.jpg' );
+	if ( $cta_id ) {
+		set_theme_mod( 'tqs_cta_bg_image', $cta_id );
+	}
+}
+
+/**
+ * Run v2.5.0 hero height / slide 3 / CTA image migration once.
+ */
+function tqs_run_hero_assets_migration_v250() {
+	if ( get_option( 'tqs_hero_assets_migrated_v250' ) ) {
+		return;
+	}
+
+	tqs_migrate_homepage_hero_slide3_v250();
+	tqs_migrate_cta_bg_image_v250();
+
+	update_option( 'tqs_hero_assets_migrated_v250', 1, false );
+}
+add_action( 'init', 'tqs_run_hero_assets_migration_v250', 21 );

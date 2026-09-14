@@ -47,7 +47,7 @@ function tqs_hero_emoji_options() {
 }
 
 /**
- * Default structure for 4 homepage hero slides (Dutch copy for slides 1–2).
+ * Default structure for 4 homepage hero slides (Dutch copy for slides 1–3).
  *
  * @return array<int, array<string, mixed>>
  */
@@ -86,7 +86,16 @@ function tqs_hero_default_homepage_slides() {
 				'subtitle' => 'Onze getrainde beveiligers zorgen dagelijks voor de veiligheid van vele grote bedrijven in Nederland, met oog voor elke specifieke situatie.',
 			)
 		),
-		$base,
+		array_merge(
+			$base,
+			array(
+				'enabled'  => true,
+				'icon'     => '🏢',
+				'badge'    => 'Landelijk Actief',
+				'title'    => 'Actief Door Heel Nederland',
+				'subtitle' => 'Van Den Haag tot in elke uithoek van het land — ons team staat klaar waar u ons nodig heeft.',
+			)
+		),
 		$base,
 	);
 

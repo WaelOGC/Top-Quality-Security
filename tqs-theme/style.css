@@ -4,7 +4,7 @@ Theme URI: https://topqualitysecurity.com/
 Author: Top Quality Security Dev Team
 Author URI: https://topqualitysecurity.com/
 Description: Custom standalone WordPress theme for Top Quality Security — a professional security services company in Den Haag, Netherlands. Elementor-compatible, SEO-optimised, GDPR-compliant.
-Version: 2.4.0
+Version: 2.5.0
 Requires at least: 6.0
 Requires PHP: 8.0
 Text Domain: tqs-theme
@@ -141,7 +141,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ==========================================================================
    6. HERO SLIDER (Homepage)
    ========================================================================== */
-.tqs-hero { position: relative; min-height: 640px; display: flex; align-items: center; overflow: hidden; background: #1A0533; }
+.tqs-hero { position: relative; min-height: 760px; display: flex; align-items: center; overflow: hidden; background: #1A0533; }
 .tqs-hero-slide { position: absolute; inset: 0; display: none; align-items: center; }
 .tqs-hero-slide.is-active { display: flex; }
 .tqs-hero-slide-bg { position: absolute; inset: 0; }
@@ -161,7 +161,10 @@ button { font-family: inherit; cursor: pointer; }
 .tqs-slide-dot { width: 9px; height: 9px; border-radius: 5px; background: rgba(255,255,255,0.4); cursor: pointer; transition: all .25s ease; border: none; padding: 0; }
 .tqs-slide-dot.is-active { width: 22px; background: var(--tqs-gold); }
 
-@media (max-width: 900px) { .tqs-hero-content { padding: 60px 76px; } }
+@media (max-width: 900px) {
+  .tqs-hero { min-height: 560px; }
+  .tqs-hero-content { padding: 60px 76px; }
+}
 @media (max-width: 768px) {
   .tqs-hero { min-height: 440px !important; }
   .tqs-hero-h1 { font-size: 32px !important; }
@@ -372,20 +375,19 @@ button { font-family: inherit; cursor: pointer; }
 	inset: 0;
 	z-index: 0;
 	background-size: cover;
-	/* Desktop: guard + skyline — keep silhouette in lower-left third, not empty sky */
-	background-position: 42% 45%;
+	/* Desktop: guard silhouette left/center; glow + open space fills the right */
+	background-position: 18% 48%;
 	background-repeat: no-repeat;
 }
 @media (max-width: 900px) {
 	.tqs-cta-bg-image {
-		background-position: 28% 42%;
+		background-position: 12% 45%;
 	}
 }
 @media (max-width: 640px) {
 	.tqs-cta-bg-image {
-		/* Narrow portrait: pin the guard silhouette into frame (not empty sky) */
 		background-size: cover;
-		background-position: 16% 38%;
+		background-position: 8% 42%;
 	}
 }
 .tqs-cta-bg-overlay {
