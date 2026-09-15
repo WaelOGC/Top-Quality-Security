@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.8.0';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.8.1';
 	}
 	return $version;
 }
@@ -1069,7 +1069,7 @@ add_action( 'save_post', 'tqs_save_meta_boxes' );
 
 // Extra meta box: service icon + content image on tqs_service edit screen.
 function tqs_add_service_icon_box() {
-	add_meta_box( 'tqs_service_icon_box', __( 'Service Details', 'tqs-theme' ), 'tqs_render_service_icon_box', 'tqs_service', 'side', 'default' );
+	add_meta_box( 'tqs_service_icon_box', __( 'Service Details', 'tqs-theme' ), 'tqs_render_service_icon_box', 'tqs_service', 'normal', 'high' );
 }
 add_action( 'add_meta_boxes', 'tqs_add_service_icon_box' );
 
