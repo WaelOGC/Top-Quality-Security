@@ -7,8 +7,9 @@
 get_header();
 
 while ( have_posts() ) : the_post();
-	$icon = get_post_meta( get_the_ID(), '_tqs_service_icon', true ) ?: 'fa-shield-halved';
-	$hero_img = tqs_get_hero_image_url();
+	$icon        = get_post_meta( get_the_ID(), '_tqs_service_icon', true ) ?: 'fa-shield-halved';
+	$hero_img    = tqs_get_hero_image_url(); // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- reserved; banner uses tqs_render_hero().
+	$content_img = tqs_get_service_content_image_url();
 
 	// Related services: 3 others, excluding current.
 	$related = get_posts( array(
@@ -30,8 +31,8 @@ while ( have_posts() ) : the_post();
 	<div class="tqs-service-single-grid">
 		<div class="tqs-service-content">
 			<div class="tqs-service-hero-media">
-				<?php if ( $hero_img ) : ?>
-					<img src="<?php echo esc_url( $hero_img ); ?>" alt="<?php the_title_attribute(); ?>">
+				<?php if ( $content_img ) : ?>
+					<img src="<?php echo esc_url( $content_img ); ?>" alt="<?php the_title_attribute(); ?>">
 				<?php else : ?>
 					<div class="tqs-service-card-illustration" style="display:flex; align-items:center; justify-content:center;">
 						<div class="tqs-illustration-float" style="position:relative;">
@@ -63,7 +64,23 @@ while ( have_posts() ) : the_post();
 					<?php endforeach; ?>
 				</div>
 			</section>
-			<?php endif; ?>
+		<?php endif; ?>
+
+		<div class="tqs-review-form-section" style="margin-top:48px;">
+			<h2 class="tqs-contact-form-title"><?php esc_html_e( 'Deel Je Ervaring', 'tqs-theme' ); ?></h2>
+			<p class="tqs-contact-form-sub">
+				<?php
+				echo esc_html(
+					sprintf(
+						/* translators: %s: service title */
+						__( 'Heeft u gebruikgemaakt van onze %s? Deel uw ervaring — uw beoordeling wordt eerst door ons gecontroleerd.', 'tqs-theme' ),
+						get_the_title()
+					)
+				);
+				?>
+			</p>
+			<?php echo do_shortcode( '[tqs_review_form service_id="' . absint( get_the_ID() ) . '"]' ); ?>
+		</div>
 		</div>
 
 		<aside class="tqs-service-sidebar">

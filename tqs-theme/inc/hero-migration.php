@@ -349,3 +349,96 @@ function tqs_run_hero_assets_migration_v250() {
 	update_option( 'tqs_hero_assets_migrated_v250', 1, false );
 }
 add_action( 'init', 'tqs_run_hero_assets_migration_v250', 21 );
+
+/**
+ * Permanently delete the three seeded fake review posts (title + seed email match).
+ * Admin-only, once.
+ */
+function tqs_remove_fake_seeded_reviews_v1() {
+	if ( get_option( 'tqs_fake_reviews_removed_v1' ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$seeds = array(
+		'Jan de Vries'  => 'jan.devries@example.test',
+		'Maria Jansen'  => 'maria.jansen@example.test',
+		'Pieter Bakker' => 'pieter.bakker@example.test',
+	);
+
+	foreach ( $seeds as $title => $expected_email ) {
+		$matches = get_posts(
+			array(
+				'post_type'      => 'tqs_review',
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'meta_key'       => '_tqs_review_email',
+				'meta_value'     => $expected_email,
+			)
+		);
+
+		foreach ( $matches as $review ) {
+			if ( $review->post_title !== $title ) {
+				continue;
+			}
+			wp_delete_post( $review->ID, true );
+		}
+	}
+
+	update_option( 'tqs_fake_reviews_removed_v1', 1, false );
+}
+add_action( 'init', 'tqs_remove_fake_seeded_reviews_v1', 22 );
+
+/**
+ * Wire Retailbeveiliging hero + content images (v2.7.0, once).
+ */
+function tqs_migrate_retailbeveiliging_images_v270() {
+	if ( get_option( 'tqs_retail_images_migrated_v270' ) ) {
+		return;
+	}
+
+	$service = get_page_by_path( 'retailbeveiliging', OBJECT, 'tqs_service' );
+	if ( ! $service ) {
+		return;
+	}
+
+	$hero_id    = tqs_ensure_theme_image_attachment( 'assets/images/tqs-hero-retailbeveiliging-beveiliger-winkelentree.jpg' );
+	$content_id = tqs_ensure_theme_image_attachment( 'assets/images/tqs-service-retailbeveiliging-beveiliger-winkelvloer.jpg' );
+
+	if ( ! $hero_id && ! $content_id ) {
+		return;
+	}
+
+	if ( $hero_id ) {
+		update_post_meta( $service->ID, '_tqs_hero_image_id', $hero_id );
+
+		/* Unified page hero banner reads `_tqs_page_hero` — keep both in sync. */
+		$page_hero = function_exists( 'tqs_get_stored_page_hero' )
+			? tqs_get_stored_page_hero( $service->ID )
+			: array(
+				'image_id' => 0,
+				'title'    => $service->post_title,
+				'subtitle' => (string) $service->post_excerpt,
+				'btn_text' => '',
+				'btn_url'  => '',
+			);
+		$page_hero['image_id'] = $hero_id;
+		if ( function_exists( 'tqs_hero_sanitize_page_hero' ) ) {
+			$page_hero = tqs_hero_sanitize_page_hero( $page_hero );
+		}
+		update_post_meta( $service->ID, '_tqs_page_hero', $page_hero );
+		update_post_meta( $service->ID, '_tqs_hero_type', 'page_hero' );
+		if ( ! metadata_exists( 'post', $service->ID, '_tqs_hero_enabled' ) ) {
+			update_post_meta( $service->ID, '_tqs_hero_enabled', '1' );
+		}
+	}
+
+	if ( $content_id ) {
+		update_post_meta( $service->ID, '_tqs_service_content_image_id', $content_id );
+	}
+
+	update_option( 'tqs_retail_images_migrated_v270', 1, false );
+}
+add_action( 'init', 'tqs_migrate_retailbeveiliging_images_v270', 23 );

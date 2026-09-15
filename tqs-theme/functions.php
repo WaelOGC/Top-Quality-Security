@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.6.0';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.7.0';
 	}
 	return $version;
 }
@@ -948,75 +948,6 @@ function tqs_maybe_reseed() {
 add_action( 'init', 'tqs_maybe_reseed' );
 
 /* ==========================================================================
-   TEMPORARY — Remove after review display is verified in production.
-   Seeds 3 sample published tqs_review posts (admin visit, once only).
-   ========================================================================== */
-function tqs_seed_sample_reviews() {
-	if ( get_option( 'tqs_reviews_display_seeded_v1' ) ) {
-		return;
-	}
-
-	$services = tqs_get_services();
-	if ( count( $services ) < 2 ) {
-		return;
-	}
-
-	$samples = array(
-		array(
-			'title'      => 'Jan de Vries',
-			'text'       => 'Zeer professionele beveiligers die discreet en alert aanwezig waren. Onze winkel voelt zich een stuk veiliger sinds de samenwerking met TQS.',
-			'rating'     => 5,
-			'service_id' => $services[0]->ID,
-			'email'      => 'jan.devries@example.test',
-		),
-		array(
-			'title'      => 'Maria Jansen',
-			'text'       => 'Tijdens ons evenement was het team rustig, vriendelijk en doortastend. Alles verliep vlekkeloos — absoluut een aanrader.',
-			'rating'     => 4,
-			'service_id' => $services[1]->ID,
-			'email'      => 'maria.jansen@example.test',
-		),
-		array(
-			'title'      => 'Pieter Bakker',
-			'text'       => 'Snelle reactie, duidelijke communicatie en representatief personeel. Wij zijn zeer tevreden over de algehele service van TQS.',
-			'rating'     => 5,
-			'service_id' => 0,
-			'email'      => 'pieter.bakker@example.test',
-		),
-	);
-
-	foreach ( $samples as $sample ) {
-		$post_id = wp_insert_post( array(
-			'post_type'   => 'tqs_review',
-			'post_title'  => $sample['title'],
-			'post_status' => 'publish',
-		), true );
-
-		if ( is_wp_error( $post_id ) || ! $post_id ) {
-			continue;
-		}
-
-		tqs_save_review_meta_fields( $post_id, array(
-			'text'       => $sample['text'],
-			'rating'     => $sample['rating'],
-			'service_id' => $sample['service_id'],
-			'email'      => $sample['email'],
-			'consent'    => true,
-		) );
-	}
-
-	update_option( 'tqs_reviews_display_seeded_v1', 1 );
-}
-
-function tqs_maybe_seed_sample_reviews() {
-	if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
-		return;
-	}
-	tqs_seed_sample_reviews();
-}
-add_action( 'admin_init', 'tqs_maybe_seed_sample_reviews' );
-
-/* ==========================================================================
    5. META BOXES — Page Options + Gallery
    ========================================================================== */
 function tqs_add_meta_boxes() {
@@ -1115,19 +1046,37 @@ function tqs_save_meta_boxes( $post_id ) {
 	if ( isset( $_POST['tqs_service_icon'] ) ) {
 		update_post_meta( $post_id, '_tqs_service_icon', sanitize_text_field( $_POST['tqs_service_icon'] ) );
 	}
+
+	if ( isset( $_POST['tqs_service_content_image_id'] ) ) {
+		update_post_meta( $post_id, '_tqs_service_content_image_id', absint( $_POST['tqs_service_content_image_id'] ) );
+	}
 }
 add_action( 'save_post', 'tqs_save_meta_boxes' );
 
-// Extra meta box: service icon field on tqs_service edit screen.
+// Extra meta box: service icon + content image on tqs_service edit screen.
 function tqs_add_service_icon_box() {
-	add_meta_box( 'tqs_service_icon_box', __( 'Service Icoon', 'tqs-theme' ), 'tqs_render_service_icon_box', 'tqs_service', 'side', 'default' );
+	add_meta_box( 'tqs_service_icon_box', __( 'Service Details', 'tqs-theme' ), 'tqs_render_service_icon_box', 'tqs_service', 'side', 'default' );
 }
 add_action( 'add_meta_boxes', 'tqs_add_service_icon_box' );
 
 function tqs_render_service_icon_box( $post ) {
-	$icon = get_post_meta( $post->ID, '_tqs_service_icon', true );
-	echo '<p><label>' . esc_html__( 'Font Awesome class (bv. fa-store)', 'tqs-theme' ) . '</label><br>';
-	echo '<input type="text" class="widefat" name="tqs_service_icon" value="' . esc_attr( $icon ) . '"></p>';
+	$icon       = get_post_meta( $post->ID, '_tqs_service_icon', true );
+	$content_id = absint( get_post_meta( $post->ID, '_tqs_service_content_image_id', true ) );
+	?>
+	<p>
+		<label for="tqs_service_icon"><strong><?php esc_html_e( 'Font Awesome class (bv. fa-store)', 'tqs-theme' ); ?></strong></label><br>
+		<input type="text" class="widefat" id="tqs_service_icon" name="tqs_service_icon" value="<?php echo esc_attr( $icon ); ?>">
+	</p>
+	<p><strong><?php esc_html_e( 'Service Content Image (under page title, "Wat Wij Bieden" area)', 'tqs-theme' ); ?></strong></p>
+	<?php
+	if ( function_exists( 'tqs_hero_render_image_field' ) ) {
+		tqs_hero_render_image_field(
+			'tqs_service_content_image_id',
+			'tqs_service_content_image_id',
+			$content_id,
+			__( 'Kies afbeelding', 'tqs-theme' )
+		);
+	}
 }
 
 /* ==========================================================================
@@ -1154,6 +1103,25 @@ function tqs_get_hero_image_url( $post_id = null, $size = 'tqs-hero' ) {
 	}
 
 	return '';
+}
+
+/**
+ * Content image under the service title (falls back to hero image when unset).
+ *
+ * @param int|null $post_id Post ID.
+ * @param string   $size    Image size.
+ * @return string
+ */
+function tqs_get_service_content_image_url( $post_id = null, $size = 'large' ) {
+	$post_id  = $post_id ?: get_the_ID();
+	$image_id = get_post_meta( $post_id, '_tqs_service_content_image_id', true );
+	if ( $image_id ) {
+		$url = wp_get_attachment_image_url( $image_id, $size );
+		if ( $url ) {
+			return $url;
+		}
+	}
+	return tqs_get_hero_image_url( $post_id, $size );
 }
 
 function tqs_breadcrumbs( $trail = array() ) {
@@ -1415,8 +1383,14 @@ add_action( 'wp_ajax_nopriv_tqs_contact_submit', 'tqs_handle_contact_submit' );
 /* ==========================================================================
    9b. REVIEW FORM SHORTCODE + AJAX HANDLER
    ========================================================================== */
-function tqs_render_review_form_shortcode() {
-	$services = tqs_get_services();
+function tqs_render_review_form_shortcode( $atts = array() ) {
+	$atts                   = shortcode_atts( array( 'service_id' => 0 ), $atts, 'tqs_review_form' );
+	$preselected_service_id = absint( $atts['service_id'] );
+	$services               = array();
+
+	if ( ! $preselected_service_id ) {
+		$services = tqs_get_services();
+	}
 
 	ob_start();
 	?>
@@ -1438,6 +1412,9 @@ function tqs_render_review_form_shortcode() {
 				<input type="email" id="tqs_review_email" name="email" class="tqs-input" required>
 			</div>
 
+			<?php if ( $preselected_service_id ) : ?>
+				<input type="hidden" name="service_id" value="<?php echo esc_attr( (string) $preselected_service_id ); ?>">
+			<?php else : ?>
 			<div class="tqs-form-group" style="margin-bottom:20px;">
 				<label for="tqs_review_service"><?php esc_html_e( 'Gekoppelde dienst', 'tqs-theme' ); ?></label>
 				<select id="tqs_review_service" name="service_id" class="tqs-select">
@@ -1447,6 +1424,7 @@ function tqs_render_review_form_shortcode() {
 					<?php endforeach; ?>
 				</select>
 			</div>
+			<?php endif; ?>
 
 			<fieldset class="tqs-star-rating" style="margin-bottom:20px;">
 				<legend class="tqs-star-rating__legend"><?php esc_html_e( 'Beoordeling', 'tqs-theme' ); ?>*</legend>
