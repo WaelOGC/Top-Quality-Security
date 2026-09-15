@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.7.0';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.8.0';
 	}
 	return $version;
 }
@@ -26,6 +26,7 @@ function tqs_theme_version() {
 require get_template_directory() . '/inc/theme-options.php';
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/cinematic-scroll.php';
+require get_template_directory() . '/inc/service-image-fx.php';
 require get_template_directory() . '/inc/meta-boxes/hero-meta-box.php';
 require get_template_directory() . '/inc/meta-boxes/about-meta-box.php';
 require get_template_directory() . '/inc/hero-render.php';
@@ -1050,6 +1051,19 @@ function tqs_save_meta_boxes( $post_id ) {
 	if ( isset( $_POST['tqs_service_content_image_id'] ) ) {
 		update_post_meta( $post_id, '_tqs_service_content_image_id', absint( $_POST['tqs_service_content_image_id'] ) );
 	}
+
+	if ( 'tqs_service' === get_post_type( $post_id ) ) {
+		if ( isset( $_POST['tqs_service_content_image_effect'] ) ) {
+			$effect = function_exists( 'tqs_sanitize_service_content_image_effect' )
+				? tqs_sanitize_service_content_image_effect( wp_unslash( $_POST['tqs_service_content_image_effect'] ) )
+				: 'none';
+			update_post_meta( $post_id, '_tqs_service_content_image_effect', $effect );
+		}
+
+		update_post_meta( $post_id, '_tqs_service_content_image_badge', isset( $_POST['tqs_service_content_image_badge'] ) ? '1' : '' );
+		update_post_meta( $post_id, '_tqs_service_content_image_border', isset( $_POST['tqs_service_content_image_border'] ) ? '1' : '' );
+		update_post_meta( $post_id, '_tqs_service_content_image_gradient', isset( $_POST['tqs_service_content_image_gradient'] ) ? '1' : '' );
+	}
 }
 add_action( 'save_post', 'tqs_save_meta_boxes' );
 
@@ -1062,6 +1076,15 @@ add_action( 'add_meta_boxes', 'tqs_add_service_icon_box' );
 function tqs_render_service_icon_box( $post ) {
 	$icon       = get_post_meta( $post->ID, '_tqs_service_icon', true );
 	$content_id = absint( get_post_meta( $post->ID, '_tqs_service_content_image_id', true ) );
+	$effect     = function_exists( 'tqs_sanitize_service_content_image_effect' )
+		? tqs_sanitize_service_content_image_effect( get_post_meta( $post->ID, '_tqs_service_content_image_effect', true ) )
+		: 'none';
+	$badge      = get_post_meta( $post->ID, '_tqs_service_content_image_badge', true );
+	$border     = get_post_meta( $post->ID, '_tqs_service_content_image_border', true );
+	$gradient   = get_post_meta( $post->ID, '_tqs_service_content_image_gradient', true );
+	$effects    = function_exists( 'tqs_service_content_image_effect_options' )
+		? tqs_service_content_image_effect_options()
+		: array( 'none' => 'Geen' );
 	?>
 	<p>
 		<label for="tqs_service_icon"><strong><?php esc_html_e( 'Font Awesome class (bv. fa-store)', 'tqs-theme' ); ?></strong></label><br>
@@ -1077,6 +1100,34 @@ function tqs_render_service_icon_box( $post ) {
 			__( 'Kies afbeelding', 'tqs-theme' )
 		);
 	}
+	?>
+	<p>
+		<label for="tqs_service_content_image_effect"><strong><?php esc_html_e( 'Animatie-effect', 'tqs-theme' ); ?></strong></label><br>
+		<select name="tqs_service_content_image_effect" id="tqs_service_content_image_effect" class="widefat">
+			<?php foreach ( $effects as $value => $label ) : ?>
+				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $effect, $value ); ?>><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+	</p>
+	<p>
+		<label>
+			<input type="checkbox" name="tqs_service_content_image_badge" value="1" <?php checked( $badge, '1' ); ?>>
+			<?php esc_html_e( 'Toon dienst-badge op afbeelding', 'tqs-theme' ); ?>
+		</label>
+	</p>
+	<p>
+		<label>
+			<input type="checkbox" name="tqs_service_content_image_border" value="1" <?php checked( $border, '1' ); ?>>
+			<?php esc_html_e( 'Toon gouden rand', 'tqs-theme' ); ?>
+		</label>
+	</p>
+	<p>
+		<label>
+			<input type="checkbox" name="tqs_service_content_image_gradient" value="1" <?php checked( $gradient, '1' ); ?>>
+			<?php esc_html_e( 'Toon verloop onderaan', 'tqs-theme' ); ?>
+		</label>
+	</p>
+	<?php
 }
 
 /* ==========================================================================

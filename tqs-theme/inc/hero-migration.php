@@ -442,3 +442,47 @@ function tqs_migrate_retailbeveiliging_images_v270() {
 	update_option( 'tqs_retail_images_migrated_v270', 1, false );
 }
 add_action( 'init', 'tqs_migrate_retailbeveiliging_images_v270', 23 );
+
+/**
+ * Swap Retailbeveiliging hero banner to people-free storefront night shot (v2.8.0).
+ * Does not change `_tqs_service_content_image_id`.
+ */
+function tqs_migrate_retailbeveiliging_hero_v280() {
+	if ( get_option( 'tqs_retail_hero_swapped_v280' ) ) {
+		return;
+	}
+
+	$service = get_page_by_path( 'retailbeveiliging', OBJECT, 'tqs_service' );
+	if ( ! $service ) {
+		return;
+	}
+
+	$hero_id = tqs_ensure_theme_image_attachment( 'assets/images/tqs-hero-retailbeveiliging-winkelentree-nacht.jpg' );
+	if ( ! $hero_id ) {
+		return;
+	}
+
+	update_post_meta( $service->ID, '_tqs_hero_image_id', $hero_id );
+
+	$page_hero = function_exists( 'tqs_get_stored_page_hero' )
+		? tqs_get_stored_page_hero( $service->ID )
+		: array(
+			'image_id' => 0,
+			'title'    => $service->post_title,
+			'subtitle' => (string) $service->post_excerpt,
+			'btn_text' => '',
+			'btn_url'  => '',
+		);
+	$page_hero['image_id'] = $hero_id;
+	if ( function_exists( 'tqs_hero_sanitize_page_hero' ) ) {
+		$page_hero = tqs_hero_sanitize_page_hero( $page_hero );
+	}
+	update_post_meta( $service->ID, '_tqs_page_hero', $page_hero );
+	update_post_meta( $service->ID, '_tqs_hero_type', 'page_hero' );
+	if ( ! metadata_exists( 'post', $service->ID, '_tqs_hero_enabled' ) ) {
+		update_post_meta( $service->ID, '_tqs_hero_enabled', '1' );
+	}
+
+	update_option( 'tqs_retail_hero_swapped_v280', 1, false );
+}
+add_action( 'init', 'tqs_migrate_retailbeveiliging_hero_v280', 24 );
