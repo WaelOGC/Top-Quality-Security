@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.9.0';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.9.1';
 	}
 	return $version;
 }

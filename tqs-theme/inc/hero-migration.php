@@ -486,3 +486,99 @@ function tqs_migrate_retailbeveiliging_hero_v280() {
 	update_option( 'tqs_retail_hero_swapped_v280', 1, false );
 }
 add_action( 'init', 'tqs_migrate_retailbeveiliging_hero_v280', 24 );
+
+/**
+ * Apply hero banner + content image meta for a single tqs_service post.
+ * Same keys/sync as Retailbeveiliging migration (v2.7.0).
+ *
+ * @param WP_Post $service      Service post.
+ * @param string  $hero_path    Theme-relative hero image path.
+ * @param string  $content_path Theme-relative content image path.
+ */
+function tqs_apply_service_hero_and_content_images( $service, $hero_path, $content_path ) {
+	if ( ! $service instanceof WP_Post ) {
+		return;
+	}
+
+	$hero_id    = tqs_ensure_theme_image_attachment( $hero_path );
+	$content_id = tqs_ensure_theme_image_attachment( $content_path );
+
+	if ( ! $hero_id && ! $content_id ) {
+		return;
+	}
+
+	if ( $hero_id ) {
+		update_post_meta( $service->ID, '_tqs_hero_image_id', $hero_id );
+
+		$page_hero = function_exists( 'tqs_get_stored_page_hero' )
+			? tqs_get_stored_page_hero( $service->ID )
+			: array(
+				'image_id' => 0,
+				'title'    => $service->post_title,
+				'subtitle' => (string) $service->post_excerpt,
+				'btn_text' => '',
+				'btn_url'  => '',
+			);
+		$page_hero['image_id'] = $hero_id;
+		if ( function_exists( 'tqs_hero_sanitize_page_hero' ) ) {
+			$page_hero = tqs_hero_sanitize_page_hero( $page_hero );
+		}
+		update_post_meta( $service->ID, '_tqs_page_hero', $page_hero );
+		update_post_meta( $service->ID, '_tqs_hero_type', 'page_hero' );
+		if ( ! metadata_exists( 'post', $service->ID, '_tqs_hero_enabled' ) ) {
+			update_post_meta( $service->ID, '_tqs_hero_enabled', '1' );
+		}
+	}
+
+	if ( $content_id ) {
+		update_post_meta( $service->ID, '_tqs_service_content_image_id', $content_id );
+	}
+}
+
+/**
+ * Wire hero + content images for the remaining 6 services (v2.9.1, once).
+ * Does not touch Retailbeveiliging or effects/badge meta.
+ */
+function tqs_migrate_remaining_services_images_v291() {
+	if ( get_option( 'tqs_remaining_services_images_migrated_v291' ) ) {
+		return;
+	}
+
+	$map = array(
+		'casinobeveiliging'      => array(
+			'assets/images/tqs-hero-casinobeveiliging-casinovloer-nacht.jpg',
+			'assets/images/tqs-service-casinobeveiliging-beveiliger-casinovloer.jpg',
+		),
+		'supermarktbeveiliging'  => array(
+			'assets/images/tqs-hero-supermarktbeveiliging-winkelpad-avond.jpg',
+			'assets/images/tqs-service-supermarktbeveiliging-beveiliger-kassa.jpg',
+		),
+		'objectbeveiliging'      => array(
+			'assets/images/tqs-hero-objectbeveiliging-kantoorlobby-nacht.jpg',
+			'assets/images/tqs-service-objectbeveiliging-beveiliger-kantoorgang.jpg',
+		),
+		'hotelbeveiliging'       => array(
+			'assets/images/tqs-hero-hotelbeveiliging-hotellobby-nacht.jpg',
+			'assets/images/tqs-service-hotelbeveiliging-beveiliger-receptie.jpg',
+		),
+		'evenementenbeveiliging' => array(
+			'assets/images/tqs-hero-evenementenbeveiliging-festivalentree-nacht.jpg',
+			'assets/images/tqs-service-evenementenbeveiliging-beveiliger-toegangscontrole.jpg',
+		),
+		'horecabeveiliging'      => array(
+			'assets/images/tqs-hero-horecabeveiliging-clubentree-nacht.jpg',
+			'assets/images/tqs-service-horecabeveiliging-beveiliger-entree.jpg',
+		),
+	);
+
+	foreach ( $map as $slug => $files ) {
+		$service = get_page_by_path( $slug, OBJECT, 'tqs_service' );
+		if ( ! $service ) {
+			continue;
+		}
+		tqs_apply_service_hero_and_content_images( $service, $files[0], $files[1] );
+	}
+
+	update_option( 'tqs_remaining_services_images_migrated_v291', 1, false );
+}
+add_action( 'init', 'tqs_migrate_remaining_services_images_v291', 23 );
