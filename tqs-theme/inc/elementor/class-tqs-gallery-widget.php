@@ -75,13 +75,13 @@ class TQS_Gallery_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'content_section',
 			array(
-				'label' => __( 'Inhoud', 'tqs-theme' ),
+				'label' => __( 'Content', 'tqs-theme' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 			)
 		);
 
 		$category_options = array(
-			'' => __( 'Alle', 'tqs-theme' ),
+			'' => __( 'All', 'tqs-theme' ),
 		);
 
 		$terms = get_terms(
@@ -100,7 +100,7 @@ class TQS_Gallery_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'category_filter',
 			array(
-				'label'   => __( 'Categorie filter', 'tqs-theme' ),
+				'label'   => __( 'Category filter', 'tqs-theme' ),
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => '',
 				'options' => $category_options,
@@ -110,7 +110,7 @@ class TQS_Gallery_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'columns',
 			array(
-				'label'   => __( 'Aantal kolommen', 'tqs-theme' ),
+				'label'   => __( 'Number of columns', 'tqs-theme' ),
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => (string) tqs_sanitize_gallery_columns( get_theme_mod( 'tqs_gallery_columns', 4 ) ),
 				'options' => array(
@@ -123,10 +123,10 @@ class TQS_Gallery_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'show_filters',
 			array(
-				'label'        => __( 'Toon filterknoppen', 'tqs-theme' ),
+				'label'        => __( 'Show filter buttons', 'tqs-theme' ),
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => __( 'Ja', 'tqs-theme' ),
-				'label_off'    => __( 'Nee', 'tqs-theme' ),
+				'label_on'     => __( 'Yes', 'tqs-theme' ),
+				'label_off'    => __( 'No', 'tqs-theme' ),
 				'return_value' => 'yes',
 				'default'      => get_theme_mod( 'tqs_gallery_show_filters', true ) ? 'yes' : '',
 			)
@@ -135,10 +135,10 @@ class TQS_Gallery_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'lightbox_enabled',
 			array(
-				'label'        => __( 'Lightbox inschakelen', 'tqs-theme' ),
+				'label'        => __( 'Enable lightbox', 'tqs-theme' ),
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => __( 'Ja', 'tqs-theme' ),
-				'label_off'    => __( 'Nee', 'tqs-theme' ),
+				'label_on'     => __( 'Yes', 'tqs-theme' ),
+				'label_off'    => __( 'No', 'tqs-theme' ),
 				'return_value' => 'yes',
 				'default'      => get_theme_mod( 'tqs_gallery_lightbox_enabled', true ) ? 'yes' : '',
 			)
@@ -147,11 +147,11 @@ class TQS_Gallery_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'max_images',
 			array(
-				'label'       => __( 'Maximaal aantal afbeeldingen', 'tqs-theme' ),
+				'label'       => __( 'Maximum number of images', 'tqs-theme' ),
 				'type'        => \Elementor\Controls_Manager::NUMBER,
 				'default'     => 0,
 				'min'         => 0,
-				'description' => __( '0 = alle afbeeldingen tonen.', 'tqs-theme' ),
+				'description' => __( '0 = show all images.', 'tqs-theme' ),
 			)
 		);
 

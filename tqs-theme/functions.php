@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.8.1';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.9.0';
 	}
 	return $version;
 }
@@ -115,11 +115,11 @@ remove_action( 'wp_head', 'wp_generator' );
    ========================================================================== */
 function tqs_register_service_cpt() {
 	$labels = array(
-		'name'          => __( 'Diensten', 'tqs-theme' ),
-		'singular_name' => __( 'Dienst', 'tqs-theme' ),
-		'add_new_item'  => __( 'Nieuwe Dienst Toevoegen', 'tqs-theme' ),
-		'edit_item'     => __( 'Dienst Bewerken', 'tqs-theme' ),
-		'all_items'     => __( 'Alle Diensten', 'tqs-theme' ),
+		'name'          => __( 'Services', 'tqs-theme' ),
+		'singular_name' => __( 'Service', 'tqs-theme' ),
+		'add_new_item'  => __( 'Add New Service', 'tqs-theme' ),
+		'edit_item'     => __( 'Edit Service', 'tqs-theme' ),
+		'all_items'     => __( 'All Services', 'tqs-theme' ),
 	);
 
 	register_post_type( 'tqs_service', array(
@@ -140,18 +140,18 @@ add_action( 'init', 'tqs_register_service_cpt' );
    ========================================================================== */
 function tqs_register_review_cpt() {
 	$labels = array(
-		'name'                  => __( 'Beoordelingen', 'tqs-theme' ),
-		'singular_name'         => __( 'Beoordeling', 'tqs-theme' ),
-		'add_new'               => __( 'Beoordeling toevoegen', 'tqs-theme' ),
-		'add_new_item'          => __( 'Beoordeling toevoegen', 'tqs-theme' ),
-		'edit_item'             => __( 'Beoordeling bewerken', 'tqs-theme' ),
-		'new_item'              => __( 'Nieuwe beoordeling', 'tqs-theme' ),
-		'view_item'             => __( 'Beoordeling bekijken', 'tqs-theme' ),
-		'search_items'          => __( 'Beoordelingen zoeken', 'tqs-theme' ),
-		'not_found'             => __( 'Geen beoordelingen gevonden', 'tqs-theme' ),
-		'not_found_in_trash'    => __( 'Geen beoordelingen in prullenbak', 'tqs-theme' ),
-		'all_items'             => __( 'Alle beoordelingen', 'tqs-theme' ),
-		'menu_name'             => __( 'Beoordelingen', 'tqs-theme' ),
+		'name'                  => __( 'Reviews', 'tqs-theme' ),
+		'singular_name'         => __( 'Review', 'tqs-theme' ),
+		'add_new'               => __( 'Add Review', 'tqs-theme' ),
+		'add_new_item'          => __( 'Add Review', 'tqs-theme' ),
+		'edit_item'             => __( 'Edit Review', 'tqs-theme' ),
+		'new_item'              => __( 'New Review', 'tqs-theme' ),
+		'view_item'             => __( 'View Review', 'tqs-theme' ),
+		'search_items'          => __( 'Search Reviews', 'tqs-theme' ),
+		'not_found'             => __( 'No reviews found', 'tqs-theme' ),
+		'not_found_in_trash'    => __( 'No reviews found in Trash', 'tqs-theme' ),
+		'all_items'             => __( 'All Reviews', 'tqs-theme' ),
+		'menu_name'             => __( 'Reviews', 'tqs-theme' ),
 	);
 
 	register_post_type( 'tqs_review', array(
@@ -206,11 +206,11 @@ function tqs_insert_review_from_submission( $postarr = array(), $meta = array() 
 
 function tqs_get_review_status_label( $status ) {
 	$labels = array(
-		'publish' => __( 'Gepubliceerd', 'tqs-theme' ),
-		'pending' => __( 'In afwachting', 'tqs-theme' ),
-		'draft'   => __( 'Concept', 'tqs-theme' ),
-		'private' => __( 'Privé', 'tqs-theme' ),
-		'trash'   => __( 'Prullenbak', 'tqs-theme' ),
+		'publish' => __( 'Published', 'tqs-theme' ),
+		'pending' => __( 'Pending', 'tqs-theme' ),
+		'draft'   => __( 'Draft', 'tqs-theme' ),
+		'private' => __( 'Private', 'tqs-theme' ),
+		'trash'   => __( 'Trash', 'tqs-theme' ),
 	);
 
 	return isset( $labels[ $status ] ) ? $labels[ $status ] : $status;
@@ -228,7 +228,7 @@ function tqs_render_review_stars( $rating ) {
 function tqs_add_review_meta_box() {
 	add_meta_box(
 		'tqs_review_details_box',
-		__( 'Beoordeling Details', 'tqs-theme' ),
+		__( 'Review Details', 'tqs-theme' ),
 		'tqs_render_review_meta_box',
 		'tqs_review',
 		'normal',
@@ -249,11 +249,11 @@ function tqs_render_review_meta_box( $post ) {
 
 	echo '<table class="form-table" role="presentation">';
 
-	echo '<tr><th scope="row"><label for="tqs_review_text">' . esc_html__( 'Beoordelingstekst', 'tqs-theme' ) . '</label></th>';
+	echo '<tr><th scope="row"><label for="tqs_review_text">' . esc_html__( 'Review text', 'tqs-theme' ) . '</label></th>';
 	echo '<td><textarea id="tqs_review_text" name="tqs_review_text" class="large-text" rows="5">' . esc_textarea( $text ) . '</textarea>';
-	echo '<p class="description">' . esc_html__( 'De tekst van de klantbeoordeling (niet via de hoofd-editor).', 'tqs-theme' ) . '</p></td></tr>';
+	echo '<p class="description">' . esc_html__( 'Customer review text (not via the main editor).', 'tqs-theme' ) . '</p></td></tr>';
 
-	echo '<tr><th scope="row">' . esc_html__( 'Sterrenbeoordeling', 'tqs-theme' ) . '</th><td>';
+	echo '<tr><th scope="row">' . esc_html__( 'Star rating', 'tqs-theme' ) . '</th><td>';
 	for ( $i = 5; $i >= 1; $i-- ) {
 		echo '<label style="margin-right:12px;">';
 		echo '<input type="radio" name="tqs_review_rating" value="' . esc_attr( $i ) . '" ' . checked( $rating, $i, false ) . '> ';
@@ -262,25 +262,25 @@ function tqs_render_review_meta_box( $post ) {
 	}
 	echo '</td></tr>';
 
-	echo '<tr><th scope="row"><label for="tqs_review_service_id">' . esc_html__( 'Gekoppelde dienst', 'tqs-theme' ) . '</label></th><td>';
+	echo '<tr><th scope="row"><label for="tqs_review_service_id">' . esc_html__( 'Linked service', 'tqs-theme' ) . '</label></th><td>';
 	echo '<select id="tqs_review_service_id" name="tqs_review_service_id">';
-	echo '<option value="0"' . selected( $service_id, 0, false ) . '>' . esc_html__( 'Algemeen', 'tqs-theme' ) . '</option>';
+	echo '<option value="0"' . selected( $service_id, 0, false ) . '>' . esc_html__( 'General', 'tqs-theme' ) . '</option>';
 	foreach ( $services as $service ) {
 		echo '<option value="' . esc_attr( $service->ID ) . '"' . selected( $service_id, $service->ID, false ) . '>' . esc_html( $service->post_title ) . '</option>';
 	}
 	echo '</select></td></tr>';
 
-	echo '<tr><th scope="row"><label for="tqs_review_email">' . esc_html__( 'E-mail reviewer', 'tqs-theme' ) . '</label></th>';
+	echo '<tr><th scope="row"><label for="tqs_review_email">' . esc_html__( 'Reviewer email', 'tqs-theme' ) . '</label></th>';
 	echo '<td><input type="email" id="tqs_review_email" name="tqs_review_email" class="regular-text" value="' . esc_attr( $email ) . '">';
-	echo '<p class="description">' . esc_html__( 'Alleen zichtbaar in wp-admin; wordt nooit op de website getoond.', 'tqs-theme' ) . '</p></td></tr>';
+	echo '<p class="description">' . esc_html__( 'Visible in wp-admin only; never shown on the website.', 'tqs-theme' ) . '</p></td></tr>';
 
-	echo '<tr><th scope="row">' . esc_html__( 'AVG-toestemming', 'tqs-theme' ) . '</th><td>';
+	echo '<tr><th scope="row">' . esc_html__( 'GDPR consent', 'tqs-theme' ) . '</th><td>';
 	if ( $consent ) {
-		echo '<label><input type="checkbox" checked disabled> ' . esc_html__( 'Toestemming gegeven bij inzending', 'tqs-theme' ) . '</label>';
+		echo '<label><input type="checkbox" checked disabled> ' . esc_html__( 'Consent given on submission', 'tqs-theme' ) . '</label>';
 		echo '<input type="hidden" name="tqs_review_consent" value="1">';
 	} else {
 		echo '<label><input type="checkbox" name="tqs_review_consent" value="1"' . checked( $consent, true, false ) . '> ';
-		echo esc_html__( 'Toestemming gegeven (handmatig instellen voor tests)', 'tqs-theme' ) . '</label>';
+		echo esc_html__( 'Consent given (set manually for tests)', 'tqs-theme' ) . '</label>';
 	}
 	echo '</td></tr>';
 
@@ -349,11 +349,11 @@ function tqs_review_admin_columns( $columns ) {
 	if ( isset( $columns['cb'] ) ) {
 		$new['cb'] = $columns['cb'];
 	}
-	$new['title']              = __( 'Naam', 'tqs-theme' );
+	$new['title']              = __( 'Name', 'tqs-theme' );
 	$new['tqs_review_rating']  = __( 'Rating', 'tqs-theme' );
-	$new['tqs_review_service'] = __( 'Gekoppelde Dienst', 'tqs-theme' );
+	$new['tqs_review_service'] = __( 'Linked Service', 'tqs-theme' );
 	$new['tqs_review_status']  = __( 'Status', 'tqs-theme' );
-	$new['date']               = __( 'Datum', 'tqs-theme' );
+	$new['date']               = __( 'Date', 'tqs-theme' );
 	return $new;
 }
 add_filter( 'manage_tqs_review_posts_columns', 'tqs_review_admin_columns' );
@@ -367,7 +367,7 @@ function tqs_review_admin_column_content( $column, $post_id ) {
 		case 'tqs_review_service':
 			$service_id = absint( get_post_meta( $post_id, '_tqs_review_service_id', true ) );
 			if ( 0 === $service_id ) {
-				echo esc_html__( 'Algemeen', 'tqs-theme' );
+				echo esc_html__( 'General', 'tqs-theme' );
 			} elseif ( get_post_type( $service_id ) === 'tqs_service' ) {
 				echo esc_html( get_the_title( $service_id ) );
 			} else {
@@ -387,17 +387,17 @@ add_action( 'manage_tqs_review_posts_custom_column', 'tqs_review_admin_column_co
    ========================================================================== */
 function tqs_register_gallery_cpt() {
 	$labels = array(
-		'name'               => __( 'Galerij Items', 'tqs-theme' ),
-		'singular_name'      => __( 'Galerij Item', 'tqs-theme' ),
-		'add_new'            => __( 'Galerij item toevoegen', 'tqs-theme' ),
-		'add_new_item'       => __( 'Galerij item toevoegen', 'tqs-theme' ),
-		'edit_item'          => __( 'Galerij item bewerken', 'tqs-theme' ),
-		'new_item'           => __( 'Nieuw galerij item', 'tqs-theme' ),
-		'view_item'          => __( 'Galerij item bekijken', 'tqs-theme' ),
-		'search_items'       => __( 'Galerij items zoeken', 'tqs-theme' ),
-		'not_found'          => __( 'Geen galerij items gevonden', 'tqs-theme' ),
-		'not_found_in_trash' => __( 'Geen galerij items in prullenbak', 'tqs-theme' ),
-		'all_items'          => __( 'Alle galerij items', 'tqs-theme' ),
+		'name'               => __( 'Gallery Items', 'tqs-theme' ),
+		'singular_name'      => __( 'Gallery Item', 'tqs-theme' ),
+		'add_new'            => __( 'Add Gallery Item', 'tqs-theme' ),
+		'add_new_item'       => __( 'Add Gallery Item', 'tqs-theme' ),
+		'edit_item'          => __( 'Edit Gallery Item', 'tqs-theme' ),
+		'new_item'           => __( 'New Gallery Item', 'tqs-theme' ),
+		'view_item'          => __( 'View Gallery Item', 'tqs-theme' ),
+		'search_items'       => __( 'Search Gallery Items', 'tqs-theme' ),
+		'not_found'          => __( 'No gallery items found', 'tqs-theme' ),
+		'not_found_in_trash' => __( 'No gallery items found in Trash', 'tqs-theme' ),
+		'all_items'          => __( 'All Gallery Items', 'tqs-theme' ),
 		'menu_name'          => 'Gallery',
 	);
 
@@ -422,17 +422,17 @@ add_action( 'init', 'tqs_register_gallery_cpt' );
 
 function tqs_register_gallery_taxonomy() {
 	$labels = array(
-		'name'              => __( 'Galerij Categorieën', 'tqs-theme' ),
-		'singular_name'     => __( 'Galerij Categorie', 'tqs-theme' ),
-		'search_items'      => __( 'Categorieën zoeken', 'tqs-theme' ),
-		'all_items'         => __( 'Alle categorieën', 'tqs-theme' ),
-		'parent_item'       => __( 'Hoofdcategorie', 'tqs-theme' ),
-		'parent_item_colon' => __( 'Hoofdcategorie:', 'tqs-theme' ),
-		'edit_item'         => __( 'Categorie bewerken', 'tqs-theme' ),
-		'update_item'       => __( 'Categorie bijwerken', 'tqs-theme' ),
-		'add_new_item'      => __( 'Categorie toevoegen', 'tqs-theme' ),
-		'new_item_name'     => __( 'Nieuwe categorienaam', 'tqs-theme' ),
-		'menu_name'         => __( 'Galerij Categorieën', 'tqs-theme' ),
+		'name'              => __( 'Gallery Categories', 'tqs-theme' ),
+		'singular_name'     => __( 'Gallery Category', 'tqs-theme' ),
+		'search_items'      => __( 'Search Categories', 'tqs-theme' ),
+		'all_items'         => __( 'All Categories', 'tqs-theme' ),
+		'parent_item'       => __( 'Parent Category', 'tqs-theme' ),
+		'parent_item_colon' => __( 'Parent Category:', 'tqs-theme' ),
+		'edit_item'         => __( 'Edit Category', 'tqs-theme' ),
+		'update_item'       => __( 'Update Category', 'tqs-theme' ),
+		'add_new_item'      => __( 'Add Category', 'tqs-theme' ),
+		'new_item_name'     => __( 'New Category Name', 'tqs-theme' ),
+		'menu_name'         => __( 'Gallery Categories', 'tqs-theme' ),
 	);
 
 	register_taxonomy( 'tqs_gallery_category', 'tqs_gallery_item', array(
@@ -482,12 +482,12 @@ function tqs_gallery_admin_columns( $columns ) {
 	if ( isset( $columns['cb'] ) ) {
 		$new['cb'] = $columns['cb'];
 	}
-	$new['tqs_gallery_thumb']     = __( 'Afbeelding', 'tqs-theme' );
-	$new['title']                 = __( 'Titel', 'tqs-theme' );
-	$new['tqs_gallery_style']     = __( 'Stijl', 'tqs-theme' );
-	$new['tqs_gallery_category']  = __( 'Categorie', 'tqs-theme' );
-	$new['menu_order']            = __( 'Volgorde', 'tqs-theme' );
-	$new['date']                  = __( 'Datum', 'tqs-theme' );
+	$new['tqs_gallery_thumb']     = __( 'Image', 'tqs-theme' );
+	$new['title']                 = __( 'Title', 'tqs-theme' );
+	$new['tqs_gallery_style']     = __( 'Style', 'tqs-theme' );
+	$new['tqs_gallery_category']  = __( 'Category', 'tqs-theme' );
+	$new['menu_order']            = __( 'Order', 'tqs-theme' );
+	$new['date']                  = __( 'Date', 'tqs-theme' );
 	return $new;
 }
 add_filter( 'manage_tqs_gallery_item_posts_columns', 'tqs_gallery_admin_columns' );
@@ -554,7 +554,7 @@ function tqs_gallery_category_filter_dropdown() {
 	$selected = isset( $_GET[ $taxonomy ] ) ? sanitize_text_field( wp_unslash( $_GET[ $taxonomy ] ) ) : '';
 
 	wp_dropdown_categories( array(
-		'show_option_all' => __( 'Alle categorieën', 'tqs-theme' ),
+		'show_option_all' => __( 'All categories', 'tqs-theme' ),
 		'taxonomy'        => $taxonomy,
 		'name'            => $taxonomy,
 		'orderby'         => 'name',
@@ -599,9 +599,9 @@ add_action( 'pre_get_posts', 'tqs_gallery_category_filter_query' );
 
 function tqs_get_gallery_display_styles() {
 	return array(
-		'grid'         => __( 'Standaard Grid', 'tqs-theme' ),
-		'featured'     => __( 'Uitgelicht (groter blok)', 'tqs-theme' ),
-		'before_after' => __( 'Voor en Na Vergelijking', 'tqs-theme' ),
+		'grid'         => __( 'Standard Grid', 'tqs-theme' ),
+		'featured'     => __( 'Featured (larger block)', 'tqs-theme' ),
+		'before_after' => __( 'Before and After Comparison', 'tqs-theme' ),
 	);
 }
 
@@ -620,7 +620,7 @@ function tqs_get_gallery_display_style_label( $style ) {
 function tqs_add_gallery_display_meta_box() {
 	add_meta_box(
 		'tqs_gallery_display_box',
-		__( 'Weergave-instellingen', 'tqs-theme' ),
+		__( 'Display Settings', 'tqs-theme' ),
 		'tqs_render_gallery_display_meta_box',
 		'tqs_gallery_item',
 		'side',
@@ -698,7 +698,7 @@ function tqs_render_gallery_display_meta_box( $post ) {
 	$style_labels = tqs_get_gallery_display_styles();
 	?>
 	<p>
-		<label for="tqs_gallery_display_style"><strong><?php esc_html_e( 'Weergave stijl', 'tqs-theme' ); ?></strong></label><br>
+		<label for="tqs_gallery_display_style"><strong><?php esc_html_e( 'Display style', 'tqs-theme' ); ?></strong></label><br>
 		<select id="tqs_gallery_display_style" name="tqs_gallery_display_style" class="widefat">
 			<?php foreach ( $style_labels as $value => $label ) : ?>
 				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $style, $value ); ?>><?php echo esc_html( $label ); ?></option>
@@ -707,16 +707,16 @@ function tqs_render_gallery_display_meta_box( $post ) {
 	</p>
 
 	<div id="tqs_gallery_after_image_wrap" style="<?php echo 'before_after' === $style ? '' : 'display:none;'; ?>">
-		<p><strong><?php esc_html_e( 'Na-afbeelding (voor Voor/Na vergelijking)', 'tqs-theme' ); ?></strong></p>
+		<p><strong><?php esc_html_e( 'After image (for Before/After comparison)', 'tqs-theme' ); ?></strong></p>
 		<input type="hidden" name="tqs_gallery_after_image_id" id="tqs_gallery_after_image_id" value="<?php echo esc_attr( $after_id ); ?>">
 		<div id="tqs_gallery_after_image_preview" style="margin-bottom:10px;">
 			<?php if ( $after_url ) : ?>
 				<img src="<?php echo esc_url( $after_url ); ?>" alt="" style="max-width:100%;height:auto;border-radius:6px;">
 			<?php endif; ?>
 		</div>
-		<button type="button" class="button" id="tqs_gallery_after_upload_btn"><?php esc_html_e( 'Kies Afbeelding', 'tqs-theme' ); ?></button>
-		<button type="button" class="button" id="tqs_gallery_after_remove_btn" <?php echo $after_id ? '' : 'style="display:none;"'; ?>><?php esc_html_e( 'Verwijderen', 'tqs-theme' ); ?></button>
-		<p class="description"><?php esc_html_e( 'De uitgelichte afbeelding wordt gebruikt als de "voor"-foto.', 'tqs-theme' ); ?></p>
+		<button type="button" class="button" id="tqs_gallery_after_upload_btn"><?php esc_html_e( 'Choose Image', 'tqs-theme' ); ?></button>
+		<button type="button" class="button" id="tqs_gallery_after_remove_btn" <?php echo $after_id ? '' : 'style="display:none;"'; ?>><?php esc_html_e( 'Remove', 'tqs-theme' ); ?></button>
+		<p class="description"><?php esc_html_e( 'The featured image is used as the "before" photo.', 'tqs-theme' ); ?></p>
 	</div>
 	<script>
 	jQuery(function($){
@@ -724,7 +724,7 @@ function tqs_render_gallery_display_meta_box( $post ) {
 		$('#tqs_gallery_after_upload_btn').on('click', function(e){
 			e.preventDefault();
 			if ( frame ) { frame.open(); return; }
-			frame = wp.media({ title: '<?php echo esc_js( __( 'Kies Na-afbeelding', 'tqs-theme' ) ); ?>', multiple: false, library: { type: 'image' } });
+			frame = wp.media({ title: '<?php echo esc_js( __( 'Choose After Image', 'tqs-theme' ) ); ?>', multiple: false, library: { type: 'image' } });
 			frame.on('select', function(){
 				var att = frame.state().get('selection').first().toJSON();
 				$('#tqs_gallery_after_image_id').val(att.id);
@@ -956,7 +956,7 @@ function tqs_add_meta_boxes() {
 	foreach ( $screens as $screen ) {
 		add_meta_box( 'tqs_page_options_box', __( '⚙️ Page Options', 'tqs-theme' ), 'tqs_render_page_options_box', $screen, 'side', 'default' );
 	}
-	add_meta_box( 'tqs_gallery_box', __( '🖼️ Galerij Afbeeldingen', 'tqs-theme' ), 'tqs_render_gallery_box', 'page', 'normal', 'high' );
+	add_meta_box( 'tqs_gallery_box', __( '🖼️ Gallery Images', 'tqs-theme' ), 'tqs_render_gallery_box', 'page', 'normal', 'high' );
 }
 add_action( 'add_meta_boxes', 'tqs_add_meta_boxes' );
 
@@ -965,15 +965,15 @@ function tqs_render_page_options_box( $post ) {
 	$hide_header = get_post_meta( $post->ID, '_tqs_hide_header', true );
 	$hide_footer = get_post_meta( $post->ID, '_tqs_hide_footer', true );
 	?>
-	<p class="description"><?php esc_html_e( 'Hero-instellingen staan in de “Hero Settings” meta box. Gebruik “Toon Hero” daar om de hero te verbergen.', 'tqs-theme' ); ?></p>
-	<p><label><input type="checkbox" name="tqs_hide_header" value="1" <?php checked( $hide_header, '1' ); ?>> <?php esc_html_e( 'Verberg header (Elementor full-canvas)', 'tqs-theme' ); ?></label></p>
-	<p><label><input type="checkbox" name="tqs_hide_footer" value="1" <?php checked( $hide_footer, '1' ); ?>> <?php esc_html_e( 'Verberg footer (Elementor full-canvas)', 'tqs-theme' ); ?></label></p>
+	<p class="description"><?php esc_html_e( 'Hero settings are in the “Hero Settings” meta box. Use “Show Hero” there to hide the hero.', 'tqs-theme' ); ?></p>
+	<p><label><input type="checkbox" name="tqs_hide_header" value="1" <?php checked( $hide_header, '1' ); ?>> <?php esc_html_e( 'Hide header (Elementor full-canvas)', 'tqs-theme' ); ?></label></p>
+	<p><label><input type="checkbox" name="tqs_hide_footer" value="1" <?php checked( $hide_footer, '1' ); ?>> <?php esc_html_e( 'Hide footer (Elementor full-canvas)', 'tqs-theme' ); ?></label></p>
 	<?php
 }
 
 function tqs_render_gallery_box( $post ) {
 	if ( 'fotogalerij' !== $post->post_name ) {
-		echo '<p>' . esc_html__( 'Deze meta box is alleen van toepassing op de Fotogalerij pagina.', 'tqs-theme' ) . '</p>';
+		echo '<p>' . esc_html__( 'This meta box only applies to the Photo Gallery page.', 'tqs-theme' ) . '</p>';
 		return;
 	}
 	$ids = get_post_meta( $post->ID, '_tqs_gallery_ids', true );
@@ -991,7 +991,7 @@ function tqs_render_gallery_box( $post ) {
 				</div>
 			<?php endforeach; ?>
 		</div>
-		<button type="button" class="button button-primary" id="tqs_add_gallery_images"><?php esc_html_e( 'Afbeeldingen Toevoegen', 'tqs-theme' ); ?></button>
+		<button type="button" class="button button-primary" id="tqs_add_gallery_images"><?php esc_html_e( 'Add Images', 'tqs-theme' ); ?></button>
 	</div>
 	<script>
 	jQuery(function($){
@@ -1003,7 +1003,7 @@ function tqs_render_gallery_box( $post ) {
 		}
 		$('#tqs_add_gallery_images').on('click', function(e){
 			e.preventDefault();
-			frame = wp.media({ title: 'Selecteer Afbeeldingen', multiple: true, library: { type: 'image' } });
+			frame = wp.media({ title: 'Select Images', multiple: true, library: { type: 'image' } });
 			frame.on('select', function(){
 				var selection = frame.state().get('selection');
 				selection.each(function(att){
@@ -1060,9 +1060,12 @@ function tqs_save_meta_boxes( $post_id ) {
 			update_post_meta( $post_id, '_tqs_service_content_image_effect', $effect );
 		}
 
-		update_post_meta( $post_id, '_tqs_service_content_image_badge', isset( $_POST['tqs_service_content_image_badge'] ) ? '1' : '' );
-		update_post_meta( $post_id, '_tqs_service_content_image_border', isset( $_POST['tqs_service_content_image_border'] ) ? '1' : '' );
-		update_post_meta( $post_id, '_tqs_service_content_image_gradient', isset( $_POST['tqs_service_content_image_gradient'] ) ? '1' : '' );
+		if ( isset( $_POST['tqs_service_content_image_badge_icon'] ) ) {
+			$badge_icon = function_exists( 'tqs_sanitize_service_content_image_badge_icon' )
+				? tqs_sanitize_service_content_image_badge_icon( wp_unslash( $_POST['tqs_service_content_image_badge_icon'] ) )
+				: '';
+			update_post_meta( $post_id, '_tqs_service_content_image_badge_icon', $badge_icon );
+		}
 	}
 }
 add_action( 'save_post', 'tqs_save_meta_boxes' );
@@ -1079,30 +1082,33 @@ function tqs_render_service_icon_box( $post ) {
 	$effect     = function_exists( 'tqs_sanitize_service_content_image_effect' )
 		? tqs_sanitize_service_content_image_effect( get_post_meta( $post->ID, '_tqs_service_content_image_effect', true ) )
 		: 'none';
-	$badge      = get_post_meta( $post->ID, '_tqs_service_content_image_badge', true );
-	$border     = get_post_meta( $post->ID, '_tqs_service_content_image_border', true );
-	$gradient   = get_post_meta( $post->ID, '_tqs_service_content_image_gradient', true );
+	$badge_icon = function_exists( 'tqs_sanitize_service_content_image_badge_icon' )
+		? tqs_sanitize_service_content_image_badge_icon( get_post_meta( $post->ID, '_tqs_service_content_image_badge_icon', true ) )
+		: '';
 	$effects    = function_exists( 'tqs_service_content_image_effect_options' )
 		? tqs_service_content_image_effect_options()
-		: array( 'none' => 'Geen' );
+		: array( 'none' => 'None' );
+	$badge_opts = function_exists( 'tqs_service_content_image_badge_icon_options' )
+		? tqs_service_content_image_badge_icon_options()
+		: array( '' => 'None' );
 	?>
 	<p>
-		<label for="tqs_service_icon"><strong><?php esc_html_e( 'Font Awesome class (bv. fa-store)', 'tqs-theme' ); ?></strong></label><br>
+		<label for="tqs_service_icon"><strong><?php esc_html_e( 'Font Awesome class (e.g. fa-store)', 'tqs-theme' ); ?></strong></label><br>
 		<input type="text" class="widefat" id="tqs_service_icon" name="tqs_service_icon" value="<?php echo esc_attr( $icon ); ?>">
 	</p>
-	<p><strong><?php esc_html_e( 'Service Content Image (under page title, "Wat Wij Bieden" area)', 'tqs-theme' ); ?></strong></p>
+	<p><strong><?php esc_html_e( 'Service Content Image (under page title, “Wat Wij Bieden” area)', 'tqs-theme' ); ?></strong></p>
 	<?php
 	if ( function_exists( 'tqs_hero_render_image_field' ) ) {
 		tqs_hero_render_image_field(
 			'tqs_service_content_image_id',
 			'tqs_service_content_image_id',
 			$content_id,
-			__( 'Kies afbeelding', 'tqs-theme' )
+			__( 'Choose Image', 'tqs-theme' )
 		);
 	}
 	?>
 	<p>
-		<label for="tqs_service_content_image_effect"><strong><?php esc_html_e( 'Animatie-effect', 'tqs-theme' ); ?></strong></label><br>
+		<label for="tqs_service_content_image_effect"><strong><?php esc_html_e( 'Animation Effect', 'tqs-theme' ); ?></strong></label><br>
 		<select name="tqs_service_content_image_effect" id="tqs_service_content_image_effect" class="widefat">
 			<?php foreach ( $effects as $value => $label ) : ?>
 				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $effect, $value ); ?>><?php echo esc_html( $label ); ?></option>
@@ -1110,22 +1116,12 @@ function tqs_render_service_icon_box( $post ) {
 		</select>
 	</p>
 	<p>
-		<label>
-			<input type="checkbox" name="tqs_service_content_image_badge" value="1" <?php checked( $badge, '1' ); ?>>
-			<?php esc_html_e( 'Toon dienst-badge op afbeelding', 'tqs-theme' ); ?>
-		</label>
-	</p>
-	<p>
-		<label>
-			<input type="checkbox" name="tqs_service_content_image_border" value="1" <?php checked( $border, '1' ); ?>>
-			<?php esc_html_e( 'Toon gouden rand', 'tqs-theme' ); ?>
-		</label>
-	</p>
-	<p>
-		<label>
-			<input type="checkbox" name="tqs_service_content_image_gradient" value="1" <?php checked( $gradient, '1' ); ?>>
-			<?php esc_html_e( 'Toon verloop onderaan', 'tqs-theme' ); ?>
-		</label>
+		<label for="tqs_service_content_image_badge_icon"><strong><?php esc_html_e( 'Content Image Badge Icon', 'tqs-theme' ); ?></strong></label><br>
+		<select name="tqs_service_content_image_badge_icon" id="tqs_service_content_image_badge_icon" class="widefat">
+			<?php foreach ( $badge_opts as $value => $label ) : ?>
+				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $badge_icon, $value ); ?>><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
 	</p>
 	<?php
 }

@@ -345,7 +345,7 @@ function tqs_hero_render_image_field( $input_name, $input_id, $image_id, $button
 		</div>
 		<p class="tqs-hero-image-actions">
 			<button type="button" class="button tqs-hero-upload-btn"><?php echo esc_html( $button_label ); ?></button>
-			<button type="button" class="button tqs-hero-remove-btn"<?php echo $image_id ? '' : ' hidden'; ?>><?php esc_html_e( 'Afbeelding verwijderen', 'tqs-theme' ); ?></button>
+			<button type="button" class="button tqs-hero-remove-btn"<?php echo $image_id ? '' : ' hidden'; ?>><?php esc_html_e( 'Remove Image', 'tqs-theme' ); ?></button>
 		</p>
 	</div>
 	<?php
@@ -378,33 +378,33 @@ function tqs_render_hero_settings_meta_box( $post ) {
 			<p>
 				<label for="tqs_hero_type"><strong><?php esc_html_e( 'Hero Type', 'tqs-theme' ); ?></strong></label><br>
 				<select name="tqs_hero_type" id="tqs_hero_type" class="tqs-hero-type-select">
-					<option value="none" <?php selected( $hero_type, 'none' ); ?>><?php esc_html_e( 'Geen hero', 'tqs-theme' ); ?></option>
+					<option value="none" <?php selected( $hero_type, 'none' ); ?>><?php esc_html_e( 'No hero', 'tqs-theme' ); ?></option>
 					<option value="homepage_hero" <?php selected( $hero_type, 'homepage_hero' ); ?>><?php esc_html_e( 'Homepage Hero (multi-slide)', 'tqs-theme' ); ?></option>
-					<option value="page_hero" <?php selected( $hero_type, 'page_hero' ); ?>><?php esc_html_e( 'Page Hero (enkele afbeelding)', 'tqs-theme' ); ?></option>
+					<option value="page_hero" <?php selected( $hero_type, 'page_hero' ); ?>><?php esc_html_e( 'Page Hero (single image)', 'tqs-theme' ); ?></option>
 				</select>
 			</p>
 			<p>
 				<label>
 					<input type="checkbox" name="tqs_hero_enabled" id="tqs_hero_enabled" value="1" <?php checked( $hero_enabled, '1' ); ?>>
-					<strong><?php esc_html_e( 'Toon Hero', 'tqs-theme' ); ?></strong>
+					<strong><?php esc_html_e( 'Show Hero', 'tqs-theme' ); ?></strong>
 				</label>
 				<br>
-				<span class="description"><?php esc_html_e( 'Schakel tijdelijk uit zonder gegevens of Hero Type te wissen. Verschilt van “Geen hero”.', 'tqs-theme' ); ?></span>
+				<span class="description"><?php esc_html_e( 'Temporarily disable without clearing data or Hero Type. Different from “No hero”.', 'tqs-theme' ); ?></span>
 			</p>
 		</div>
 
 		<!-- Field Group C — informational only (edited in Customizer) -->
 		<div class="tqs-hero-field-group tqs-hero-global-buttons" id="tqs-hero-group-global-buttons">
-			<h3><?php esc_html_e( 'Standaard hero-knoppen (globaal)', 'tqs-theme' ); ?></h3>
+			<h3><?php esc_html_e( 'Default hero buttons (global)', 'tqs-theme' ); ?></h3>
 			<p class="description" style="font-style:italic;margin-bottom:0;">
-				<?php esc_html_e( 'Deze standaardknoppen (tekst + URL) beheer je via Weergave → Customizer → TQS Theme Settings → Hero — Global Defaults. Ze gelden voor elke Homepage Hero-slide die knoppen hieronder niet overschrijft.', 'tqs-theme' ); ?>
+				<?php esc_html_e( 'Manage these default buttons (text + URL) via Appearance → Customizer → TQS Theme Settings → Hero — Global Defaults. They apply to every Homepage Hero slide that does not override buttons below.', 'tqs-theme' ); ?>
 			</p>
 		</div>
 
 		<!-- Field Group A — Homepage Hero -->
 		<div class="tqs-hero-field-group" id="tqs-hero-group-homepage" data-tqs-hero-group="homepage_hero" hidden>
 			<h3><?php esc_html_e( 'Homepage Hero', 'tqs-theme' ); ?></h3>
-			<p class="description"><?php esc_html_e( 'Tot 4 slides. Slide 1 staat standaard aan; schakel extra slides in naar wens.', 'tqs-theme' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Up to 4 slides. Slide 1 is enabled by default; enable extra slides as needed.', 'tqs-theme' ); ?></p>
 
 			<?php foreach ( $slides as $i => $slide ) :
 				$n          = $i + 1;
@@ -418,27 +418,27 @@ function tqs_render_hero_settings_meta_box( $post ) {
 					<p>
 						<label>
 							<input type="checkbox" name="<?php echo esc_attr( $prefix ); ?>[enabled]" value="1" <?php checked( ! empty( $slide['enabled'] ) ); ?>>
-							<?php esc_html_e( 'Deze slide inschakelen', 'tqs-theme' ); ?>
+							<?php esc_html_e( 'Enable this slide', 'tqs-theme' ); ?>
 						</label>
 					</p>
 
-					<p><strong><?php esc_html_e( 'Afbeelding', 'tqs-theme' ); ?></strong></p>
+					<p><strong><?php esc_html_e( 'Image', 'tqs-theme' ); ?></strong></p>
 					<?php
 					tqs_hero_render_image_field(
 						$prefix . '[image_id]',
 						$id_base . '_image_id',
 						isset( $slide['image_id'] ) ? (int) $slide['image_id'] : 0,
-						__( 'Kies afbeelding', 'tqs-theme' )
+						__( 'Choose Image', 'tqs-theme' )
 					);
 					?>
 
 					<p>
-						<label for="<?php echo esc_attr( $id_base ); ?>_badge"><strong><?php esc_html_e( 'Badge tekst', 'tqs-theme' ); ?></strong></label>
+						<label for="<?php echo esc_attr( $id_base ); ?>_badge"><strong><?php esc_html_e( 'Badge text', 'tqs-theme' ); ?></strong></label>
 						<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_badge" name="<?php echo esc_attr( $prefix ); ?>[badge]" value="<?php echo esc_attr( $slide['badge'] ); ?>" placeholder="ND 7099 GECERTIFICEERD">
 					</p>
 
 					<p>
-						<label for="<?php echo esc_attr( $id_base ); ?>_icon"><strong><?php esc_html_e( 'Icoon / emoji', 'tqs-theme' ); ?></strong></label><br>
+						<label for="<?php echo esc_attr( $id_base ); ?>_icon"><strong><?php esc_html_e( 'Icon / emoji', 'tqs-theme' ); ?></strong></label><br>
 						<select id="<?php echo esc_attr( $id_base ); ?>_icon" name="<?php echo esc_attr( $prefix ); ?>[icon]" class="tqs-hero-emoji-select">
 							<?php foreach ( $emojis as $emoji => $label ) : ?>
 								<option value="<?php echo esc_attr( $emoji ); ?>" <?php selected( $slide['icon'], $emoji ); ?>><?php echo esc_html( $label ); ?></option>
@@ -448,44 +448,44 @@ function tqs_render_hero_settings_meta_box( $post ) {
 
 					<div class="tqs-hero-grid-2">
 						<p>
-							<label for="<?php echo esc_attr( $id_base ); ?>_title"><strong><?php esc_html_e( 'Titel', 'tqs-theme' ); ?></strong></label>
+							<label for="<?php echo esc_attr( $id_base ); ?>_title"><strong><?php esc_html_e( 'Title', 'tqs-theme' ); ?></strong></label>
 							<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_title" name="<?php echo esc_attr( $prefix ); ?>[title]" value="<?php echo esc_attr( $slide['title'] ); ?>">
 						</p>
 						<p>
-							<label for="<?php echo esc_attr( $id_base ); ?>_highlight"><strong><?php esc_html_e( 'Titel highlight (goud)', 'tqs-theme' ); ?></strong></label>
+							<label for="<?php echo esc_attr( $id_base ); ?>_highlight"><strong><?php esc_html_e( 'Title highlight (gold)', 'tqs-theme' ); ?></strong></label>
 							<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_highlight" name="<?php echo esc_attr( $prefix ); ?>[highlight]" value="<?php echo esc_attr( $slide['highlight'] ); ?>">
 						</p>
 					</div>
 
 					<p>
-						<label for="<?php echo esc_attr( $id_base ); ?>_subtitle"><strong><?php esc_html_e( 'Subtitel', 'tqs-theme' ); ?></strong></label>
+						<label for="<?php echo esc_attr( $id_base ); ?>_subtitle"><strong><?php esc_html_e( 'Subtitle', 'tqs-theme' ); ?></strong></label>
 						<textarea class="widefat" rows="3" id="<?php echo esc_attr( $id_base ); ?>_subtitle" name="<?php echo esc_attr( $prefix ); ?>[subtitle]"><?php echo esc_textarea( $slide['subtitle'] ); ?></textarea>
 					</p>
 
 					<p>
 						<label>
 							<input type="checkbox" class="tqs-hero-override-btns" name="<?php echo esc_attr( $prefix ); ?>[override_buttons]" value="1" <?php checked( ! empty( $slide['override_buttons'] ) ); ?> data-tqs-override-target="<?php echo esc_attr( $id_base ); ?>_btn_fields">
-							<?php esc_html_e( 'Standaardknoppen overschrijven voor deze slide', 'tqs-theme' ); ?>
+							<?php esc_html_e( 'Override default buttons for this slide', 'tqs-theme' ); ?>
 						</label>
 					</p>
 
 					<div class="tqs-hero-slide-btn-fields" id="<?php echo esc_attr( $id_base ); ?>_btn_fields" <?php echo ! empty( $slide['override_buttons'] ) ? '' : 'hidden'; ?>>
 						<div class="tqs-hero-grid-2">
 							<p>
-								<label for="<?php echo esc_attr( $id_base ); ?>_btn1_text"><strong><?php esc_html_e( 'Knop 1 tekst', 'tqs-theme' ); ?></strong></label>
+								<label for="<?php echo esc_attr( $id_base ); ?>_btn1_text"><strong><?php esc_html_e( 'Button 1 text', 'tqs-theme' ); ?></strong></label>
 								<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_btn1_text" name="<?php echo esc_attr( $prefix ); ?>[btn1_text]" value="<?php echo esc_attr( $slide['btn1_text'] ); ?>">
 							</p>
 							<p>
-								<label for="<?php echo esc_attr( $id_base ); ?>_btn1_url"><strong><?php esc_html_e( 'Knop 1 URL', 'tqs-theme' ); ?></strong></label>
-								<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_btn1_url" name="<?php echo esc_attr( $prefix ); ?>[btn1_url]" value="<?php echo esc_attr( $slide['btn1_url'] ); ?>" placeholder="<?php esc_attr_e( 'bijv. /contact of https://…', 'tqs-theme' ); ?>">
+								<label for="<?php echo esc_attr( $id_base ); ?>_btn1_url"><strong><?php esc_html_e( 'Button 1 URL', 'tqs-theme' ); ?></strong></label>
+								<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_btn1_url" name="<?php echo esc_attr( $prefix ); ?>[btn1_url]" value="<?php echo esc_attr( $slide['btn1_url'] ); ?>" placeholder="<?php esc_attr_e( 'e.g. /contact or https://…', 'tqs-theme' ); ?>">
 							</p>
 							<p>
-								<label for="<?php echo esc_attr( $id_base ); ?>_btn2_text"><strong><?php esc_html_e( 'Knop 2 tekst', 'tqs-theme' ); ?></strong></label>
+								<label for="<?php echo esc_attr( $id_base ); ?>_btn2_text"><strong><?php esc_html_e( 'Button 2 text', 'tqs-theme' ); ?></strong></label>
 								<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_btn2_text" name="<?php echo esc_attr( $prefix ); ?>[btn2_text]" value="<?php echo esc_attr( $slide['btn2_text'] ); ?>">
 							</p>
 							<p>
-								<label for="<?php echo esc_attr( $id_base ); ?>_btn2_url"><strong><?php esc_html_e( 'Knop 2 URL', 'tqs-theme' ); ?></strong></label>
-								<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_btn2_url" name="<?php echo esc_attr( $prefix ); ?>[btn2_url]" value="<?php echo esc_attr( $slide['btn2_url'] ); ?>" placeholder="<?php esc_attr_e( 'bijv. /onze-diensten of https://…', 'tqs-theme' ); ?>">
+								<label for="<?php echo esc_attr( $id_base ); ?>_btn2_url"><strong><?php esc_html_e( 'Button 2 URL', 'tqs-theme' ); ?></strong></label>
+								<input type="text" class="widefat" id="<?php echo esc_attr( $id_base ); ?>_btn2_url" name="<?php echo esc_attr( $prefix ); ?>[btn2_url]" value="<?php echo esc_attr( $slide['btn2_url'] ); ?>" placeholder="<?php esc_attr_e( 'e.g. /onze-diensten or https://…', 'tqs-theme' ); ?>">
 							</p>
 						</div>
 					</div>
@@ -497,34 +497,34 @@ function tqs_render_hero_settings_meta_box( $post ) {
 		<!-- Field Group B — Page Hero -->
 		<div class="tqs-hero-field-group" id="tqs-hero-group-page" data-tqs-hero-group="page_hero" hidden>
 			<h3><?php esc_html_e( 'Page Hero', 'tqs-theme' ); ?></h3>
-			<p class="description"><?php esc_html_e( 'Eenvoudige hero met één afbeelding voor een binnenpagina.', 'tqs-theme' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Simple hero with a single image for an inner page.', 'tqs-theme' ); ?></p>
 
-			<p><strong><?php esc_html_e( 'Afbeelding', 'tqs-theme' ); ?></strong></p>
+			<p><strong><?php esc_html_e( 'Image', 'tqs-theme' ); ?></strong></p>
 			<?php
 			tqs_hero_render_image_field(
 				'tqs_page_hero[image_id]',
 				'tqs_page_hero_image_id',
 				isset( $page_hero['image_id'] ) ? (int) $page_hero['image_id'] : 0,
-				__( 'Kies afbeelding', 'tqs-theme' )
+				__( 'Choose Image', 'tqs-theme' )
 			);
 			?>
 
 			<p>
-				<label for="tqs_page_hero_title"><strong><?php esc_html_e( 'Titel', 'tqs-theme' ); ?></strong></label>
+				<label for="tqs_page_hero_title"><strong><?php esc_html_e( 'Title', 'tqs-theme' ); ?></strong></label>
 				<input type="text" class="widefat" id="tqs_page_hero_title" name="tqs_page_hero[title]" value="<?php echo esc_attr( $page_hero['title'] ); ?>">
 			</p>
 			<p>
-				<label for="tqs_page_hero_subtitle"><strong><?php esc_html_e( 'Subtitel', 'tqs-theme' ); ?></strong></label>
+				<label for="tqs_page_hero_subtitle"><strong><?php esc_html_e( 'Subtitle', 'tqs-theme' ); ?></strong></label>
 				<textarea class="widefat" rows="3" id="tqs_page_hero_subtitle" name="tqs_page_hero[subtitle]"><?php echo esc_textarea( $page_hero['subtitle'] ); ?></textarea>
 			</p>
 			<div class="tqs-hero-grid-2">
 				<p>
-					<label for="tqs_page_hero_btn_text"><strong><?php esc_html_e( 'CTA knoptekst (optioneel)', 'tqs-theme' ); ?></strong></label>
+					<label for="tqs_page_hero_btn_text"><strong><?php esc_html_e( 'CTA button text (optional)', 'tqs-theme' ); ?></strong></label>
 					<input type="text" class="widefat" id="tqs_page_hero_btn_text" name="tqs_page_hero[btn_text]" value="<?php echo esc_attr( $page_hero['btn_text'] ); ?>">
 				</p>
 				<p>
-					<label for="tqs_page_hero_btn_url"><strong><?php esc_html_e( 'CTA knop URL', 'tqs-theme' ); ?></strong></label>
-					<input type="text" class="widefat" id="tqs_page_hero_btn_url" name="tqs_page_hero[btn_url]" value="<?php echo esc_attr( $page_hero['btn_url'] ); ?>" placeholder="<?php esc_attr_e( 'bijv. /contact of https://…', 'tqs-theme' ); ?>">
+					<label for="tqs_page_hero_btn_url"><strong><?php esc_html_e( 'CTA button URL', 'tqs-theme' ); ?></strong></label>
+					<input type="text" class="widefat" id="tqs_page_hero_btn_url" name="tqs_page_hero[btn_url]" value="<?php echo esc_attr( $page_hero['btn_url'] ); ?>" placeholder="<?php esc_attr_e( 'e.g. /contact or https://…', 'tqs-theme' ); ?>">
 				</p>
 			</div>
 		</div>

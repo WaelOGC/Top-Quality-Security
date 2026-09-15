@@ -236,15 +236,15 @@ function tqs_about_render_item_row( $name_prefix, $index, $item ) {
 	?>
 	<div class="tqs-about-item" style="border:1px solid #dcdcde;padding:12px;margin-bottom:10px;background:#fff;">
 		<p>
-			<label><strong><?php esc_html_e( 'Icoon (Font Awesome class)', 'tqs-theme' ); ?></strong></label><br>
+			<label><strong><?php esc_html_e( 'Icon (Font Awesome class)', 'tqs-theme' ); ?></strong></label><br>
 			<input type="text" class="widefat" name="<?php echo esc_attr( $name_prefix . '[' . $index . '][icon]' ); ?>" value="<?php echo esc_attr( $icon ); ?>" placeholder="fa-handshake">
 		</p>
 		<p>
-			<label><strong><?php esc_html_e( 'Titel', 'tqs-theme' ); ?></strong></label><br>
+			<label><strong><?php esc_html_e( 'Title', 'tqs-theme' ); ?></strong></label><br>
 			<input type="text" class="widefat" name="<?php echo esc_attr( $name_prefix . '[' . $index . '][title]' ); ?>" value="<?php echo esc_attr( $title ); ?>">
 		</p>
 		<p>
-			<label><strong><?php esc_html_e( 'Beschrijving', 'tqs-theme' ); ?></strong></label><br>
+			<label><strong><?php esc_html_e( 'Description', 'tqs-theme' ); ?></strong></label><br>
 			<textarea class="widefat" rows="2" name="<?php echo esc_attr( $name_prefix . '[' . $index . '][desc]' ); ?>"><?php echo esc_textarea( $desc ); ?></textarea>
 		</p>
 	</div>
@@ -279,29 +279,29 @@ function tqs_render_about_meta_box( $post ) {
 		<p>
 			<label>
 				<input type="checkbox" name="tqs_about_layout" value="1" <?php checked( $layout_on ); ?>>
-				<strong><?php esc_html_e( 'Gebruik About-pagina layout (verhaal + kernwaarden + garanties)', 'tqs-theme' ); ?></strong>
+				<strong><?php esc_html_e( 'Use About page layout (story + core values + guarantees)', 'tqs-theme' ); ?></strong>
 			</label>
 		</p>
 
-		<h3><?php esc_html_e( 'Ons Verhaal — afbeelding', 'tqs-theme' ); ?></h3>
-		<p class="description"><?php esc_html_e( 'Afbeelding links naast de verhaaltekst.', 'tqs-theme' ); ?></p>
+		<h3><?php esc_html_e( 'Our Story — image', 'tqs-theme' ); ?></h3>
+		<p class="description"><?php esc_html_e( 'Image on the left beside the story text.', 'tqs-theme' ); ?></p>
 		<?php
 		if ( function_exists( 'tqs_hero_render_image_field' ) ) {
 			tqs_hero_render_image_field(
 				'tqs_story_image_id',
 				'tqs_story_image_id',
 				$story_id,
-				__( 'Kies afbeelding', 'tqs-theme' )
+				__( 'Choose Image', 'tqs-theme' )
 			);
 		}
 		?>
 
-		<h3><?php esc_html_e( 'Onze Kernwaarden', 'tqs-theme' ); ?></h3>
+		<h3><?php esc_html_e( 'Our Core Values', 'tqs-theme' ); ?></h3>
 		<?php foreach ( $values as $i => $item ) : ?>
 			<?php tqs_about_render_item_row( 'tqs_about_values', (int) $i, $item ); ?>
 		<?php endforeach; ?>
 
-		<h3><?php esc_html_e( 'Garanties-balk', 'tqs-theme' ); ?></h3>
+		<h3><?php esc_html_e( 'Guarantees bar', 'tqs-theme' ); ?></h3>
 		<?php foreach ( $guarantees as $i => $item ) : ?>
 			<?php tqs_about_render_item_row( 'tqs_about_guarantees', (int) $i, $item ); ?>
 		<?php endforeach; ?>
