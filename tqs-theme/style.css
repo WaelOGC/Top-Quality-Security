@@ -4,7 +4,7 @@ Theme URI: https://topqualitysecurity.com/
 Author: Top Quality Security Dev Team
 Author URI: https://topqualitysecurity.com/
 Description: Custom standalone WordPress theme for Top Quality Security — a professional security services company in Den Haag, Netherlands. Elementor-compatible, SEO-optimised, GDPR-compliant.
-Version: 2.9.1
+Version: 2.9.2
 Requires at least: 6.0
 Requires PHP: 8.0
 Text Domain: tqs-theme
@@ -141,19 +141,19 @@ button { font-family: inherit; cursor: pointer; }
 /* ==========================================================================
    6. HERO SLIDER (Homepage)
    ========================================================================== */
-.tqs-hero { position: relative; min-height: 760px; display: flex; align-items: center; overflow: hidden; background: #1A0533; }
-.tqs-hero-slide { position: absolute; inset: 0; display: none; align-items: center; }
+.tqs-hero { position: relative; min-height: 760px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #1A0533; }
+.tqs-hero-slide { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
 .tqs-hero-slide.is-active { display: flex; }
 .tqs-hero-slide-bg { position: absolute; inset: 0; }
 .tqs-hero-illustration { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 7%; pointer-events: none; }
 .tqs-hero-illustration .tqs-badge-icon { position: absolute; top: -8px; right: -16px; width: 50px; height: 50px; border-radius: 50%; background: var(--tqs-gold); display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 22px rgba(0,0,0,0.28); }
-.tqs-hero-overlay { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(26,5,51,0.94) 20%, rgba(45,10,78,0.72) 55%, rgba(45,10,78,0.5) 100%); }
-.tqs-hero-content { position: relative; z-index: 2; max-width: 680px; padding: 60px 90px; }
-.tqs-hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,151,58,0.15); border: 1px solid var(--tqs-gold); color: var(--tqs-gold-light); font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 30px; margin-bottom: 24px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-.tqs-hero-h1 { font-weight: 800; font-size: 52px; line-height: 1.12; color: var(--tqs-white); margin: 0 0 22px; }
+.tqs-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(26,5,51,0.55) 0%, rgba(26,5,51,0.4) 45%, rgba(26,5,51,0.6) 100%); }
+.tqs-hero-content { position: relative; z-index: 2; max-width: 680px; padding: 60px 90px; text-align: center; margin: 0 auto; }
+.tqs-hero-badge { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: rgba(201,151,58,0.15); border: 1px solid var(--tqs-gold); color: var(--tqs-gold-light); font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 30px; margin: 0 auto 24px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.tqs-hero-h1 { font-weight: 800; font-size: 52px; line-height: 1.12; color: var(--tqs-white); margin: 0 0 22px; text-shadow: 0 2px 16px rgba(26,5,51,0.55); }
 .tqs-hero-h1 span { color: var(--tqs-gold); }
-.tqs-hero-p { font-size: 17px; line-height: 1.7; color: var(--tqs-muted-light); margin: 0 0 36px; max-width: 540px; }
-.tqs-hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+.tqs-hero-p { font-size: 17px; line-height: 1.7; color: var(--tqs-muted-light); margin: 0 auto 36px; max-width: 540px; text-shadow: 0 1px 10px rgba(26,5,51,0.45); }
+.tqs-hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-left: auto; margin-right: auto; }
 .tqs-slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: var(--tqs-white); font-size: 18px; cursor: pointer; z-index: 3; transition: all .2s; }
 .tqs-arrow-prev { left: 20px; }
 .tqs-arrow-next { right: 20px; }
@@ -298,7 +298,7 @@ button { font-family: inherit; cursor: pointer; }
 		object-position: center 10%;
 	}
 }
-.tqs-whyus-h2 { font-weight: 800; font-size: 36px; color: var(--tqs-primary); margin: 0 0 20px; line-height: 1.2; }
+.tqs-whyus-h2 { font-weight: 800; font-size: 29px; color: var(--tqs-primary); margin: 0 0 20px; line-height: 1.2; }
 .tqs-whyus-text { font-size: 16px; line-height: 1.75; color: var(--tqs-text); margin: 0; }
 .tqs-whyus-cards {
 	display: grid;

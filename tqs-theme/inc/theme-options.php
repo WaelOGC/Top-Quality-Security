@@ -30,12 +30,44 @@ function tqs_get_brand_color_defaults() {
  */
 function tqs_get_default_why_us_cards() {
 	return array(
-		array( 'icon' => 'fa-shield-halved', 'title' => 'ND 7099 Gecertificeerd', 'desc' => 'Voldoen aan de hoogste kwaliteitsnorm in de beveiligingsbranche.' ),
-		array( 'icon' => 'fa-graduation-cap', 'title' => 'Ervaren Personeel', 'desc' => 'Goed opgeleide, representatieve beveiligers met jarenlange ervaring.' ),
-		array( 'icon' => 'fa-clock', 'title' => '24/7 Beschikbaar', 'desc' => 'Altijd bereikbaar, ook buiten kantoortijden en in het weekend.' ),
-		array( 'icon' => 'fa-gear', 'title' => 'Maatwerk Oplossingen', 'desc' => 'Beveiligingsplannen afgestemd op de specifieke situatie van uw organisatie.' ),
+		array( 'icon' => 'fa-shield-halved', 'title' => 'ND 7099 Gecertificeerd', 'desc' => 'Voldoen aan de hoogste kwaliteitsnorm in de beveiligingsbranche, jaarlijks getoetst en gecontroleerd door een erkende certificerende instelling.' ),
+		array( 'icon' => 'fa-graduation-cap', 'title' => 'Ervaren Personeel', 'desc' => 'Goed opgeleide, representatieve beveiligers met jarenlange ervaring in uiteenlopende sectoren, van retail tot evenementen.' ),
+		array( 'icon' => 'fa-clock', 'title' => '24/7 Beschikbaar', 'desc' => 'Altijd bereikbaar, ook buiten kantoortijden, in het weekend en tijdens feestdagen — voor spoedsituaties en vaste inzet.' ),
+		array( 'icon' => 'fa-gear', 'title' => 'Maatwerk Oplossingen', 'desc' => 'Beveiligingsplannen volledig afgestemd op de specifieke situatie, risico\'s en wensen van uw organisatie of locatie.' ),
 	);
 }
+
+/**
+ * One-time: upgrade Why-Us card descriptions that still match the old short defaults.
+ * Does not overwrite admin-edited Customizer values.
+ */
+function tqs_migrate_why_us_card_copy_v292() {
+	if ( get_option( 'tqs_why_us_copy_migrated_v292' ) ) {
+		return;
+	}
+
+	$old = array(
+		0 => 'Voldoen aan de hoogste kwaliteitsnorm in de beveiligingsbranche.',
+		1 => 'Goed opgeleide, representatieve beveiligers met jarenlange ervaring.',
+		2 => 'Altijd bereikbaar, ook buiten kantoortijden en in het weekend.',
+		3 => 'Beveiligingsplannen afgestemd op de specifieke situatie van uw organisatie.',
+	);
+	$new = tqs_get_default_why_us_cards();
+
+	for ( $i = 0; $i < 4; $i++ ) {
+		$key     = "tqs_why_{$i}_desc";
+		$current = get_theme_mod( $key, null );
+		if ( null === $current || false === $current || '' === $current ) {
+			continue;
+		}
+		if ( (string) $current === $old[ $i ] ) {
+			set_theme_mod( $key, $new[ $i ]['desc'] );
+		}
+	}
+
+	update_option( 'tqs_why_us_copy_migrated_v292', 1, false );
+}
+add_action( 'init', 'tqs_migrate_why_us_card_copy_v292', 25 );
 
 function tqs_sanitize_hex_color( $color ) {
 	$color = sanitize_hex_color( $color );
