@@ -50,6 +50,8 @@
 					'container'      => false,
 					'items_wrap'     => '%3$s',
 					'link_before'    => '',
+					'depth'          => 2,
+					'walker'         => new TQS_Primary_Nav_Walker(),
 					'fallback_cb'    => 'tqs_fallback_primary_menu',
 				) );
 			} else {
