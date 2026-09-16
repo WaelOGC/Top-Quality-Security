@@ -18,7 +18,7 @@ function tqs_theme_version() {
 	static $version = null;
 	if ( null === $version ) {
 		$theme   = wp_get_theme();
-		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.9.2';
+		$version = $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '2.10.0';
 	}
 	return $version;
 }
@@ -959,6 +959,190 @@ function tqs_add_meta_boxes() {
 	add_meta_box( 'tqs_gallery_box', __( '🖼️ Gallery Images', 'tqs-theme' ), 'tqs_render_gallery_box', 'page', 'normal', 'high' );
 }
 add_action( 'add_meta_boxes', 'tqs_add_meta_boxes' );
+
+/**
+ * Default FAQ items (fallback when no meta saved yet).
+ *
+ * @return array<int, array{question: string, answer: string}>
+ */
+function tqs_get_default_faq_items() {
+	return array(
+		array(
+			'question' => 'Wat is Top Quality Security (TQS)?',
+			'answer'   => 'TQS is een professionele beveiligingsorganisatie gevestigd in Den Haag, actief door heel Nederland, gespecialiseerd in maatwerk beveiligingsoplossingen voor bedrijven, instellingen en evenementen.',
+		),
+		array(
+			'question' => 'Is TQS gecertificeerd?',
+			'answer'   => 'Ja, TQS is een erkend leerbedrijf en voldoet aan de ND 7099-norm, de kwaliteitsnorm voor particuliere beveiligingsorganisaties in Nederland.',
+		),
+		array(
+			'question' => 'Welke beveiligingsdiensten biedt TQS aan?',
+			'answer'   => 'TQS biedt onder andere Retailbeveiliging, Horecabeveiliging, Evenementenbeveiliging, Hotelbeveiliging, Objectbeveiliging, Supermarktbeveiliging en Casino\'s Beveiliging.',
+		),
+		array(
+			'question' => 'In welke regio\'s is TQS actief?',
+			'answer'   => 'TQS is gevestigd in Den Haag en actief door heel Nederland.',
+		),
+		array(
+			'question' => 'Hoe snel ontvang ik een offerte?',
+			'answer'   => 'In de regel ontvangt u binnen één werkdag een vrijblijvend voorstel op maat.',
+		),
+		array(
+			'question' => 'Is TQS ook buiten kantoortijden bereikbaar?',
+			'answer'   => 'Onze reguliere kantooruren zijn maandag t/m vrijdag van 09:00 tot 18:00, met het weekend op afspraak. Voor lopende opdrachten zijn wij 24/7 bereikbaar.',
+		),
+		array(
+			'question' => 'Kan ik beveiliging inhuren voor een eenmalig evenement?',
+			'answer'   => 'Ja, naast structurele inzet verzorgt TQS ook beveiliging voor eenmalige evenementen, piekmomenten en feestdagen.',
+		),
+		array(
+			'question' => 'Hoe kan ik contact opnemen met TQS?',
+			'answer'   => 'U kunt ons bereiken via telefoon, e-mail, WhatsApp of het contactformulier op onze website.',
+		),
+	);
+}
+
+/**
+ * Sanitize FAQ items array (max 10 rows).
+ *
+ * @param mixed $raw Raw POST/meta value.
+ * @return array<int, array{question: string, answer: string}>
+ */
+function tqs_sanitize_faq_items( $raw ) {
+	$out = array();
+	if ( ! is_array( $raw ) ) {
+		return $out;
+	}
+
+	$count = 0;
+	foreach ( $raw as $row ) {
+		if ( $count >= 10 ) {
+			break;
+		}
+		if ( ! is_array( $row ) ) {
+			continue;
+		}
+		$question = isset( $row['question'] ) ? sanitize_text_field( (string) $row['question'] ) : '';
+		$answer   = isset( $row['answer'] ) ? wp_kses_post( (string) $row['answer'] ) : '';
+		if ( '' === $question && '' === $answer ) {
+			continue;
+		}
+		$out[] = array(
+			'question' => $question,
+			'answer'   => $answer,
+		);
+		$count++;
+	}
+
+	return $out;
+}
+
+/**
+ * FAQ items for a page (saved meta or defaults).
+ *
+ * @param int $post_id Page ID.
+ * @return array<int, array{question: string, answer: string}>
+ */
+function tqs_get_faq_items( $post_id ) {
+	$post_id = absint( $post_id );
+	if ( ! $post_id || ! metadata_exists( 'post', $post_id, '_tqs_faq_items' ) ) {
+		return tqs_get_default_faq_items();
+	}
+	$stored = get_post_meta( $post_id, '_tqs_faq_items', true );
+	$items  = tqs_sanitize_faq_items( $stored );
+	return ! empty( $items ) ? $items : tqs_get_default_faq_items();
+}
+
+/**
+ * Register FAQ Items meta box only on pages using page-faq.php.
+ *
+ * @param string       $post_type Post type.
+ * @param WP_Post|null $post      Current post.
+ */
+function tqs_add_faq_meta_box( $post_type, $post = null ) {
+	if ( 'page' !== $post_type ) {
+		return;
+	}
+
+	$post_id = ( $post instanceof WP_Post ) ? (int) $post->ID : 0;
+	if ( ! $post_id && isset( $_GET['post'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_id = absint( $_GET['post'] );
+	}
+	if ( ! $post_id || 'page-faq.php' !== get_page_template_slug( $post_id ) ) {
+		return;
+	}
+
+	add_meta_box(
+		'tqs_faq_items_box',
+		__( 'FAQ Items', 'tqs-theme' ),
+		'tqs_render_faq_meta_box',
+		'page',
+		'normal',
+		'high'
+	);
+}
+add_action( 'add_meta_boxes', 'tqs_add_faq_meta_box', 10, 2 );
+
+/**
+ * Render FAQ Items meta box (up to 10 Q&A pairs).
+ *
+ * @param WP_Post $post Current post.
+ */
+function tqs_render_faq_meta_box( $post ) {
+	wp_nonce_field( 'tqs_save_faq_items', 'tqs_faq_items_nonce' );
+
+	$items = metadata_exists( 'post', $post->ID, '_tqs_faq_items' )
+		? tqs_sanitize_faq_items( get_post_meta( $post->ID, '_tqs_faq_items', true ) )
+		: tqs_get_default_faq_items();
+
+	while ( count( $items ) < 10 ) {
+		$items[] = array( 'question' => '', 'answer' => '' );
+	}
+	$items = array_slice( $items, 0, 10 );
+	?>
+	<p class="description"><?php esc_html_e( 'Up to 10 FAQ items. Leave unused rows blank — empty pairs are not shown on the front end.', 'tqs-theme' ); ?></p>
+	<?php for ( $i = 0; $i < 10; $i++ ) : ?>
+		<div style="border:1px solid #dcdcde;padding:12px;margin-bottom:10px;background:#fff;">
+			<p>
+				<label for="tqs_faq_q_<?php echo esc_attr( (string) $i ); ?>"><strong><?php echo esc_html( sprintf( __( 'Question %d', 'tqs-theme' ), $i + 1 ) ); ?></strong></label><br>
+				<input type="text" class="widefat" id="tqs_faq_q_<?php echo esc_attr( (string) $i ); ?>" name="tqs_faq_items[<?php echo esc_attr( (string) $i ); ?>][question]" value="<?php echo esc_attr( $items[ $i ]['question'] ); ?>">
+			</p>
+			<p>
+				<label for="tqs_faq_a_<?php echo esc_attr( (string) $i ); ?>"><strong><?php echo esc_html( sprintf( __( 'Answer %d', 'tqs-theme' ), $i + 1 ) ); ?></strong></label><br>
+				<textarea class="widefat" rows="3" id="tqs_faq_a_<?php echo esc_attr( (string) $i ); ?>" name="tqs_faq_items[<?php echo esc_attr( (string) $i ); ?>][answer]"><?php echo esc_textarea( $items[ $i ]['answer'] ); ?></textarea>
+			</p>
+		</div>
+	<?php endfor; ?>
+	<?php
+}
+
+/**
+ * Save FAQ Items meta.
+ *
+ * @param int $post_id Post ID.
+ */
+function tqs_save_faq_meta_box( $post_id ) {
+	if ( ! isset( $_POST['tqs_faq_items_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tqs_faq_items_nonce'] ) ), 'tqs_save_faq_items' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( wp_is_post_revision( $post_id ) ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+	if ( 'page' !== get_post_type( $post_id ) ) {
+		return;
+	}
+
+	$raw   = isset( $_POST['tqs_faq_items'] ) ? wp_unslash( $_POST['tqs_faq_items'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$items = tqs_sanitize_faq_items( is_array( $raw ) ? $raw : array() );
+	update_post_meta( $post_id, '_tqs_faq_items', $items );
+}
+add_action( 'save_post_page', 'tqs_save_faq_meta_box' );
 
 function tqs_render_page_options_box( $post ) {
 	wp_nonce_field( 'tqs_save_meta', 'tqs_meta_nonce' );

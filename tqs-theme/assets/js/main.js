@@ -26,6 +26,11 @@
 			$('#tqsMobileServicesChevron').text(isOpen ? '▼' : '▲');
 		});
 
+		/* FAQ accordion (independent toggles, same pattern as mobile sub) */
+		$(document).on('click', '.tqs-faq-q', function () {
+			$(this).closest('.tqs-faq-item').toggleClass('is-open');
+		});
+
 		/* Desktop nav dropdowns (click toggle) */
 		var $navDropdownWraps = $('.tqs-nav-dropdown-wrap');
 
